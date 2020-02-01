@@ -1,0 +1,72 @@
+# Ignore all files in root dir with a prefix
+/*.*
+
+# Files which are NOT to ignore
+!.gitignore
+!.gitmodules
+!*.md
+!*.yml
+!CMakeLists.txt
+!package.xml
+
+# Ignore all files in src dir with a prefix
+/src/*.*
+
+# Files in the src dir which are NOT to ignore
+!/src/*.c
+!/src/*.cc
+!/src/*.cpp
+!/src/*.h
+!/src/*.hpp
+!/src/*.md
+
+# Ignore all files in proto dir
+/proto/*
+
+# Files in the proto dir which are NOT to ignore
+!/proto/*.proto
+!/proto/*.sila.xml
+
+# Executables
+*.exe
+
+# Library files
+*.so
+*.a
+*.dll
+*.lib
+
+# Generated files
+*.class
+*.jar
+[Cc]onfig.h
+[Cc]onfig.java
+
+# Temporary and core files
+~*
+core
+
+# NetBeans project directories and files
+dist/
+private/
+nbproject/
+
+# CMake generated directories and files
+CMakeFiles/
+Testing/
+[Bb]uild/
+[Rr]elease/
+Makefile
+*.cmake
+
+# Visual Studio project directories and files
+.vs/
+out/
+
+# Doxygen generated documentation files
+/doc/html/
+/doc/latex/
+/doc/docbook/
+/doc/xml/
+/doc/man/
+/doc/rtf/
