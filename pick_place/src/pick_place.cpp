@@ -90,8 +90,8 @@ void pick(moveit::planning_interface::MoveGroupInterface& move_group) {
     tf2::Quaternion orientation;
     orientation.setRPY(-M_PI, 0, -M_PI / 4);
     grasps[0].grasp_pose.pose.orientation = tf2::toMsg(orientation);
-    grasps[0].grasp_pose.pose.position.x = 0.6;
-    grasps[0].grasp_pose.pose.position.y = -0.5;
+    grasps[0].grasp_pose.pose.position.x = 0.425;
+    grasps[0].grasp_pose.pose.position.y = 0.6;
     grasps[0].grasp_pose.pose.position.z = 0.25;
 
     // Setting pre-grasp approach
@@ -143,8 +143,8 @@ void place(moveit::planning_interface::MoveGroupInterface& group) {
     place_location[0].place_pose.pose.orientation = tf2::toMsg(orientation);
 
     /* While placing it is the exact location of the center of the object. */
-    place_location[0].place_pose.pose.position.x = 0.2;
-    place_location[0].place_pose.pose.position.y = 0.4;
+    place_location[0].place_pose.pose.position.x = -0.6;
+    place_location[0].place_pose.pose.position.y = 0.2;
     place_location[0].place_pose.pose.position.z = 0.025;
 
     // Setting pre-place approach
@@ -191,15 +191,15 @@ void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& pla
     collision_objects[0].primitives.resize(1);
     collision_objects[0].primitives[0].type = collision_objects[0].primitives[0].BOX;
     collision_objects[0].primitives[0].dimensions.resize(3);
-    collision_objects[0].primitives[0].dimensions[0] = 0.8; // length
-    collision_objects[0].primitives[0].dimensions[1] = 0.6; // width
-    collision_objects[0].primitives[0].dimensions[2] = 0.1; // height
+    collision_objects[0].primitives[0].dimensions[0] = 2.0; // length
+    collision_objects[0].primitives[0].dimensions[1] = 0.8; // width
+    collision_objects[0].primitives[0].dimensions[2] = 0.05; // height
 
     /* Define the pose of the table. */
     collision_objects[0].primitive_poses.resize(1);
-    collision_objects[0].primitive_poses[0].position.x = 0.8;
-    collision_objects[0].primitive_poses[0].position.y = -0.6;
-    collision_objects[0].primitive_poses[0].position.z = 0.05;
+    collision_objects[0].primitive_poses[0].position.x = 0.0;
+    collision_objects[0].primitive_poses[0].position.y = 0.0;
+    collision_objects[0].primitive_poses[0].position.z = -0.025;
 
     collision_objects[0].operation = collision_objects[0].ADD;
 
@@ -212,13 +212,13 @@ void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& pla
     collision_objects[1].primitives[0].type = collision_objects[1].primitives[0].BOX;
     collision_objects[1].primitives[0].dimensions.resize(3);
     collision_objects[1].primitives[0].dimensions[0] = 0.8;
-    collision_objects[1].primitives[0].dimensions[1] = 2.0;
+    collision_objects[1].primitives[0].dimensions[1] = 1.2;
     collision_objects[1].primitives[0].dimensions[2] = 0.05;
 
     /* Define the pose of the table. */
     collision_objects[1].primitive_poses.resize(1);
-    collision_objects[1].primitive_poses[0].position.x = 0.0;
-    collision_objects[1].primitive_poses[0].position.y = 0.0;
+    collision_objects[1].primitive_poses[0].position.x = 0.6;
+    collision_objects[1].primitive_poses[0].position.y = 1.0;
     collision_objects[1].primitive_poses[0].position.z = -0.025;
 
     collision_objects[1].operation = collision_objects[1].ADD;
@@ -237,9 +237,9 @@ void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& pla
 
     /* Define the pose of the object. */
     collision_objects[2].primitive_poses.resize(1);
-    collision_objects[2].primitive_poses[0].position.x = 0.6;
-    collision_objects[2].primitive_poses[0].position.y = -0.5;
-    collision_objects[2].primitive_poses[0].position.z = 0.1 + WELLS_HEIGHT_IN_M / 2.0;
+    collision_objects[2].primitive_poses[0].position.x = 0.425;
+    collision_objects[2].primitive_poses[0].position.y = 0.6;
+    collision_objects[2].primitive_poses[0].position.z = 0.01 + WELLS_HEIGHT_IN_M / 2.0;
     // END_SUB_TUTORIAL
 
     collision_objects[2].operation = collision_objects[2].ADD;
