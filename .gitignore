@@ -9,17 +9,6 @@
 !CMakeLists.txt
 !package.xml
 
-# Ignore all files in src dir with a prefix
-/src/*.*
-
-# Files in the src dir which are NOT to ignore
-!/src/*.c
-!/src/*.cc
-!/src/*.cpp
-!/src/*.h
-!/src/*.hpp
-!/src/*.md
-
 # Ignore all files in proto dir
 /proto/*
 

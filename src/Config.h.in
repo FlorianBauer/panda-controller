@@ -1,0 +1,14 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
+// The build properties from CMake. 
+#define VERSION_MAJOR @panda_controller_VERSION_MAJOR@
+#define VERSION_MINOR @panda_controller_VERSION_MINOR@
+#define VERSION_PATCH @panda_controller_VERSION_PATCH@
+#define EXECUTABLE_NAME "@EXECUTABLE_NAME@"
+#define BUILD_TYPE "@CMAKE_BUILD_TYPE@"
+#define BUILD_TIMESTAMP "@BUILD_TIMESTAMP@"
+#define COMPILER_ID "@CMAKE_CXX_COMPILER_ID@"
+#define COMPILER_VERSION "@CMAKE_CXX_COMPILER_VERSION@"
+
+#endif // CONFIG_H
