@@ -90,8 +90,8 @@ void pick(moveit::planning_interface::MoveGroupInterface& move_group) {
     tf2::Quaternion orientation;
     orientation.setRPY(-M_PI, 0, -M_PI / 4);
     grasps[0].grasp_pose.pose.orientation = tf2::toMsg(orientation);
-    grasps[0].grasp_pose.pose.position.x = 0.425;
-    grasps[0].grasp_pose.pose.position.y = 0.6;
+    grasps[0].grasp_pose.pose.position.x = 0.15 + WELLS_LENGTH_IN_M / 2.0;
+    grasps[0].grasp_pose.pose.position.y = 0.50;
     grasps[0].grasp_pose.pose.position.z = 0.25;
 
     // Setting pre-grasp approach
@@ -143,7 +143,7 @@ void place(moveit::planning_interface::MoveGroupInterface& group) {
     place_location[0].place_pose.pose.orientation = tf2::toMsg(orientation);
 
     /* While placing it is the exact location of the center of the object. */
-    place_location[0].place_pose.pose.position.x = -0.6;
+    place_location[0].place_pose.pose.position.x = -0.4;
     place_location[0].place_pose.pose.position.y = 0.2;
     place_location[0].place_pose.pose.position.z = 0.025;
 
@@ -177,79 +177,119 @@ void place(moveit::planning_interface::MoveGroupInterface& group) {
 }
 
 void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& planning_scene_interface) {
-    // Creating Environment
-    // ^^^^^^^^^^^^^^^^^^^^
     // Create vector to hold 3 collision objects.
     std::vector<moveit_msgs::CollisionObject> collision_objects;
-    collision_objects.resize(3);
+    collision_objects.resize(6);
 
     // Add the first table where the cube will originally be kept.
     collision_objects[0].id = "table1";
     collision_objects[0].header.frame_id = "panda_link0";
-
-    /* Define the primitive and its dimensions. */
+    // Define the primitive and its dimensions.
     collision_objects[0].primitives.resize(1);
     collision_objects[0].primitives[0].type = collision_objects[0].primitives[0].BOX;
     collision_objects[0].primitives[0].dimensions.resize(3);
-    collision_objects[0].primitives[0].dimensions[0] = 2.0; // length
-    collision_objects[0].primitives[0].dimensions[1] = 0.8; // width
+    collision_objects[0].primitives[0].dimensions[0] = 2.00; // length
+    collision_objects[0].primitives[0].dimensions[1] = 0.70; // width
     collision_objects[0].primitives[0].dimensions[2] = 0.05; // height
-
-    /* Define the pose of the table. */
+    // Define the pose of the table.
     collision_objects[0].primitive_poses.resize(1);
-    collision_objects[0].primitive_poses[0].position.x = 0.0;
-    collision_objects[0].primitive_poses[0].position.y = 0.0;
+    collision_objects[0].primitive_poses[0].position.x = 0.00;
+    collision_objects[0].primitive_poses[0].position.y = 0.00;
     collision_objects[0].primitive_poses[0].position.z = -0.025;
-
     collision_objects[0].operation = collision_objects[0].ADD;
 
     // Add the second table where we will be placing the cube.
     collision_objects[1].id = "table2";
     collision_objects[1].header.frame_id = "panda_link0";
-
-    /* Define the primitive and its dimensions. */
+    // Define the primitive and its dimensions.
     collision_objects[1].primitives.resize(1);
     collision_objects[1].primitives[0].type = collision_objects[1].primitives[0].BOX;
     collision_objects[1].primitives[0].dimensions.resize(3);
-    collision_objects[1].primitives[0].dimensions[0] = 0.8;
-    collision_objects[1].primitives[0].dimensions[1] = 1.2;
+    collision_objects[1].primitives[0].dimensions[0] = 0.90;
+    collision_objects[1].primitives[0].dimensions[1] = 1.20;
     collision_objects[1].primitives[0].dimensions[2] = 0.05;
-
-    /* Define the pose of the table. */
+    // Define the pose of the table.
     collision_objects[1].primitive_poses.resize(1);
-    collision_objects[1].primitive_poses[0].position.x = 0.6;
-    collision_objects[1].primitive_poses[0].position.y = 1.0;
+    collision_objects[1].primitive_poses[0].position.x = 0.55;
+    collision_objects[1].primitive_poses[0].position.y = 0.95;
     collision_objects[1].primitive_poses[0].position.z = -0.025;
-
     collision_objects[1].operation = collision_objects[1].ADD;
 
-    // Define the object that we will be manipulating
+    // Add the centrifuge.
+    constexpr double CENTRIFUGE_DEPTH = 0.605;
+    constexpr double CENTRIFUGE_WIDTH = 0.623;
+    constexpr double CENTRIFUGE_HEIGHT = 0.36;
+    collision_objects[2].id = "centrifuge";
     collision_objects[2].header.frame_id = "panda_link0";
-    collision_objects[2].id = "object";
-
-    /* Define the primitive and its dimensions. */
+    // Define the primitive and its dimensions.
     collision_objects[2].primitives.resize(1);
-    collision_objects[2].primitives[0].type = collision_objects[1].primitives[0].BOX;
+    collision_objects[2].primitives[0].type = collision_objects[2].primitives[0].BOX;
     collision_objects[2].primitives[0].dimensions.resize(3);
-    collision_objects[2].primitives[0].dimensions[0] = WELLS_LENGTH_IN_M;
-    collision_objects[2].primitives[0].dimensions[1] = WELLS_WIDTH_IN_M;
-    collision_objects[2].primitives[0].dimensions[2] = WELLS_HEIGHT_IN_M;
-
-    /* Define the pose of the object. */
+    collision_objects[2].primitives[0].dimensions[0] = CENTRIFUGE_DEPTH;
+    collision_objects[2].primitives[0].dimensions[1] = CENTRIFUGE_WIDTH;
+    collision_objects[2].primitives[0].dimensions[2] = CENTRIFUGE_HEIGHT;
+    // Define the pose of the centrifuge.
     collision_objects[2].primitive_poses.resize(1);
-    collision_objects[2].primitive_poses[0].position.x = 0.425;
-    collision_objects[2].primitive_poses[0].position.y = 0.6;
-    collision_objects[2].primitive_poses[0].position.z = 0.01 + WELLS_HEIGHT_IN_M / 2.0;
-    // END_SUB_TUTORIAL
-
+    collision_objects[2].primitive_poses[0].position.x = CENTRIFUGE_DEPTH / 2.0 + 0.06 + 0.18;
+    collision_objects[2].primitive_poses[0].position.y = 0.00;
+    collision_objects[2].primitive_poses[0].position.z = CENTRIFUGE_HEIGHT / 2.0;
     collision_objects[2].operation = collision_objects[2].ADD;
+
+    // Add the Biomek base.
+    collision_objects[3].id = "biomek0";
+    collision_objects[3].header.frame_id = "panda_link0";
+    // Define the primitive and its dimensions.
+    collision_objects[3].primitives.resize(1);
+    collision_objects[3].primitives[0].type = collision_objects[3].primitives[0].BOX;
+    collision_objects[3].primitives[0].dimensions.resize(3);
+    collision_objects[3].primitives[0].dimensions[0] = 0.60;
+    collision_objects[3].primitives[0].dimensions[1] = 1.00;
+    collision_objects[3].primitives[0].dimensions[2] = 0.20;
+    // Define the pose of the centrifuge.
+    collision_objects[3].primitive_poses.resize(1);
+    collision_objects[3].primitive_poses[0].position.x = 0.30 + 0.30;
+    collision_objects[3].primitive_poses[0].position.y = 0.50 + 0.40;
+    collision_objects[3].primitive_poses[0].position.z = 0.10;
+    collision_objects[3].operation = collision_objects[3].ADD;
+
+    collision_objects[4].id = "biomek1";
+    collision_objects[4].header.frame_id = "panda_link0";
+    // Define the primitive and its dimensions.
+    collision_objects[4].primitives.resize(1);
+    collision_objects[4].primitives[0].type = collision_objects[4].primitives[0].BOX;
+    collision_objects[4].primitives[0].dimensions.resize(3);
+    collision_objects[4].primitives[0].dimensions[0] = 0.60;
+    collision_objects[4].primitives[0].dimensions[1] = 0.05;
+    collision_objects[4].primitives[0].dimensions[2] = 1.20;
+    // Define the pose of the centrifuge.
+    collision_objects[4].primitive_poses.resize(1);
+    collision_objects[4].primitive_poses[0].position.x = 0.30 + 0.30;
+    collision_objects[4].primitive_poses[0].position.y = 0.025 + 0.35;
+    collision_objects[4].primitive_poses[0].position.z = 0.60;
+    collision_objects[4].operation = collision_objects[4].ADD;
+
+    // Define the object that we will be manipulating
+    collision_objects[5].header.frame_id = "panda_link0";
+    collision_objects[5].id = "object";
+    // Define the primitive and its dimensions.
+    collision_objects[5].primitives.resize(1);
+    collision_objects[5].primitives[0].type = collision_objects[5].primitives[0].BOX;
+    collision_objects[5].primitives[0].dimensions.resize(3);
+    collision_objects[5].primitives[0].dimensions[0] = WELLS_LENGTH_IN_M;
+    collision_objects[5].primitives[0].dimensions[1] = WELLS_WIDTH_IN_M;
+    collision_objects[5].primitives[0].dimensions[2] = WELLS_HEIGHT_IN_M;
+    // Define the pose of the object.
+    collision_objects[5].primitive_poses.resize(1);
+    collision_objects[5].primitive_poses[0].position.x = 0.15 + WELLS_LENGTH_IN_M / 2.0;
+    collision_objects[5].primitive_poses[0].position.y = 0.50;
+    collision_objects[5].primitive_poses[0].position.z = 0.01 + WELLS_HEIGHT_IN_M / 2.0;
+    collision_objects[5].operation = collision_objects[5].ADD;
 
     planning_scene_interface.applyCollisionObjects(collision_objects);
 }
 
 int main(int argc, char** argv) {
     ros::init(argc, argv, "panda_arm_pick_place");
-    ros::NodeHandle nh;
     ros::AsyncSpinner spinner(1);
     spinner.start();
 
@@ -264,12 +304,8 @@ int main(int argc, char** argv) {
     ros::WallDuration(1.0).sleep();
 
     pick(group);
-
     ros::WallDuration(1.0).sleep();
-
     place(group);
-
     ros::waitForShutdown();
     return 0;
 }
-
