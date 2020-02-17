@@ -298,14 +298,30 @@ int main(int argc, char** argv) {
     moveit::planning_interface::MoveGroupInterface group("panda_arm");
     group.setPlanningTime(45.0);
 
+    // setup constrains
+    moveit_msgs::OrientationConstraint ocm;
+    ocm.link_name = "panda_link7";
+    ocm.header.frame_id = "panda_link0";
+    tf2::Quaternion orientation;
+    orientation.setRPY(-M_PI, 0, -M_PI_4);
+    ocm.orientation = tf2::toMsg(orientation);
+    ocm.absolute_x_axis_tolerance = M_PI / 10.0;
+    ocm.absolute_y_axis_tolerance = M_PI / 10.0;
+    ocm.absolute_z_axis_tolerance = 2 * M_PI;
+    ocm.weight = 1.0;
+    moveit_msgs::Constraints grasp_constrains;
+    grasp_constrains.orientation_constraints.push_back(ocm);
+
     addCollisionObjects(planning_scene_interface);
 
     // Wait a bit for ROS things to initialize
     ros::WallDuration(1.0).sleep();
 
     pick(group);
+    group.setPathConstraints(grasp_constrains);
     ros::WallDuration(1.0).sleep();
     place(group);
+    group.clearPathConstraints();
     ros::waitForShutdown();
     return 0;
 }
