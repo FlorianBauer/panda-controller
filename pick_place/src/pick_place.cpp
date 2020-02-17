@@ -88,7 +88,7 @@ void pick(moveit::planning_interface::MoveGroupInterface& move_group) {
     // extra padding)
     grasps[0].grasp_pose.header.frame_id = "panda_link0";
     tf2::Quaternion orientation;
-    orientation.setRPY(-M_PI, 0, -M_PI / 4);
+    orientation.setRPY(-M_PI, 0, -M_PI_4);
     grasps[0].grasp_pose.pose.orientation = tf2::toMsg(orientation);
     grasps[0].grasp_pose.pose.position.x = 0.15 + WELLS_LENGTH_IN_M / 2.0;
     grasps[0].grasp_pose.pose.position.y = 0.50;
@@ -120,8 +120,8 @@ void pick(moveit::planning_interface::MoveGroupInterface& move_group) {
     // +++++++++++++++++++++++++++++++++++
     closedGripper(grasps[0].grasp_posture);
 
-    // Set support surface as table1.
-    move_group.setSupportSurfaceName("table1");
+    // Set support surface as table2.
+    move_group.setSupportSurfaceName("table2");
     // Call pick to pick up the object using the grasps given
     move_group.pick("object", grasps);
 }
@@ -138,7 +138,7 @@ void place(moveit::planning_interface::MoveGroupInterface& group) {
     // +++++++++++++++++++++++++++
     place_location[0].place_pose.header.frame_id = "panda_link0";
     tf2::Quaternion orientation;
-    orientation.setRPY(0, 0, M_PI / 2);
+    orientation.setRPY(0, 0, M_PI_2);
     //  orientation.setRPY(0, M_PI / 2, M_PI / 2);
     place_location[0].place_pose.pose.orientation = tf2::toMsg(orientation);
 
@@ -170,8 +170,8 @@ void place(moveit::planning_interface::MoveGroupInterface& group) {
     /* Similar to the pick case */
     openGripper(place_location[0].post_place_posture);
 
-    // Set support surface as table2.
-    group.setSupportSurfaceName("table2");
+    // Set support surface as table1.
+    group.setSupportSurfaceName("table1");
     // Call place to place the object using the place locations given.
     group.place("object", place_location);
 }
