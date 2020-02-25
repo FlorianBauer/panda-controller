@@ -35,6 +35,9 @@ configure_file(
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/")
 
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/extern/json/")
+
 # Build Java wrapper
 # add_subdirectory("${CMAKE_SOURCE_DIR}/src/wrapper/java/")
 
@@ -43,15 +46,14 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/")
 
 add_executable(${EXECUTABLE_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/src/PandaController.cpp")
 target_sources(${EXECUTABLE_NAME} PUBLIC 
-    #"${CMAKE_SOURCE_DIR}/src/Telegram.cpp"
+#    "${CMAKE_CURRENT_SOURCE_DIR}/src/MicroplateTransport.cpp"
 )
 
 target_link_libraries(${EXECUTABLE_NAME}
     Threads::Threads
+    nlohmann_json::nlohmann_json
 )
 
-#set(catkin_DIR "/home/bauer/ws_moveit/logs/catkin_tools_prebuild")
-#set(catkin_DIR "/opt/ros/melodic/share/catkin/cmake/")
 include_directories("/opt/ros/melodic/include/")
 
 find_package(catkin REQUIRED
@@ -73,8 +75,6 @@ find_package(catkin REQUIRED
 )
 
 find_package(Eigen3 REQUIRED)
-
-#set(THIS_PACKAGE_INCLUDE_DIRS  "doc/interactivity/include")
 
 catkin_package(
   LIBRARIES
