@@ -4,12 +4,16 @@
 
 ```
 mkdir -p ~/catkin_ws/src/
+```
+* Copy these project files into the `src`-dir.
+* Also add the `panda_moveit_config` from https://github.com/ros-planning/panda_moveit_config
+(`git clone https://github.com/ros-planning/panda_moveit_config.git -b melodic-devel`).
+* Ensure a `package.xml`-file with all the dependencies exists.
+
+Build with:
+```
 cd ~/catkin_ws/
-```
-Copy these project files into the `src`-dir.
-Ensure a `package.xml`-file with all the dependencies exists.
-```
-source /opt/ros/melodic/setup.bash
+source /opt/ros/noetic/setup.bash
 catkin_make
 ```
 
@@ -32,5 +36,5 @@ To omit sourcing the workspace every time in a new terminal, the setup can be am
 
 To check the proper set up of the workspace `echo $ROS_PACKAGE_PATH` should return something like
 ```
-/home/username/path/to/catkin_ws/src:/opt/ros/melodic/share
+/home/username/path/to/catkin_ws/src:/opt/ros/noetic/share
 ```
