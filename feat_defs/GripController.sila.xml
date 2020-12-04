@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Feature SiLA2Version="1.0" FeatureVersion="1.0" MaturityLevel="Draft" Originator="de.fau" Category="robot"
+         xmlns="http://www.sila-standard.org"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.sila-standard.org https://gitlab.com/SiLA2/sila_base/raw/master/schema/FeatureDefinition.xsd">
+<!--> This is a modified version of https://gitlab.com/SiLA2/sila_base/-/blob/master/feature_definitions/ch/unitelabs/robot/GripController.sila.xml from Unite Labs. So, kudos to them.</!--> 
+    <Identifier>GripController</Identifier>
+    <DisplayName>Grip Controller</DisplayName>
+    <Description>
+        Feature to be able to control the gripper attached to a robot.
+    </Description>
+    <Command>
+        <Identifier>Grip</Identifier>
+        <DisplayName>Grip</DisplayName>
+        <Description>Closes the gripper.</Description>
+        <Observable>No</Observable>
+    </Command>
+    <Command>
+        <Identifier>Release</Identifier>
+        <DisplayName>Release</DisplayName>
+        <Description>Opens the gripper.</Description>
+        <Observable>No</Observable>
+    </Command>
+</Feature>
