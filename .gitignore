@@ -10,7 +10,11 @@
 !package.xml
 
 # Ignore all files in proto dir
-/proto/*
+/proto/
+
+# Ignore submodules and test dirs
+/extern/
+[Gg][Tt]est/
 
 # Files in the proto dir which are NOT to ignore
 !/proto/*.proto
@@ -47,6 +51,11 @@ Testing/
 [Rr]elease/
 Makefile
 *.cmake
+*.make
+
+# ROS and catkin generated directories
+catkin_generated/
+atomic_configure/
 
 # Visual Studio project directories and files
 .vs/
