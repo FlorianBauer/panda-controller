@@ -195,7 +195,7 @@ void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& pla
     collision_objects[0].primitive_poses.resize(1);
     collision_objects[0].primitive_poses[0].position.x = 0.00;
     collision_objects[0].primitive_poses[0].position.y = 0.00;
-    collision_objects[0].primitive_poses[0].position.z = -0.025;
+    collision_objects[0].primitive_poses[0].position.z = -0.15;
     collision_objects[0].operation = collision_objects[0].ADD;
 
     // Add the second table where we will be placing the cube.
@@ -316,6 +316,42 @@ int main(int argc, char** argv) {
 
     // Wait a bit for ROS things to initialize
     ros::WallDuration(1.0).sleep();
+
+    std::vector<double> jointValues0{
+        0.03981577981008856,
+        -1.066839368897888,
+        -0.1417231063074033,
+        -2.295944596229565,
+        -0.09524576377316192,
+        1.3426527882925567,
+        -2.5195802228194144};
+
+    std::vector<double> jointValues1 = {
+        0.043933380036991154,
+        -1.2048149657667728,
+        -0.14132218451204462,
+        -2.2845054997673544,
+        -0.09504651506741842,
+        1.1336760935516015,
+        -2.5337736336928276
+    };
+    group.setJointValueTarget(jointValues0);
+    group.move();
+
+    ros::WallDuration(1.0).sleep();
+
+    for (const auto& val : group.getCurrentJointValues()) {
+        std::cout << val << " ";
+    }
+    std::cout << std::endl;
+
+
+    group.setJointValueTarget(jointValues1);
+    group.move();
+    for (const auto& val : group.getCurrentJointValues()) {
+        std::cout << val << " ";
+    }
+    std::cout << std::endl;
 
     pick(group);
     group.setPathConstraints(grasp_constrains);
