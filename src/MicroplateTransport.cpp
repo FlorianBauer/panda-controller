@@ -4,7 +4,7 @@
 #include <ros/ros.h>
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-#include <nlohmann/json.hpp>
+//#include <nlohmann/json.hpp>
 
 MicroplateTransport::MicroplateTransport() {
 }
@@ -48,10 +48,10 @@ void MicroplateTransport::run() {
 }
 
 void MicroplateTransport::loadFrankaEmikaTaskFile() {
-    using json = nlohmann::json;
-
-    std::ifstream taskFile("file.json");
-    json jsonStruct;
-    taskFile >> jsonStruct;
+//    using json = nlohmann::json;
+//
+//    std::ifstream taskFile("file.json");
+//    json jsonStruct;
+//    taskFile >> jsonStruct;
     // TODO: implement
 }

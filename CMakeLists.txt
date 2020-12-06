@@ -1,16 +1,16 @@
 cmake_minimum_required(VERSION 3.13)
 
 project("panda_controller")
-set(EXECUTABLE_NAME "panda_controller")
+set(ROBOT_SERVICE "robot_service")
 set(PROJECT_TEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/test")
 
 # Enable tests with -DBUILD_TESTS=ON
 option(BUILD_TESTS "Build all unit tests." OFF)
 
 # Version number
-set("${EXECUTABLE_NAME}_VERSION_MAJOR" 0)
-set("${EXECUTABLE_NAME}_VERSION_MINOR" 1)
-set("${EXECUTABLE_NAME}_VERSION_PATCH" 0)
+set("${ROBOT_SERVICE}_VERSION_MAJOR" 0)
+set("${ROBOT_SERVICE}_VERSION_MINOR" 1)
+set("${ROBOT_SERVICE}_VERSION_PATCH" 0)
 
 # Build-timestamp
 string(TIMESTAMP BUILD_TIMESTAMP UTC)
@@ -26,7 +26,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-
 # A header file to pass some of the CMake settings
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/src/Config.h.in"
@@ -34,28 +33,15 @@ configure_file(
 )
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/")
+include_directories("/opt/ros/${ROS_DISTRO}/include/")
 
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/extern/json/")
-
-# Build Java wrapper
-# add_subdirectory("${CMAKE_SOURCE_DIR}/src/wrapper/java/")
-
-# Build utility tools
-# add_subdirectory("${CMAKE_SOURCE_DIR}/src/util/")
-
-add_executable(${EXECUTABLE_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/src/PandaControllerSrv.cpp")
-target_sources(${EXECUTABLE_NAME} PUBLIC 
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/MicroplateTransport.cpp"
-)
-
-include_directories("/opt/ros/$ROS_DISTRO/include/")
 
 find_package(catkin REQUIRED
   COMPONENTS
     interactive_markers
     moveit_core
-#    moveit_visual_tools
     moveit_ros_planning
     moveit_ros_planning_interface
     moveit_ros_perception
@@ -93,7 +79,6 @@ catkin_package(
   INCLUDE_DIRS
   CATKIN_DEPENDS
     moveit_core
-#    moveit_visual_tools
     moveit_ros_planning_interface
     interactive_markers
     tf2_geometry_msgs
@@ -103,10 +88,22 @@ catkin_package(
 
 include_directories(${THIS_PACKAGE_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIRS})
 
-target_link_libraries(${EXECUTABLE_NAME}
+# Build the ROS client node
+set(ROBOT_CLIENT "robot_client")
+add_executable(${ROBOT_CLIENT} "${CMAKE_CURRENT_SOURCE_DIR}/src/RobotClient.cpp")
+target_link_libraries(${ROBOT_CLIENT} ${catkin_LIBRARIES})
+#add_dependencies(${ROBOT_CLIENT} panda_controller_gencpp)
+
+target_link_libraries(${ROBOT_CLIENT}
     Threads::Threads
     nlohmann_json::nlohmann_json
     ${catkin_LIBRARIES}
 )
 
-install(TARGETS ${EXECUTABLE_NAME} DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+# Build the ROS service node
+add_executable(${ROBOT_SERVICE} "${CMAKE_CURRENT_SOURCE_DIR}/src/RobotService.cpp")
+target_sources(${ROBOT_SERVICE} PUBLIC 
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/MicroplateTransport.cpp"
+)
+target_link_libraries(${ROBOT_SERVICE} ${catkin_LIBRARIES})
+#add_dependencies(${ROBOT_SERVICE} panda_controller_gencpp)
