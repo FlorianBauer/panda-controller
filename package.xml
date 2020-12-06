@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>panda-controller</name>
+  <name>panda_controller</name>
   <version>0.1.0</version>
-  <description>The panda-controller package</description>
+  <description>The panda_controller package</description>
   <license>Apache-2.0</license>
 
   <author email="florian.bauer.dev@gmail.com">Florian Bauer</author>
@@ -29,6 +29,7 @@
   <build_depend>tf2_ros</build_depend>
   <build_depend>tf2_eigen</build_depend>
   <build_depend>tf2_geometry_msgs</build_depend>
+  <build_depend>message_generation</build_depend>
 
   <run_depend>panda_moveit_config</run_depend>
   <run_depend>pluginlib</run_depend>
@@ -47,8 +48,9 @@
   <run_depend>tf2_ros</run_depend>
   <run_depend>tf2_eigen</run_depend>
   <run_depend>tf2_geometry_msgs</run_depend>
+  <run_depend>message_runtime</run_depend>
 
   <test_depend>moveit_resources</test_depend>
   <test_depend>rosunit</test_depend>
-
 </package>
+

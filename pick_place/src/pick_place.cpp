@@ -44,6 +44,15 @@ constexpr double WELLS_LENGTH_IN_M = 0.12776;
 constexpr double WELLS_WIDTH_IN_M = 0.08548;
 constexpr double WELLS_HEIGHT_IN_M = 0.01435;
 
+// void moveToPosition(Position pos)
+// void moveToSite(Site site)
+// void retract(void)
+// void approachTo(Site site)
+// void movePlate(Site src, Site dst, PlateType plate)
+// void pickPlate(Site site, PlateType plate)
+// void placePlate(Site site, PlateType plate)
+// bool checkOccupied(Site site) // TODO: necessary??
+
 void openGripper(trajectory_msgs::JointTrajectory& posture) {
     // BEGIN_SUB_TUTORIAL open_gripper
     /* Add both finger joints of panda robot. */

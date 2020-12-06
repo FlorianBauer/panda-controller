@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.13)
 
-project("panda-controller")
+project("panda_controller")
 set(EXECUTABLE_NAME "panda_controller")
-set(PROJECT_TEST_DIR "${CMAKE_SOURCE_DIR}/test")
+set(PROJECT_TEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/test")
 
 # Enable tests with -DBUILD_TESTS=ON
 option(BUILD_TESTS "Build all unit tests." OFF)
@@ -15,8 +15,8 @@ set("${EXECUTABLE_NAME}_VERSION_PATCH" 0)
 # Build-timestamp
 string(TIMESTAMP BUILD_TIMESTAMP UTC)
 
-# Set C++11 as standard
-set(CMAKE_CXX_STANDARD 11)
+# Set C++14 as standard
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # General compiler flags
@@ -44,17 +44,12 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/extern/json/")
 # Build utility tools
 # add_subdirectory("${CMAKE_SOURCE_DIR}/src/util/")
 
-add_executable(${EXECUTABLE_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/src/PandaController.cpp")
+add_executable(${EXECUTABLE_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/src/PandaControllerSrv.cpp")
 target_sources(${EXECUTABLE_NAME} PUBLIC 
-#    "${CMAKE_CURRENT_SOURCE_DIR}/src/MicroplateTransport.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/MicroplateTransport.cpp"
 )
 
-target_link_libraries(${EXECUTABLE_NAME}
-    Threads::Threads
-    nlohmann_json::nlohmann_json
-)
-
-include_directories("/opt/ros/melodic/include/")
+include_directories("/opt/ros/$ROS_DISTRO/include/")
 
 find_package(catkin REQUIRED
   COMPONENTS
@@ -72,6 +67,23 @@ find_package(catkin REQUIRED
     tf2_ros
     tf2_eigen
     tf2_geometry_msgs
+    roscpp
+    rospy
+    std_msgs
+    message_generation
+)
+
+# Generate services in the 'srv' folder
+add_service_files(
+    FILES
+    MoveTo.srv
+    SetJoints.srv
+)
+
+# Generate added messages and services with any dependencies listed here
+generate_messages(
+    DEPENDENCIES
+    std_msgs  # Or other packages containing msgs
 )
 
 find_package(Eigen3 REQUIRED)
@@ -90,4 +102,11 @@ catkin_package(
 )
 
 include_directories(${THIS_PACKAGE_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIRS})
-add_subdirectory("pick_place/")
+
+target_link_libraries(${EXECUTABLE_NAME}
+    Threads::Threads
+    nlohmann_json::nlohmann_json
+    ${catkin_LIBRARIES}
+)
+
+install(TARGETS ${EXECUTABLE_NAME} DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
