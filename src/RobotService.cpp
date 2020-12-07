@@ -1,3 +1,8 @@
+/** 
+ * The ROS service which receives the ROS messages from the `robot_client` and executes the actual
+ * movements. Only low-level commands are done here. High-level tasks (e.g.  collision detection) 
+ * are in the responsibility of the client.
+ */
 #include <iostream>
 #include <ros/ros.h>
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
@@ -27,17 +32,12 @@ bool moveTo(panda_controller::MoveTo::Request& req, panda_controller::MoveTo::Re
     grasps.resize(1);
 
     grasps[0].grasp_pose.header.frame_id = "panda_link0";
-    const tf2::Quaternion orientation(
-            (double) req.orientation_x,
-            (double) req.orientation_y,
-            (double) req.orientation_z,
-            (double) req.orientation_w);
-
+    grasps[0].grasp_pose.pose.position.x = req.pos_x;
+    grasps[0].grasp_pose.pose.position.y = req.pos_y;
+    grasps[0].grasp_pose.pose.position.z = req.pos_z;
+    tf2::Quaternion orientation;
+    orientation.setRPY(req.rot_r, req.rot_p, req.rot_y);
     grasps[0].grasp_pose.pose.orientation = tf2::toMsg(orientation);
-    grasps[0].grasp_pose.pose.position.x = (double) req.position_x;
-    grasps[0].grasp_pose.pose.position.y = (double) req.position_y;
-    grasps[0].grasp_pose.pose.position.z = (double) req.position_z;
-
     ROS_INFO("Hyper, Hyper");
     res.was_success = true;
     return true;
@@ -46,9 +46,8 @@ bool moveTo(panda_controller::MoveTo::Request& req, panda_controller::MoveTo::Re
 int main(int argc, char* argv[]) {
     printBuildInfo();
 
-    ros::init(argc, argv, "panda_controller_server");
+    ros::init(argc, argv, "panda_controller_service");
     ros::NodeHandle node;
-
     ros::ServiceServer service = node.advertiseService("move_to", moveTo);
     ROS_INFO("Ready to move.");
     ros::spin();
