@@ -21,7 +21,8 @@ static void printBuildInfo() {
             << "Version: "
             << VERSION_MAJOR << "."
             << VERSION_MINOR << "."
-            << VERSION_PATCH << "\n"
+            << VERSION_PATCH << "-"
+            << GIT_COMMIT_SHORT << "\n"
             << "Build Type: " << BUILD_TYPE << "\n"
             << "Build Timestamp: " << BUILD_TIMESTAMP << "\n"
             << "Compiler: " << COMPILER_ID << " " << COMPILER_VERSION << "\n";
