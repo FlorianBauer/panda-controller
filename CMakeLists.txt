@@ -114,8 +114,5 @@ target_link_libraries(${ROBOT_CLIENT}
 
 # Build the ROS service node
 add_executable(${ROBOT_SERVICE} "${CMAKE_CURRENT_SOURCE_DIR}/src/RobotService.cpp")
-target_sources(${ROBOT_SERVICE} PUBLIC 
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/MicroplateTransport.cpp"
-)
 target_link_libraries(${ROBOT_SERVICE} ${catkin_LIBRARIES})
 #add_dependencies(${ROBOT_SERVICE} panda_controller_gencpp)

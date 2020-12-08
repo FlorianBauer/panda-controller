@@ -8,10 +8,17 @@
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-
 #include "Config.h"
-#include "MicroplateTransport.h"
 #include "panda_controller/MoveTo.h"
+#include "panda_controller/SetJoints.h"
+
+constexpr char PANDA_ARM[] = "panda_arm";
+constexpr char PANDA_LINK0[] = "panda_link0";
+constexpr char PANDA_SERVICE_NAME[] = "panda_controller_service";
+constexpr char SRV_MOVE_TO[] = "move_to";
+constexpr char SRV_SET_JOINTS[] = "set_joints";
+
+moveit::planning_interface::MoveGroupInterface* moveGroupPtr;
 
 /**
  * Prints some information about the current build.
@@ -29,17 +36,28 @@ static void printBuildInfo() {
 }
 
 bool moveTo(panda_controller::MoveTo::Request& req, panda_controller::MoveTo::Response& res) {
-    std::vector<moveit_msgs::Grasp> grasps;
-    grasps.resize(1);
+    moveGroupPtr->setPositionTarget(req.pos_x, req.pos_y, req.pos_z, PANDA_LINK0);
+    moveGroupPtr->setRPYTarget(req.rot_r, req.rot_p, req.rot_y, PANDA_LINK0);
+    moveGroupPtr->move();
 
-    grasps[0].grasp_pose.header.frame_id = "panda_link0";
-    grasps[0].grasp_pose.pose.position.x = req.pos_x;
-    grasps[0].grasp_pose.pose.position.y = req.pos_y;
-    grasps[0].grasp_pose.pose.position.z = req.pos_z;
-    tf2::Quaternion orientation;
-    orientation.setRPY(req.rot_r, req.rot_p, req.rot_y);
-    grasps[0].grasp_pose.pose.orientation = tf2::toMsg(orientation);
-    ROS_INFO("Hyper, Hyper");
+    ROS_INFO("moveTo success");
+    res.was_success = true;
+    return true;
+}
+
+bool setJoints(panda_controller::SetJoints::Request& req, panda_controller::SetJoints::Response& res) {
+    const std::vector<double> jointValues = {
+        req.joints[0],
+        req.joints[1],
+        req.joints[2],
+        req.joints[3],
+        req.joints[4],
+        req.joints[5],
+        req.joints[6]
+    };
+    moveGroupPtr->setJointValueTarget(jointValues);
+    moveGroupPtr->move();
+    ROS_INFO("setJoints success");
     res.was_success = true;
     return true;
 }
@@ -47,11 +65,22 @@ bool moveTo(panda_controller::MoveTo::Request& req, panda_controller::MoveTo::Re
 int main(int argc, char* argv[]) {
     printBuildInfo();
 
-    ros::init(argc, argv, "panda_controller_service");
+    ros::init(argc, argv, PANDA_SERVICE_NAME);
+    moveit::planning_interface::PlanningSceneInterface planningScene;
+    moveGroupPtr = new moveit::planning_interface::MoveGroupInterface(PANDA_ARM);
+    moveGroupPtr->setPlanningTime(45.0);
+
     ros::NodeHandle node;
-    ros::ServiceServer service = node.advertiseService("move_to", moveTo);
+    std::vector<ros::ServiceServer> services = {
+        node.advertiseService(SRV_MOVE_TO, moveTo),
+        node.advertiseService(SRV_SET_JOINTS, setJoints)
+    };
+
     ROS_INFO("Ready to move.");
-    ros::spin();
+
+    ros::AsyncSpinner spinner(services.size());
+    spinner.start();
+    ros::waitForShutdown();
 
     return 0;
 }

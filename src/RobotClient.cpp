@@ -5,6 +5,7 @@
 #include <ros/ros.h>
 #include "RobotClient.h"
 #include "panda_controller/MoveTo.h"
+#include "panda_controller/SetJoints.h"
 
 RobotClient::RobotClient() {
 }
@@ -19,20 +20,45 @@ int main(int argc, char* argv[]) {
     ros::init(argc, argv, "panda_controller_client");
 
     ros::NodeHandle node;
-    ros::ServiceClient client = node.serviceClient<panda_controller::MoveTo>("move_to");
+    //    ros::ServiceClient moveClient = node.serviceClient<panda_controller::MoveTo>("move_to");
+    ros::ServiceClient jointClient = node.serviceClient<panda_controller::SetJoints>("set_joints");
 
-    panda_controller::MoveTo srv;
-    srv.request.pos_x = 5.0;
-    srv.request.pos_y = 5.0;
-    srv.request.pos_z = 5.0;
-    srv.request.rot_r = 5.0;
-    srv.request.rot_p = 5.0;
-    srv.request.rot_y = 5.0;
+    // shaker
+    //    pos_x: -0.4211
+    //    pos_y: -0.1057
+    //    pos_z: 0.1221
+    //    rot_p: 0.0083
+    //    rot_r: 3.1348
+    //    rot_y: -1.4114
 
-    if (client.call(srv)) {
-        ROS_INFO("Was Success: %d", srv.response.was_success);
+    //    panda_controller::MoveTo move;
+    //    move.request.pos_x = -0.4211;
+    //    move.request.pos_y = -0.1057;
+    //    move.request.pos_z = 0.1221;
+    //    move.request.rot_r = 0.0083;
+    //    move.request.rot_p = 3.1348;
+    //    move.request.rot_y = -1.4114;
+    //    if (moveClient.call(move)) {
+    //        ROS_INFO("Was Success: %d", move.response.was_success);
+    //        ;
+    //    } else {
+    //        ROS_ERROR("Failed to call service MoveTo");
+    //        return 1;
+    //    }
+
+    panda_controller::SetJoints joints;
+    joints.request.joints[0] = 0.03981577981008856;
+    joints.request.joints[1] = -1.066839368897888;
+    joints.request.joints[2] = -0.1417231063074033;
+    joints.request.joints[3] = -2.295944596229565;
+    joints.request.joints[4] = -0.09524576377316192;
+    joints.request.joints[5] = 1.3426527882925567;
+    joints.request.joints[6] = -2.5195802228194144;
+
+    if (jointClient.call(joints)) {
+        ROS_INFO("Was Success: %d", joints.response.was_success);
     } else {
-        ROS_ERROR("Failed to call service MoveTo");
+        ROS_ERROR("Failed to call service SetJoints");
         return 1;
     }
 
