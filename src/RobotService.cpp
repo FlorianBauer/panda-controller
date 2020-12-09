@@ -9,14 +9,9 @@
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include "Config.h"
+#include "ServiceDefs.h"
 #include "panda_controller/MoveTo.h"
 #include "panda_controller/SetJoints.h"
-
-constexpr char PANDA_ARM[] = "panda_arm";
-constexpr char PANDA_LINK0[] = "panda_link0";
-constexpr char PANDA_SERVICE_NAME[] = "panda_controller_service";
-constexpr char SRV_MOVE_TO[] = "move_to";
-constexpr char SRV_SET_JOINTS[] = "set_joints";
 
 moveit::planning_interface::MoveGroupInterface* moveGroupPtr;
 
@@ -36,8 +31,18 @@ static void printBuildInfo() {
 }
 
 bool moveTo(panda_controller::MoveTo::Request& req, panda_controller::MoveTo::Response& res) {
-    moveGroupPtr->setPositionTarget(req.pos_x, req.pos_y, req.pos_z, PANDA_LINK0);
-    moveGroupPtr->setRPYTarget(req.rot_r, req.rot_p, req.rot_y, PANDA_LINK0);
+    tf2::Quaternion orientation;
+    orientation.setRPY(req.rot_r, req.rot_p, req.rot_y);
+
+    geometry_msgs::Pose targetPose;
+    targetPose.position.x = req.pos_x;
+    targetPose.position.y = req.pos_y;
+    targetPose.position.z = req.pos_z;
+    targetPose.orientation.x = orientation.getX();
+    targetPose.orientation.y = orientation.getY();
+    targetPose.orientation.z = orientation.getZ();
+    targetPose.orientation.w = orientation.getW();
+    moveGroupPtr->setPoseTarget(targetPose);
     moveGroupPtr->move();
 
     ROS_INFO("moveTo success");

@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <ros/ros.h>
 #include "RobotClient.h"
+#include "ServiceDefs.h"
 #include "panda_controller/MoveTo.h"
 #include "panda_controller/SetJoints.h"
 
@@ -17,11 +18,8 @@ RobotClient::~RobotClient() {
 }
 
 int main(int argc, char* argv[]) {
-    ros::init(argc, argv, "panda_controller_client");
-
+    ros::init(argc, argv, PANDA_CLIENT_NAME);
     ros::NodeHandle node;
-    //    ros::ServiceClient moveClient = node.serviceClient<panda_controller::MoveTo>("move_to");
-    ros::ServiceClient jointClient = node.serviceClient<panda_controller::SetJoints>("set_joints");
 
     // shaker
     //    pos_x: -0.4211
@@ -31,21 +29,27 @@ int main(int argc, char* argv[]) {
     //    rot_r: 3.1348
     //    rot_y: -1.4114
 
-    //    panda_controller::MoveTo move;
-    //    move.request.pos_x = -0.4211;
-    //    move.request.pos_y = -0.1057;
-    //    move.request.pos_z = 0.1221;
-    //    move.request.rot_r = 0.0083;
-    //    move.request.rot_p = 3.1348;
-    //    move.request.rot_y = -1.4114;
-    //    if (moveClient.call(move)) {
-    //        ROS_INFO("Was Success: %d", move.response.was_success);
-    //        ;
-    //    } else {
-    //        ROS_ERROR("Failed to call service MoveTo");
-    //        return 1;
-    //    }
+    ros::ServiceClient moveClient = node.serviceClient<panda_controller::MoveTo>(SRV_MOVE_TO);
+    panda_controller::MoveTo move;
+    move.request.pos_x = -0.4211;
+    move.request.pos_y = -0.1057;
+    move.request.pos_z = 0.1221;
+    move.request.rot_r = 0.0083;
+    move.request.rot_p = 3.1348;
+    move.request.rot_y = -1.4114;
 
+    ROS_INFO("Call move");
+    if (moveClient.call(move)) {
+        ROS_INFO("Was Success: %d", move.response.was_success);
+        ;
+    } else {
+        ROS_ERROR("Failed to call service MoveTo");
+        return 1;
+    }
+
+    ros::WallDuration(1.0).sleep();
+
+    ros::ServiceClient jointClient = node.serviceClient<panda_controller::SetJoints>(SRV_SET_JOINTS);
     panda_controller::SetJoints joints;
     joints.request.joints[0] = 0.03981577981008856;
     joints.request.joints[1] = -1.066839368897888;
@@ -55,6 +59,7 @@ int main(int argc, char* argv[]) {
     joints.request.joints[5] = 1.3426527882925567;
     joints.request.joints[6] = -2.5195802228194144;
 
+    ROS_INFO("Call joints");
     if (jointClient.call(joints)) {
         ROS_INFO("Was Success: %d", joints.response.was_success);
     } else {
