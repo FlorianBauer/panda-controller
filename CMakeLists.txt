@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.10)
 
 project("panda_controller")
 set(ROBOT_SERVICE "robot_service")
