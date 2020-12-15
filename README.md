@@ -14,7 +14,7 @@ Build with:
 ```
 cd ~/catkin_ws/
 source /opt/ros/noetic/setup.bash
-catkin_make
+catkin build
 ```
 
 ## Run the project in MoveIt
@@ -23,12 +23,14 @@ Start a terminal, source the workspace and launch MoveIt:
 ```
 source devel/setup.bash
 roslaunch panda_moveit_config demo.launch
+# On real hardware:
+# roslaunch franka_control franka_control.launch
 ```
 
 Start another terminal, source the workspace and run the build package:
 ```
 source devel/setup.bash
-rosrun panda-controller pick_place
+rosrun panda_controller robot_service
 ```
 
 To omit sourcing the workspace every time in a new terminal, the setup can be amended into 
