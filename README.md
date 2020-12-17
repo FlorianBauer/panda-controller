@@ -14,7 +14,7 @@ Build with:
 ```
 cd ~/catkin_ws/
 source /opt/ros/noetic/setup.bash
-catkin build
+catkin_make
 ```
 
 ## Run the project in MoveIt
