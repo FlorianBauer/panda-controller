@@ -23,15 +23,25 @@ Start a terminal, source the workspace and launch MoveIt:
 ```
 source devel/setup.bash
 roslaunch panda_moveit_config demo.launch
-# On real hardware:
+# On real hardware [!sic]:
 # roslaunch franka_control franka_control.launch
 ```
 
-Start another terminal, source the workspace and run the build package:
+Start another terminal, source the workspace and run the built ROS service:
 ```
 source devel/setup.bash
 rosrun panda_controller robot_service
 ```
+
+To start the ROS client in yet another terminal:
+```
+source devel/setup.bash
+rosrun panda_controller robot_client
+```
+
+The executables could also be used without `rosrun`. Therefore, simply execute the files
+in a sourced environment with `./devel/lib/panda_controller/robot_service` and 
+`./devel/lib/panda_controller/robot_client`.
 
 To omit sourcing the workspace every time in a new terminal, the setup can be amended into 
 `.bashrc` with `echo 'source ~/catkin_ws/devel/setup.bash' >> ~/.bashrc`
