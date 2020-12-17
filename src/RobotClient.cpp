@@ -1,8 +1,8 @@
 /**
  * A ROS client which sends ROS messages to the `robot_service` node.
  */
-#include <cstdlib>
 #include <ros/ros.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include "RobotClient.h"
 #include "ServiceDefs.h"
 #include "panda_controller/MoveTo.h"
@@ -34,9 +34,13 @@ int main(int argc, char* argv[]) {
     move.request.pos_x = -0.4211;
     move.request.pos_y = -0.1057;
     move.request.pos_z = 0.1221;
-    move.request.rot_r = 0.0083;
-    move.request.rot_p = 3.1348;
-    move.request.rot_y = -1.4114;
+
+    tf2::Quaternion orientation;
+    orientation.setRPY(0.0083, 3.1348, -1.4114);
+    move.request.ori_x = orientation.getX();
+    move.request.ori_y = orientation.getY();
+    move.request.ori_z = orientation.getZ();
+    move.request.ori_w = orientation.getW();
 
     ROS_INFO("Call move");
     if (moveClient.call(move)) {

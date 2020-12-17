@@ -31,20 +31,16 @@ static void printBuildInfo() {
 }
 
 bool moveTo(panda_controller::MoveTo::Request& req, panda_controller::MoveTo::Response& res) {
-    tf2::Quaternion orientation;
-    orientation.setRPY(req.rot_r, req.rot_p, req.rot_y);
-
     geometry_msgs::Pose targetPose;
     targetPose.position.x = req.pos_x;
     targetPose.position.y = req.pos_y;
     targetPose.position.z = req.pos_z;
-    targetPose.orientation.x = orientation.getX();
-    targetPose.orientation.y = orientation.getY();
-    targetPose.orientation.z = orientation.getZ();
-    targetPose.orientation.w = orientation.getW();
+    targetPose.orientation.x = req.ori_x;
+    targetPose.orientation.y = req.ori_y;
+    targetPose.orientation.z = req.ori_z;
+    targetPose.orientation.w = req.ori_w;
     moveGroupPtr->setPoseTarget(targetPose);
     moveGroupPtr->move();
-
     ROS_INFO("moveTo success");
     res.was_success = true;
     return true;
