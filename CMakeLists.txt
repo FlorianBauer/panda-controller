@@ -74,6 +74,8 @@ find_package(catkin REQUIRED
 # Generate services in the 'srv' folder
 add_service_files(
     FILES
+    GetJoints.srv
+    GetPose.srv
     MoveTo.srv
     SetJoints.srv
 )

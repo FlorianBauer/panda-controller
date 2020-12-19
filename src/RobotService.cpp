@@ -10,6 +10,8 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include "Config.h"
 #include "ServiceDefs.h"
+#include "panda_controller/GetJoints.h"
+#include "panda_controller/GetPose.h"
 #include "panda_controller/MoveTo.h"
 #include "panda_controller/SetJoints.h"
 
@@ -46,6 +48,14 @@ bool moveTo(panda_controller::MoveTo::Request& req, panda_controller::MoveTo::Re
     return true;
 }
 
+/**
+ * Sets the angle of each joint an therefore moves the arm to a certain pose. This is effectively 
+ * equivalent to `moveTo` but without path planning or collision detection.
+ * 
+ * @param req The request containing a array with all joint values.
+ * @param res The response containing a bool signaling the success of the operation.
+ * @return `true` on success, otherwise `false`.
+ */
 bool setJoints(panda_controller::SetJoints::Request& req, panda_controller::SetJoints::Response& res) {
     const std::vector<double> jointValues = {
         req.joints[0],
@@ -63,6 +73,40 @@ bool setJoints(panda_controller::SetJoints::Request& req, panda_controller::SetJ
     return true;
 }
 
+/**
+ * Gets the current joint values.
+ * 
+ * @return `true` on success, otherwise `false`.
+ */
+bool getJoints(panda_controller::GetJoints::Request& req, panda_controller::GetJoints::Response& res) {
+    const std::vector<double> curJoints = moveGroupPtr->getCurrentJointValues();
+    res.joints[0] = curJoints[0];
+    res.joints[1] = curJoints[0];
+    res.joints[2] = curJoints[0];
+    res.joints[3] = curJoints[0];
+    res.joints[4] = curJoints[0];
+    res.joints[5] = curJoints[0];
+    res.joints[6] = curJoints[0];
+    return true;
+}
+
+/**
+ * Get the current pose.
+ * 
+ * @return `true` on success, otherwise `false`.
+ */
+bool getPose(panda_controller::GetPose::Request& req, panda_controller::GetPose::Response& res) {
+    const geometry_msgs::PoseStamped curPose = moveGroupPtr->getCurrentPose(PANDA_LINK_EEF);
+    res.pos_x = curPose.pose.position.x;
+    res.pos_y = curPose.pose.position.y;
+    res.pos_z = curPose.pose.position.z;
+    res.ori_x = curPose.pose.orientation.x;
+    res.ori_y = curPose.pose.orientation.y;
+    res.ori_z = curPose.pose.orientation.z;
+    res.ori_w = curPose.pose.orientation.w;
+    return true;
+}
+
 int main(int argc, char* argv[]) {
     printBuildInfo();
 
@@ -72,12 +116,14 @@ int main(int argc, char* argv[]) {
     moveGroupPtr->setPlanningTime(45.0);
 
     ros::NodeHandle node;
-    std::vector<ros::ServiceServer> services = {
+    const std::vector<ros::ServiceServer> services = {
+        node.advertiseService(SRV_GET_JOINTS, getJoints),
+        node.advertiseService(SRV_GET_POSE, getPose),
         node.advertiseService(SRV_MOVE_TO, moveTo),
         node.advertiseService(SRV_SET_JOINTS, setJoints)
     };
 
-    ROS_INFO("Ready to move.");
+    ROS_INFO("Services are now available.");
 
     ros::AsyncSpinner spinner(services.size());
     spinner.start();

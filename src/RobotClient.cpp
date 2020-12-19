@@ -5,6 +5,8 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include "RobotClient.h"
 #include "ServiceDefs.h"
+#include "panda_controller/GetPose.h"
+#include "panda_controller/GetJoints.h"
 #include "panda_controller/MoveTo.h"
 #include "panda_controller/SetJoints.h"
 
@@ -42,7 +44,7 @@ int main(int argc, char* argv[]) {
     move.request.ori_z = orientation.getZ();
     move.request.ori_w = orientation.getW();
 
-    ROS_INFO("Call move");
+    ROS_INFO("Call MoveTo");
     if (moveClient.call(move)) {
         ROS_INFO("Was Success: %d", move.response.was_success);
         ;
@@ -63,11 +65,45 @@ int main(int argc, char* argv[]) {
     joints.request.joints[5] = 1.3426527882925567;
     joints.request.joints[6] = -2.5195802228194144;
 
-    ROS_INFO("Call joints");
+    ROS_INFO("Call SetJoints");
     if (jointClient.call(joints)) {
         ROS_INFO("Was Success: %d", joints.response.was_success);
     } else {
         ROS_ERROR("Failed to call service SetJoints");
+        return 1;
+    }
+
+    ros::ServiceClient getJointsClient = node.serviceClient<panda_controller::GetJoints>(SRV_GET_JOINTS);
+    panda_controller::GetJoints curJoints;
+    ROS_INFO("Call GetJoints");
+    if (getJointsClient.call(curJoints)) {
+        ROS_INFO("Was Success: [ %f, %f, %f, %f, %f, %f, %f ]",
+                curJoints.response.joints[0],
+                curJoints.response.joints[1],
+                curJoints.response.joints[2],
+                curJoints.response.joints[3],
+                curJoints.response.joints[4],
+                curJoints.response.joints[5],
+                curJoints.response.joints[6]);
+    } else {
+        ROS_ERROR("Failed to call service GetPose");
+        return 1;
+    }
+
+    ros::ServiceClient getPoseClient = node.serviceClient<panda_controller::GetPose>(SRV_GET_POSE);
+    panda_controller::GetPose pose;
+    ROS_INFO("Call GetPose");
+    if (getPoseClient.call(pose)) {
+        ROS_INFO("Was Success: [ %f, %f, %f, %f, %f, %f, %f ]",
+                pose.response.pos_x,
+                pose.response.pos_y,
+                pose.response.pos_x,
+                pose.response.ori_x,
+                pose.response.ori_y,
+                pose.response.ori_z,
+                pose.response.ori_w);
+    } else {
+        ROS_ERROR("Failed to call service GetPose");
         return 1;
     }
 
