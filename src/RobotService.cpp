@@ -8,14 +8,21 @@
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-#include "Config.h"
-#include "ServiceDefs.h"
 #include "panda_controller/GetJoints.h"
 #include "panda_controller/GetPose.h"
 #include "panda_controller/MoveTo.h"
 #include "panda_controller/SetJoints.h"
+#include "Config.h"
+#include "Plate.h"
+#include "ServiceDefs.h"
+#include "Site.h"
+
+constexpr double WELLS_LENGTH_IN_M = 0.12776;
+constexpr double WELLS_WIDTH_IN_M = 0.08548;
+constexpr double WELLS_HEIGHT_IN_M = 0.01435;
 
 moveit::planning_interface::MoveGroupInterface* moveGroupPtr;
+moveit::planning_interface::PlanningSceneInterface* planningScenePtr;
 
 /**
  * Prints some information about the current build.
@@ -30,6 +37,24 @@ static void printBuildInfo() {
             << "Build Type: " << BUILD_TYPE << "\n"
             << "Build Timestamp: " << BUILD_TIMESTAMP << "\n"
             << "Compiler: " << COMPILER_ID << " " << COMPILER_VERSION << "\n";
+}
+
+void openGripper(trajectory_msgs::JointTrajectory& posture) {
+    /* Set them as open, wide enough for the object to fit. */
+    posture.points.resize(1);
+    posture.points[0].positions.resize(2);
+    posture.points[0].positions[0] = WELLS_WIDTH_IN_M / 2.0 + 0.01;
+    posture.points[0].positions[1] = WELLS_WIDTH_IN_M / 2.0 + 0.01;
+    posture.points[0].time_from_start = ros::Duration(0.5);
+}
+
+void closedGripper(trajectory_msgs::JointTrajectory& posture) {
+    /* Set them as closed. */
+    posture.points.resize(1);
+    posture.points[0].positions.resize(2);
+    posture.points[0].positions[0] = 0.00;
+    posture.points[0].positions[1] = 0.00;
+    posture.points[0].time_from_start = ros::Duration(0.5);
 }
 
 bool moveTo(panda_controller::MoveTo::Request& req, panda_controller::MoveTo::Response& res) {
@@ -90,6 +115,15 @@ bool getJoints(panda_controller::GetJoints::Request& req, panda_controller::GetJ
     return true;
 }
 
+bool pickFromSite(Site& site, Plate& plate) {
+    moveit_msgs::Grasp& grasp = site.getGrasp();
+    openGripper(grasp.pre_grasp_posture);
+    closedGripper(grasp.grasp_posture);
+
+    moveGroupPtr->pick(plate.getObjectId(), grasp);
+    return false;
+}
+
 /**
  * Get the current pose.
  * 
@@ -104,6 +138,38 @@ bool getPose(panda_controller::GetPose::Request& req, panda_controller::GetPose:
     res.ori_y = curPose.pose.orientation.y;
     res.ori_z = curPose.pose.orientation.z;
     res.ori_w = curPose.pose.orientation.w;
+
+    tf2::Quaternion orientation;
+    orientation.setRPY(-M_PI, 0, -M_PI_4);
+
+    geometry_msgs::Pose sitePose;
+    sitePose.orientation = tf2::toMsg(orientation);
+    sitePose.position.x = 0.15 + WELLS_LENGTH_IN_M / 2.0;
+    sitePose.position.y = 0.50;
+    sitePose.position.z = 0.01 + 0.24; // <- finger length!!!
+    Site mySite(sitePose);
+
+    geometry_msgs::Pose platePose;
+    platePose.position.x = 0.15 + WELLS_LENGTH_IN_M / 2.0;
+    platePose.position.y = 0.50;
+    platePose.position.z = 0.01 + WELLS_HEIGHT_IN_M / 2.0;
+
+    Plate myPlate(platePose);
+    myPlate.setPlateDimensions(WELLS_LENGTH_IN_M, WELLS_WIDTH_IN_M, WELLS_HEIGHT_IN_M);
+    planningScenePtr->applyCollisionObject(myPlate.getCollisonObject());
+
+    moveit_msgs::GripperTranslation approach;
+    approach.direction.vector.x = 1.0;
+    approach.min_distance = 0.095;
+    approach.desired_distance = 0.115;
+    mySite.setApproach(approach);
+
+    moveit_msgs::GripperTranslation retreat;
+    retreat.direction.vector.z = 1.0;
+    retreat.min_distance = 0.1;
+    retreat.desired_distance = 0.25;
+    mySite.setRetreat(retreat);
+    pickFromSite(mySite, myPlate);
     return true;
 }
 
@@ -111,9 +177,9 @@ int main(int argc, char* argv[]) {
     printBuildInfo();
 
     ros::init(argc, argv, PANDA_SERVICE_NAME);
-    moveit::planning_interface::PlanningSceneInterface planningScene;
     moveGroupPtr = new moveit::planning_interface::MoveGroupInterface(PANDA_ARM);
     moveGroupPtr->setPlanningTime(45.0);
+    planningScenePtr = new moveit::planning_interface::PlanningSceneInterface;
 
     ros::NodeHandle node;
     const std::vector<ros::ServiceServer> services = {
@@ -128,6 +194,8 @@ int main(int argc, char* argv[]) {
     ros::AsyncSpinner spinner(services.size());
     spinner.start();
     ros::waitForShutdown();
+    delete moveGroupPtr;
+    delete planningScenePtr;
 
     return 0;
 }

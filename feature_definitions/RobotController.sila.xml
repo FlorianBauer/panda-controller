@@ -42,16 +42,16 @@
         </DefinedExecutionErrors>
     </Command>
     <Command>
-        <Identifier>Retract</Identifier>
-        <DisplayName>Retract</DisplayName>
-        <Description>Savely pull back from the current site, if not already retracted.</Description>
+        <Identifier>Retreat</Identifier>
+        <DisplayName>Retreat</DisplayName>
+        <Description>Carefully pull back from the current site, if not already retracted.</Description>
         <Observable>Yes</Observable>
     </Command>
     <Command>
         <Identifier>ApproachTo</Identifier>
         <DisplayName>Approach To</DisplayName>
         <Description>
-            Moving to the safe pose to approach a size (without changing gripping).
+            Moving to the safe pose to approach a site (without changing gripping).
         </Description>
         <Observable>Yes</Observable>
         <Parameter>
