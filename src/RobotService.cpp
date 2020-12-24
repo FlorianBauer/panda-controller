@@ -124,6 +124,27 @@ bool pickFromSite(Site& site, Plate& plate) {
     return false;
 }
 
+bool placeToSite(Site& site, Plate& plate) {
+    openGripper(site.getGrasp().pre_grasp_posture);
+
+    geometry_msgs::PoseStamped sitePose = site.getSitePose();
+    tf2::Quaternion orientation;
+    orientation.setW(sitePose.pose.orientation.w);
+    orientation.setX(sitePose.pose.orientation.x);
+    orientation.setY(sitePose.pose.orientation.y);
+    orientation.setZ(sitePose.pose.orientation.z);
+
+    tf2::Quaternion rot;
+    rot.setRPY(M_PI, 0, 0);
+    orientation *= rot;
+    //    orientation.normalize();
+
+    sitePose.pose.orientation = tf2::toMsg(orientation);
+
+    moveGroupPtr->place(plate.getObjectId(), sitePose);
+    return true;
+}
+
 /**
  * Get the current pose.
  * 
@@ -146,21 +167,17 @@ bool getPose(panda_controller::GetPose::Request& req, panda_controller::GetPose:
     sitePose.orientation = tf2::toMsg(orientation);
     sitePose.position.x = 0.15 + WELLS_LENGTH_IN_M / 2.0;
     sitePose.position.y = 0.50;
-    sitePose.position.z = 0.01 + 0.24; // <- finger length!!!
+    //    sitePose.position.z = 0.01 + 0.24; // <- finger length!!!
+    sitePose.position.z = 0.01 + WELLS_HEIGHT_IN_M / 2.0;
     Site mySite(sitePose);
 
-    geometry_msgs::Pose platePose;
-    platePose.position.x = 0.15 + WELLS_LENGTH_IN_M / 2.0;
-    platePose.position.y = 0.50;
-    platePose.position.z = 0.01 + WELLS_HEIGHT_IN_M / 2.0;
-
-    Plate myPlate(platePose);
-    myPlate.setPlateDimensions(WELLS_LENGTH_IN_M, WELLS_WIDTH_IN_M, WELLS_HEIGHT_IN_M);
+    Plate myPlate(WELLS_LENGTH_IN_M, WELLS_WIDTH_IN_M, WELLS_HEIGHT_IN_M);
+    myPlate.putLocationToSite(sitePose);
     planningScenePtr->applyCollisionObject(myPlate.getCollisonObject());
 
     moveit_msgs::GripperTranslation approach;
     approach.direction.vector.x = 1.0;
-    approach.min_distance = 0.095;
+    approach.min_distance = 0.1;
     approach.desired_distance = 0.115;
     mySite.setApproach(approach);
 
@@ -169,7 +186,10 @@ bool getPose(panda_controller::GetPose::Request& req, panda_controller::GetPose:
     retreat.min_distance = 0.1;
     retreat.desired_distance = 0.25;
     mySite.setRetreat(retreat);
+
     pickFromSite(mySite, myPlate);
+    placeToSite(mySite, myPlate);
+
     return true;
 }
 

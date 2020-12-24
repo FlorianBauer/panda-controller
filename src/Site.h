@@ -11,7 +11,8 @@ public:
     Site(const geometry_msgs::Pose& pose);
     Site(const Site& orig);
     virtual ~Site();
-    void setPose(const geometry_msgs::Pose& pose);
+
+    geometry_msgs::PoseStamped getSitePose() const;
     void setApproach(const moveit_msgs::GripperTranslation& approach);
     void setRetreat(const moveit_msgs::GripperTranslation& retreat);
     moveit_msgs::Grasp& getGrasp();
@@ -19,6 +20,7 @@ private:
     std::string siteId;
     std::string description;
     moveit_msgs::Grasp grasp;
+    geometry_msgs::Pose locationPose;
     bool hasRetreat = false;
 };
 
