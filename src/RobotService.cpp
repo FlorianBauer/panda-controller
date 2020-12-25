@@ -192,6 +192,9 @@ bool getPose(panda_controller::GetPose::Request& req, panda_controller::GetPose:
     pickFromSite(mySite, myPlate);
     placeToSite(mySite, myPlate);
 
+    // remove plate from scene
+    planningScenePtr->removeCollisionObjects({myPlate.getObjectId()});
+
     return true;
 }
 
