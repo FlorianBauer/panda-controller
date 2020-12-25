@@ -14,7 +14,9 @@ public:
 
     geometry_msgs::PoseStamped getSitePose() const;
     void setApproach(const moveit_msgs::GripperTranslation& approach);
+    moveit_msgs::GripperTranslation getApproach() const;
     void setRetreat(const moveit_msgs::GripperTranslation& retreat);
+    moveit_msgs::GripperTranslation getRetreat() const;
     moveit_msgs::Grasp& getGrasp();
 private:
     std::string siteId;
