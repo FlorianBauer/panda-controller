@@ -69,3 +69,28 @@ moveit_msgs::GripperTranslation Site::getRetreat() const {
 moveit_msgs::Grasp& Site::getGrasp() {
     return grasp;
 }
+
+moveit_msgs::PlaceLocation Site::getPlaceLocation() const {
+    geometry_msgs::PoseStamped sitePose = getSitePose();
+    tf2::Quaternion orientation;
+    sitePose.pose.orientation = tf2::toMsg(orientation);
+
+    moveit_msgs::PlaceLocation pl;
+    pl.place_pose = sitePose;
+
+    // The place approach is the reversed pick retreat.
+    moveit_msgs::GripperTranslation approach = getRetreat();
+    approach.direction.vector.x *= -1.0;
+    approach.direction.vector.y *= -1.0;
+    approach.direction.vector.z *= -1.0;
+    pl.pre_place_approach = approach;
+
+    // The place retreat is the reversed pick approach.
+    moveit_msgs::GripperTranslation retreat = getApproach();
+    retreat.direction.vector.x *= -1.0;
+    retreat.direction.vector.y *= -1.0;
+    retreat.direction.vector.z *= -1.0;
+    pl.post_place_retreat = retreat;
+
+    return pl;
+}

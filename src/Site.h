@@ -18,6 +18,8 @@ public:
     void setRetreat(const moveit_msgs::GripperTranslation& retreat);
     moveit_msgs::GripperTranslation getRetreat() const;
     moveit_msgs::Grasp& getGrasp();
+    moveit_msgs::PlaceLocation getPlaceLocation() const;
+
 private:
     std::string siteId;
     std::string description;
