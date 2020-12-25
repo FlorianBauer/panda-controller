@@ -119,29 +119,13 @@ bool pickFromSite(Site& site, Plate& plate) {
     moveit_msgs::Grasp& grasp = site.getGrasp();
     openGripper(grasp.pre_grasp_posture);
     closedGripper(grasp.grasp_posture);
-
     moveGroupPtr->pick(plate.getObjectId(), grasp);
     return false;
 }
 
 bool placeToSite(Site& site, Plate& plate) {
     openGripper(site.getGrasp().pre_grasp_posture);
-
-    geometry_msgs::PoseStamped sitePose = site.getSitePose();
-    tf2::Quaternion orientation;
-    orientation.setW(sitePose.pose.orientation.w);
-    orientation.setX(sitePose.pose.orientation.x);
-    orientation.setY(sitePose.pose.orientation.y);
-    orientation.setZ(sitePose.pose.orientation.z);
-
-    tf2::Quaternion rot;
-    rot.setRPY(M_PI, 0, 0);
-    orientation *= rot;
-    //    orientation.normalize();
-
-    sitePose.pose.orientation = tf2::toMsg(orientation);
-
-    moveGroupPtr->place(plate.getObjectId(), sitePose);
+    moveGroupPtr->place(plate.getObjectId(),{site.getPlaceLocation()});
     return true;
 }
 
