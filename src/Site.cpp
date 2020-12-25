@@ -1,12 +1,12 @@
 #include "Site.h"
 #include "ServiceDefs.h"
 
-constexpr double FINGER_LENGTH = 0.24;
+constexpr double FINGER_LENGTH = 0.20;
 
 Site::Site(const geometry_msgs::Pose& pose) {
     locationPose = pose;
     grasp.grasp_pose.pose = pose;
-    grasp.grasp_pose.pose.position.z = 0.01 + FINGER_LENGTH;
+    grasp.grasp_pose.pose.position.x -= FINGER_LENGTH;
 
     grasp.grasp_pose.header.frame_id = PANDA_LINK_BASE;
 

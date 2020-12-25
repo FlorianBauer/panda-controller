@@ -161,31 +161,33 @@ bool getPose(panda_controller::GetPose::Request& req, panda_controller::GetPose:
     res.ori_w = curPose.pose.orientation.w;
 
     tf2::Quaternion orientation;
-    orientation.setRPY(-M_PI, 0, -M_PI_4);
+    //    orientation.setRPY(-M_PI, 0, -M_PI_4);
+    orientation.setValue(0.21539, 0.64963, 0.30375, 0.66282);
+    orientation.normalize();
 
     geometry_msgs::Pose sitePose;
     sitePose.orientation = tf2::toMsg(orientation);
     sitePose.position.x = 0.15 + WELLS_LENGTH_IN_M / 2.0;
     sitePose.position.y = 0.50;
-    //    sitePose.position.z = 0.01 + 0.24; // <- finger length!!!
     sitePose.position.z = 0.01 + WELLS_HEIGHT_IN_M / 2.0;
     Site mySite(sitePose);
 
-    Plate myPlate(WELLS_LENGTH_IN_M, WELLS_WIDTH_IN_M, WELLS_HEIGHT_IN_M);
-    myPlate.putLocationToSite(sitePose);
-    planningScenePtr->applyCollisionObject(myPlate.getCollisonObject());
-
     moveit_msgs::GripperTranslation approach;
     approach.direction.vector.x = 1.0;
-    approach.min_distance = 0.1;
-    approach.desired_distance = 0.115;
+    approach.min_distance = 0.01;
+    approach.desired_distance = 0.05;
     mySite.setApproach(approach);
 
     moveit_msgs::GripperTranslation retreat;
     retreat.direction.vector.z = 1.0;
-    retreat.min_distance = 0.1;
-    retreat.desired_distance = 0.25;
+    retreat.min_distance = 0.01;
+    retreat.desired_distance = 0.05;
     mySite.setRetreat(retreat);
+
+    Plate myPlate(WELLS_LENGTH_IN_M, WELLS_WIDTH_IN_M, WELLS_HEIGHT_IN_M);
+    myPlate.putLocationToSite(sitePose);
+    // add plate to scene
+    planningScenePtr->applyCollisionObject(myPlate.getCollisonObject());
 
     pickFromSite(mySite, myPlate);
     placeToSite(mySite, myPlate);
