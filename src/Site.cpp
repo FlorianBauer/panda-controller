@@ -1,14 +1,23 @@
 #include "Site.h"
 #include "ServiceDefs.h"
 
+/// The length of the robot finger in m.
 constexpr double FINGER_LENGTH = 0.20;
+/// Finger position relative to end-effector.
+static const tf2::Vector3 FINGER_REL_POS(0.0, 0.0, -FINGER_LENGTH);
 
 Site::Site(const geometry_msgs::Pose& pose) {
+    grasp.grasp_pose.header.frame_id = PANDA_LINK_BASE;
     locationPose = pose;
     grasp.grasp_pose.pose = pose;
-    grasp.grasp_pose.pose.position.x -= FINGER_LENGTH;
 
-    grasp.grasp_pose.header.frame_id = PANDA_LINK_BASE;
+    // Transform position a bit back to grab target with the actual fingers.
+    tf2::Transform trans;
+    tf2::fromMsg(pose, trans);
+    tf2::Vector3 transFinger = trans * FINGER_REL_POS;
+    grasp.grasp_pose.pose.position.x = transFinger.getX();
+    grasp.grasp_pose.pose.position.y = transFinger.getY();
+    grasp.grasp_pose.pose.position.z = transFinger.getZ();
 
     grasp.pre_grasp_posture.joint_names.resize(2);
     grasp.pre_grasp_posture.joint_names[0] = PANDA_FINGER_1;

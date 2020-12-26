@@ -145,9 +145,8 @@ bool getPose(panda_controller::GetPose::Request& req, panda_controller::GetPose:
     res.ori_w = curPose.pose.orientation.w;
 
     tf2::Quaternion orientation;
-    //    orientation.setRPY(-M_PI, 0, -M_PI_4);
-    orientation.setValue(0.21539, 0.64963, 0.30375, 0.66282);
-    orientation.normalize();
+    // orientation.setRPY(-M_PI, 0, -M_PI_4);
+    orientation.setRPY(M_PI_2, M_PI_4, M_PI_2);
 
     geometry_msgs::Pose sitePose;
     sitePose.orientation = tf2::toMsg(orientation);
