@@ -39,17 +39,15 @@ static void printBuildInfo() {
             << "Compiler: " << COMPILER_ID << " " << COMPILER_VERSION << "\n";
 }
 
-void openGripper(trajectory_msgs::JointTrajectory& posture) {
-    /* Set them as open, wide enough for the object to fit. */
+void openGripper(trajectory_msgs::JointTrajectory& posture, const Plate& plate) {
     posture.points.resize(1);
     posture.points[0].positions.resize(2);
-    posture.points[0].positions[0] = WELLS_WIDTH_IN_M / 2.0 + 0.01;
-    posture.points[0].positions[1] = WELLS_WIDTH_IN_M / 2.0 + 0.01;
+    posture.points[0].positions[0] = plate.getWidth() / 2.0 + 0.01;
+    posture.points[0].positions[1] = plate.getWidth() / 2.0 + 0.01;
     posture.points[0].time_from_start = ros::Duration(0.5);
 }
 
 void closedGripper(trajectory_msgs::JointTrajectory& posture) {
-    /* Set them as closed. */
     posture.points.resize(1);
     posture.points[0].positions.resize(2);
     posture.points[0].positions[0] = 0.00;
@@ -57,7 +55,7 @@ void closedGripper(trajectory_msgs::JointTrajectory& posture) {
     posture.points[0].time_from_start = ros::Duration(0.5);
 }
 
-bool moveTo(panda_controller::MoveTo::Request& req, panda_controller::MoveTo::Response& res) {
+bool moveToPosition(panda_controller::MoveTo::Request& req, panda_controller::MoveTo::Response& res) {
     geometry_msgs::Pose targetPose;
     targetPose.position.x = req.pos_x;
     targetPose.position.y = req.pos_y;
@@ -117,33 +115,19 @@ bool getJoints(panda_controller::GetJoints::Request& req, panda_controller::GetJ
 
 bool pickFromSite(Site& site, Plate& plate) {
     moveit_msgs::Grasp& grasp = site.getGrasp();
-    openGripper(grasp.pre_grasp_posture);
+    openGripper(grasp.pre_grasp_posture, plate);
     closedGripper(grasp.grasp_posture);
     moveGroupPtr->pick(plate.getObjectId(), grasp);
     return false;
 }
 
 bool placeToSite(Site& site, Plate& plate) {
-    openGripper(site.getGrasp().pre_grasp_posture);
+    openGripper(site.getGrasp().pre_grasp_posture, plate);
     moveGroupPtr->place(plate.getObjectId(),{site.getPlaceLocation()});
     return true;
 }
 
-/**
- * Get the current pose.
- * 
- * @return `true` on success, otherwise `false`.
- */
-bool getPose(panda_controller::GetPose::Request& req, panda_controller::GetPose::Response& res) {
-    const geometry_msgs::PoseStamped curPose = moveGroupPtr->getCurrentPose(PANDA_LINK_EEF);
-    res.pos_x = curPose.pose.position.x;
-    res.pos_y = curPose.pose.position.y;
-    res.pos_z = curPose.pose.position.z;
-    res.ori_x = curPose.pose.orientation.x;
-    res.ori_y = curPose.pose.orientation.y;
-    res.ori_z = curPose.pose.orientation.z;
-    res.ori_w = curPose.pose.orientation.w;
-
+void grabTest() {
     tf2::Quaternion orientation;
     // orientation.setRPY(-M_PI, 0, -M_PI_4);
     orientation.setRPY(M_PI_2, M_PI_4, M_PI_2);
@@ -177,6 +161,49 @@ bool getPose(panda_controller::GetPose::Request& req, panda_controller::GetPose:
 
     // remove plate from scene
     planningScenePtr->removeCollisionObjects({myPlate.getObjectId()});
+}
+
+bool transportPlate(Site& source, Site& destination, Plate& plate) {
+    // set-up constraint for liquids
+    moveit_msgs::OrientationConstraint oriCon;
+    oriCon.link_name = "panda_link7";
+    oriCon.header.frame_id = PANDA_LINK_EEF;
+    tf2::Quaternion orientation;
+    orientation.setRPY(-M_PI, 0.0, -M_PI_4);
+    oriCon.orientation = tf2::toMsg(orientation);
+    // restrain X and Y axis to max. +- 36° tilt (360° / 10)
+    oriCon.absolute_x_axis_tolerance = 2.0 * M_PI / 10.0;
+    oriCon.absolute_y_axis_tolerance = 2.0 * M_PI / 10.0;
+    // Z axis has full freedom
+    oriCon.absolute_z_axis_tolerance = 2.0 * M_PI;
+    oriCon.weight = 1.0;
+    moveit_msgs::Constraints liquidTransportConstraint;
+    liquidTransportConstraint.orientation_constraints.push_back(oriCon);
+
+    moveGroupPtr->setPathConstraints(liquidTransportConstraint);
+
+    // TODO: implement
+
+    moveGroupPtr->clearPathConstraints();
+    return true;
+}
+
+/**
+ * Get the current pose.
+ * 
+ * @return `true` on success, otherwise `false`.
+ */
+bool getPose(panda_controller::GetPose::Request& req, panda_controller::GetPose::Response& res) {
+    const geometry_msgs::PoseStamped curPose = moveGroupPtr->getCurrentPose(PANDA_LINK_EEF);
+    res.pos_x = curPose.pose.position.x;
+    res.pos_y = curPose.pose.position.y;
+    res.pos_z = curPose.pose.position.z;
+    res.ori_x = curPose.pose.orientation.x;
+    res.ori_y = curPose.pose.orientation.y;
+    res.ori_z = curPose.pose.orientation.z;
+    res.ori_w = curPose.pose.orientation.w;
+
+    grabTest();
 
     return true;
 }
@@ -186,14 +213,14 @@ int main(int argc, char* argv[]) {
 
     ros::init(argc, argv, PANDA_SERVICE_NAME);
     moveGroupPtr = new moveit::planning_interface::MoveGroupInterface(PANDA_ARM);
-    moveGroupPtr->setPlanningTime(45.0);
+    moveGroupPtr->setPlanningTime(15.0);
     planningScenePtr = new moveit::planning_interface::PlanningSceneInterface;
 
     ros::NodeHandle node;
     const std::vector<ros::ServiceServer> services = {
         node.advertiseService(SRV_GET_JOINTS, getJoints),
         node.advertiseService(SRV_GET_POSE, getPose),
-        node.advertiseService(SRV_MOVE_TO, moveTo),
+        node.advertiseService(SRV_MOVE_TO, moveToPosition),
         node.advertiseService(SRV_SET_JOINTS, setJoints)
     };
 
