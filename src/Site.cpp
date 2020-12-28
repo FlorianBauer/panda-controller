@@ -1,3 +1,7 @@
+/**
+ * A "Site" describes a place or device relative located to the robot to pick things up from or
+ * place to. Therefore, every site needs to define a pose from which the robot can access this site.
+ */
 #include "Site.h"
 #include "ServiceDefs.h"
 
@@ -71,7 +75,15 @@ void Site::setRetreat(const moveit_msgs::GripperTranslation& retreat) {
 
 moveit_msgs::GripperTranslation Site::getRetreat() const {
     moveit_msgs::GripperTranslation retreat;
-    retreat = grasp.post_grasp_retreat;
+    if (hasRetreat) {
+        retreat = grasp.post_grasp_retreat;
+    } else {
+        // if no retreat was set, use the reversed approach
+        retreat = grasp.pre_grasp_approach;
+        retreat.direction.vector.x *= -1.0;
+        retreat.direction.vector.y *= -1.0;
+        retreat.direction.vector.z *= -1.0;
+    }
     return retreat;
 }
 
