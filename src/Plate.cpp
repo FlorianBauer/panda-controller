@@ -1,3 +1,4 @@
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include "Plate.h"
 #include "ServiceDefs.h"
 
@@ -21,14 +22,29 @@ Plate::~Plate() {
 
 void Plate::putLocationToSite(const geometry_msgs::Pose& sitePose) {
     plateObject.primitive_poses.resize(1);
+    tf2::Quaternion orientation;
+    orientation.setRPY(0.0, 0.0, 0.0);
+    plateObject.primitive_poses[0].orientation = tf2::toMsg(orientation);
     plateObject.primitive_poses[0].position = sitePose.position;
     plateObject.operation = moveit_msgs::CollisionObject::ADD;
 }
 
-const std::string& Plate::getObjectId() {
+const std::string& Plate::getObjectId() const {
     return plateObject.id;
 }
 
 moveit_msgs::CollisionObject& Plate::getCollisonObject() {
     return plateObject;
+}
+
+double Plate::getLength() const {
+    return plateObject.primitives[0].dimensions[0];
+}
+
+double Plate::getWidth() const {
+    return plateObject.primitives[0].dimensions[1];
+}
+
+double Plate::getHeight() const {
+    return plateObject.primitives[0].dimensions[2];
 }

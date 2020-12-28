@@ -13,9 +13,11 @@ public:
     virtual ~Plate();
 
     void putLocationToSite(const geometry_msgs::Pose& sitePose);
-    const std::string& getObjectId();
+    const std::string& getObjectId() const;
     moveit_msgs::CollisionObject& getCollisonObject();
-
+    double getLength() const;
+    double getWidth() const;
+    double getHeight() const;
 private:
     moveit_msgs::CollisionObject plateObject;
 };
