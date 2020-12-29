@@ -41,14 +41,25 @@ static void printBuildInfo() {
             << "Compiler: " << COMPILER_ID << " " << COMPILER_VERSION << "\n";
 }
 
-void openGripper(trajectory_msgs::JointTrajectory& posture, const Plate& plate) {
+/**
+ * Opens the gripper to the given amount + 1 cm extra space.
+ * 
+ * @param posture The posture to apply the operation on.
+ * @param width The width in m to open the gripper.
+ */
+void openGripper(trajectory_msgs::JointTrajectory& posture, double width) {
     posture.points.resize(1);
     posture.points[0].positions.resize(2);
-    posture.points[0].positions[0] = plate.getWidth() / 2.0 + 0.01;
-    posture.points[0].positions[1] = plate.getWidth() / 2.0 + 0.01;
+    posture.points[0].positions[0] = width / 2.0 + 0.005;
+    posture.points[0].positions[1] = width / 2.0 + 0.005;
     posture.points[0].time_from_start = ros::Duration(0.5);
 }
 
+/**
+ * Closes the gripper.
+ * 
+ * @param posture The posture to apply the operation on.
+ */
 void closedGripper(trajectory_msgs::JointTrajectory& posture) {
     posture.points.resize(1);
     posture.points[0].positions.resize(2);
@@ -117,7 +128,7 @@ bool getJoints(panda_controller::GetJoints::Request& req, panda_controller::GetJ
 
 bool pickFromSite(Site& site, Plate& plate) {
     moveit_msgs::Grasp& grasp = site.getGrasp();
-    openGripper(grasp.pre_grasp_posture, plate);
+    openGripper(grasp.pre_grasp_posture, plate.getWidth());
     closedGripper(grasp.grasp_posture);
     const MoveItErrorCode err = moveGroupPtr->pick(plate.getObjectId(), grasp);
     if (err != MoveItErrorCode::SUCCESS) {
@@ -127,7 +138,7 @@ bool pickFromSite(Site& site, Plate& plate) {
 }
 
 bool placeToSite(Site& site, Plate& plate) {
-    openGripper(site.getGrasp().pre_grasp_posture, plate);
+    openGripper(site.getGrasp().pre_grasp_posture, plate.getWidth());
     const MoveItErrorCode err = moveGroupPtr->place(plate.getObjectId(),{site.getPlaceLocation()});
     if (err != MoveItErrorCode::SUCCESS) {
         return false;
