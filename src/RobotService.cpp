@@ -164,14 +164,16 @@ void grabTest() {
 }
 
 bool transportPlate(Site& source, Site& destination, Plate& plate) {
+
+    pickFromSite(source, plate);
+
+    const geometry_msgs::PoseStamped curPose = moveGroupPtr->getCurrentPose(PANDA_LINK_HAND);
     // set-up constraint for liquids
     moveit_msgs::OrientationConstraint oriCon;
-    oriCon.link_name = "panda_link7";
-    oriCon.header.frame_id = PANDA_LINK_EEF;
-    tf2::Quaternion orientation;
-    orientation.setRPY(-M_PI, 0.0, -M_PI_4);
-    oriCon.orientation = tf2::toMsg(orientation);
-    // restrain X and Y axis to max. +- 36° tilt (360° / 10)
+    oriCon.header.frame_id = PANDA_LINK_BASE;
+    oriCon.link_name = PANDA_LINK_HAND;
+    oriCon.orientation = curPose.pose.orientation;
+    // restrain X and Y axis to max. +-36° tilt(360° / 10)
     oriCon.absolute_x_axis_tolerance = 2.0 * M_PI / 10.0;
     oriCon.absolute_y_axis_tolerance = 2.0 * M_PI / 10.0;
     // Z axis has full freedom
@@ -182,9 +184,10 @@ bool transportPlate(Site& source, Site& destination, Plate& plate) {
 
     moveGroupPtr->setPathConstraints(liquidTransportConstraint);
 
-    // TODO: implement
+    placeToSite(destination, plate);
 
     moveGroupPtr->clearPathConstraints();
+
     return true;
 }
 
@@ -194,7 +197,7 @@ bool transportPlate(Site& source, Site& destination, Plate& plate) {
  * @return `true` on success, otherwise `false`.
  */
 bool getPose(panda_controller::GetPose::Request& req, panda_controller::GetPose::Response& res) {
-    const geometry_msgs::PoseStamped curPose = moveGroupPtr->getCurrentPose(PANDA_LINK_EEF);
+    const geometry_msgs::PoseStamped curPose = moveGroupPtr->getCurrentPose(PANDA_LINK_HAND);
     res.pos_x = curPose.pose.position.x;
     res.pos_y = curPose.pose.position.y;
     res.pos_z = curPose.pose.position.z;
