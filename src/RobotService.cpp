@@ -17,6 +17,8 @@
 #include "ServiceDefs.h"
 #include "Site.h"
 
+using moveit::planning_interface::MoveItErrorCode;
+
 constexpr double WELLS_LENGTH_IN_M = 0.12776;
 constexpr double WELLS_WIDTH_IN_M = 0.08548;
 constexpr double WELLS_HEIGHT_IN_M = 0.01435;
@@ -117,13 +119,19 @@ bool pickFromSite(Site& site, Plate& plate) {
     moveit_msgs::Grasp& grasp = site.getGrasp();
     openGripper(grasp.pre_grasp_posture, plate);
     closedGripper(grasp.grasp_posture);
-    moveGroupPtr->pick(plate.getObjectId(), grasp);
-    return false;
+    const MoveItErrorCode err = moveGroupPtr->pick(plate.getObjectId(), grasp);
+    if (err != MoveItErrorCode::SUCCESS) {
+        return false;
+    }
+    return true;
 }
 
 bool placeToSite(Site& site, Plate& plate) {
     openGripper(site.getGrasp().pre_grasp_posture, plate);
-    moveGroupPtr->place(plate.getObjectId(),{site.getPlaceLocation()});
+    const MoveItErrorCode err = moveGroupPtr->place(plate.getObjectId(),{site.getPlaceLocation()});
+    if (err != MoveItErrorCode::SUCCESS) {
+        return false;
+    }
     return true;
 }
 
