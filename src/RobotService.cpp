@@ -191,6 +191,43 @@ bool transportPlate(Site& source, Site& destination, Plate& plate) {
     return true;
 }
 
+void transportTest() {
+    tf2::Quaternion orientation;
+    //  orientation.setRPY(-M_PI, 0, -M_PI_4);
+    orientation.setRPY(M_PI_2, M_PI_4, M_PI_2);
+
+    geometry_msgs::Pose poseA;
+    poseA.orientation = tf2::toMsg(orientation);
+    poseA.position.x = 0.15 + WELLS_LENGTH_IN_M / 2.0;
+    poseA.position.y = 0.50;
+    poseA.position.z = 0.01 + WELLS_HEIGHT_IN_M / 2.0;
+    Site siteA(poseA);
+
+    geometry_msgs::Pose poseB;
+    poseB.orientation = tf2::toMsg(orientation);
+    poseB.position.x = 0.15 + WELLS_LENGTH_IN_M / 2.0;
+    poseB.position.y = -0.50;
+    poseB.position.z = 0.01 + WELLS_HEIGHT_IN_M / 2.0;
+    Site siteB(poseB);
+
+    moveit_msgs::GripperTranslation approach;
+    approach.direction.vector.x = 1.0;
+    approach.min_distance = 0.01;
+    approach.desired_distance = 0.05;
+    siteA.setApproach(approach);
+    siteB.setApproach(approach);
+
+    Plate myPlate(WELLS_LENGTH_IN_M, WELLS_WIDTH_IN_M, WELLS_HEIGHT_IN_M);
+    myPlate.putLocationToSite(poseA);
+    // add plate to scene
+    planningScenePtr->applyCollisionObject(myPlate.getCollisonObject());
+
+    transportPlate(siteA, siteB, myPlate);
+
+    // remove plate from scene
+    planningScenePtr->removeCollisionObjects({myPlate.getObjectId()});
+}
+
 /**
  * Get the current pose.
  * 
@@ -206,7 +243,8 @@ bool getPose(panda_controller::GetPose::Request& req, panda_controller::GetPose:
     res.ori_z = curPose.pose.orientation.z;
     res.ori_w = curPose.pose.orientation.w;
 
-    grabTest();
+    //    grabTest();
+    transportTest();
 
     return true;
 }
