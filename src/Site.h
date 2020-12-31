@@ -8,7 +8,7 @@
 
 class Site {
 public:
-    Site(const geometry_msgs::Pose& pose);
+    Site(const std::string& identifier, const geometry_msgs::Pose& pose);
     Site(const Site& orig);
     virtual ~Site();
 

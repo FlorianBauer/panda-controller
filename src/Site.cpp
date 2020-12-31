@@ -10,7 +10,8 @@ constexpr double FINGER_LENGTH = 0.20;
 /// Finger position relative to end-effector.
 static const tf2::Vector3 FINGER_REL_POS(0.0, 0.0, -FINGER_LENGTH);
 
-Site::Site(const geometry_msgs::Pose& pose) {
+Site::Site(const std::string& identifier, const geometry_msgs::Pose& pose) {
+    siteId = identifier;
     grasp.grasp_pose.header.frame_id = PANDA_LINK_BASE;
     locationPose = pose;
     grasp.grasp_pose.pose = pose;

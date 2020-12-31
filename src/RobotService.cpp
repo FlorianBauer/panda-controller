@@ -156,7 +156,7 @@ void grabTest() {
     sitePose.position.x = 0.15 + WELLS_LENGTH_IN_M / 2.0;
     sitePose.position.y = 0.50;
     sitePose.position.z = 0.01 + WELLS_HEIGHT_IN_M / 2.0;
-    Site mySite(sitePose);
+    Site mySite("grabSite", sitePose);
 
     moveit_msgs::GripperTranslation approach;
     approach.direction.vector.x = 1.0;
@@ -220,14 +220,14 @@ void transportTest() {
     poseA.position.x = 0.15 + WELLS_LENGTH_IN_M / 2.0;
     poseA.position.y = 0.50;
     poseA.position.z = 0.01 + WELLS_HEIGHT_IN_M / 2.0;
-    Site siteA(poseA);
+    Site siteA("siteA", poseA);
 
     geometry_msgs::Pose poseB;
     poseB.orientation = tf2::toMsg(orientation);
     poseB.position.x = 0.15 + WELLS_LENGTH_IN_M / 2.0;
     poseB.position.y = -0.50;
     poseB.position.z = 0.01 + WELLS_HEIGHT_IN_M / 2.0;
-    Site siteB(poseB);
+    Site siteB("siteB", poseB);
 
     moveit_msgs::GripperTranslation approach;
     approach.direction.vector.x = 1.0;
