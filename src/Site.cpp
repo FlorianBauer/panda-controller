@@ -1,6 +1,6 @@
 /**
  * A "Site" describes a place or device relative located to the robot to pick things up from or
- * place to. Therefore, every site needs to define a pose from which the robot can access this site.
+ * put to. Therefore, every Site needs to define a pose from which the arm can access this location.
  */
 #include "Site.h"
 #include "ServiceDefs.h"
