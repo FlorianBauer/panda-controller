@@ -5,21 +5,95 @@
 #include "Site.h"
 #include "ServiceDefs.h"
 
+using json = nlohmann::json;
+
 /// The length of the robot finger in m.
-constexpr double FINGER_LENGTH = 0.20;
+static constexpr double FINGER_LENGTH = 0.20;
 /// Finger position relative to end-effector.
 static const tf2::Vector3 FINGER_REL_POS(0.0, 0.0, -FINGER_LENGTH);
+
+// Field identifiers for de-/serialization.
+static constexpr char SITE_ID[] = "id";
+static constexpr char POSE[] = "pose";
+static constexpr char POS_X[] = "posX";
+static constexpr char POS_Y[] = "posY";
+static constexpr char POS_Z[] = "posZ";
+static constexpr char ORI_X[] = "oriX";
+static constexpr char ORI_Y[] = "oriY";
+static constexpr char ORI_Z[] = "oriZ";
+static constexpr char ORI_W[] = "oriW";
+static constexpr char APPROACH[] = "approach";
+static constexpr char RETREAT[] = "retreat";
+static constexpr char DESIRED_DIST[] = "desiredDist";
+static constexpr char MIN_DIST[] = "minDist";
+static constexpr char DIR_X[] = "dirX";
+static constexpr char DIR_Y[] = "dirY";
+static constexpr char DIR_Z[] = "dirZ";
 
 Site::Site(const std::string& identifier, const geometry_msgs::Pose& pose) {
     siteId = identifier;
     grasp.grasp_pose.header.frame_id = PANDA_LINK_BASE;
     locationPose = pose;
-    grasp.grasp_pose.pose = pose;
 
     // Transform position a bit back to grab target with the actual fingers.
     tf2::Transform trans;
-    tf2::fromMsg(pose, trans);
+    tf2::fromMsg(locationPose, trans);
     tf2::Vector3 transFinger = trans * FINGER_REL_POS;
+
+    grasp.grasp_pose.pose = locationPose;
+    grasp.grasp_pose.pose.position.x = transFinger.getX();
+    grasp.grasp_pose.pose.position.y = transFinger.getY();
+    grasp.grasp_pose.pose.position.z = transFinger.getZ();
+
+    grasp.pre_grasp_posture.joint_names.resize(2);
+    grasp.pre_grasp_posture.joint_names[0] = PANDA_FINGER_1;
+    grasp.pre_grasp_posture.joint_names[1] = PANDA_FINGER_1;
+
+    grasp.grasp_posture.joint_names.resize(2);
+    grasp.grasp_posture.joint_names[0] = PANDA_FINGER_1;
+    grasp.grasp_posture.joint_names[1] = PANDA_FINGER_1;
+}
+
+Site::Site(const json& jsonStruct) {
+    siteId = jsonStruct[SITE_ID].get<std::string>();
+    const json& jsonPose = jsonStruct[POSE];
+    locationPose.position.x = jsonPose[POS_X].get<double>();
+    locationPose.position.y = jsonPose[POS_Y].get<double>();
+    locationPose.position.z = jsonPose[POS_Z].get<double>();
+    locationPose.orientation.x = jsonPose[ORI_X].get<double>();
+    locationPose.orientation.y = jsonPose[ORI_Y].get<double>();
+    locationPose.orientation.z = jsonPose[ORI_Z].get<double>();
+    locationPose.orientation.w = jsonPose[ORI_W].get<double>();
+
+    const json& jsonApproach = jsonStruct[APPROACH];
+    if (!jsonApproach.empty()) {
+        grasp.pre_grasp_approach.direction.header.frame_id = PANDA_LINK_BASE;
+        grasp.pre_grasp_approach.desired_distance = jsonApproach[DESIRED_DIST].get<double>();
+        grasp.pre_grasp_approach.min_distance = jsonApproach[MIN_DIST].get<double>();
+        grasp.pre_grasp_approach.direction.vector.x = jsonApproach[DIR_X].get<double>();
+        grasp.pre_grasp_approach.direction.vector.y = jsonApproach[DIR_Y].get<double>();
+        grasp.pre_grasp_approach.direction.vector.z = jsonApproach[DIR_Z].get<double>();
+        hasApproach = true;
+    }
+
+    const json& jsonRetreat = jsonStruct[RETREAT];
+    if (!jsonRetreat.empty()) {
+        grasp.post_place_retreat.direction.header.frame_id = PANDA_LINK_BASE;
+        grasp.post_place_retreat.desired_distance = jsonRetreat[DESIRED_DIST].get<double>();
+        grasp.post_place_retreat.min_distance = jsonRetreat[MIN_DIST].get<double>();
+        grasp.post_place_retreat.direction.vector.x = jsonRetreat[DIR_X].get<double>();
+        grasp.post_place_retreat.direction.vector.y = jsonRetreat[DIR_Y].get<double>();
+        grasp.post_place_retreat.direction.vector.z = jsonRetreat[DIR_Z].get<double>();
+        hasRetreat = true;
+    }
+
+    grasp.grasp_pose.header.frame_id = PANDA_LINK_BASE;
+
+    // Transform position a bit back to grab target with the actual fingers.
+    tf2::Transform trans;
+    tf2::fromMsg(locationPose, trans);
+    tf2::Vector3 transFinger = trans * FINGER_REL_POS;
+    grasp.grasp_pose.pose = locationPose;
     grasp.grasp_pose.pose.position.x = transFinger.getX();
     grasp.grasp_pose.pose.position.y = transFinger.getY();
     grasp.grasp_pose.pose.position.z = transFinger.getZ();
@@ -50,6 +124,7 @@ geometry_msgs::PoseStamped Site::getSitePose() const {
 void Site::setApproach(const moveit_msgs::GripperTranslation& approach) {
     grasp.pre_grasp_approach = approach;
     grasp.pre_grasp_approach.direction.header.frame_id = PANDA_LINK_BASE;
+    hasApproach = true;
 }
 
 /**
@@ -113,6 +188,48 @@ moveit_msgs::PlaceLocation Site::getPlaceLocation() const {
     retreat.direction.vector.y *= -1.0;
     retreat.direction.vector.z *= -1.0;
     pl.post_place_retreat = retreat;
-
     return pl;
+}
+
+json Site::getSiteAsJson() const {
+    json jsonStruct;
+    jsonStruct[SITE_ID] = siteId;
+    jsonStruct[POSE] = {
+        {POS_X, locationPose.position.x},
+        {POS_Y, locationPose.position.y},
+        {POS_Z, locationPose.position.z},
+        {ORI_X, locationPose.orientation.x},
+        {ORI_Y, locationPose.orientation.y},
+        {ORI_Z, locationPose.orientation.z},
+        {ORI_W, locationPose.orientation.w},
+    };
+
+    if (hasApproach) {
+        jsonStruct[APPROACH] = {
+            {DESIRED_DIST, grasp.pre_grasp_approach.desired_distance},
+            {MIN_DIST, grasp.pre_grasp_approach.min_distance},
+            {DIR_X, grasp.pre_grasp_approach.direction.vector.x},
+            {DIR_Y, grasp.pre_grasp_approach.direction.vector.y},
+            {DIR_Z, grasp.pre_grasp_approach.direction.vector.z},
+        };
+    }
+
+    if (hasRetreat) {
+        jsonStruct[RETREAT] = {
+            {DESIRED_DIST, grasp.post_grasp_retreat.desired_distance},
+            {MIN_DIST, grasp.post_grasp_retreat.min_distance},
+            {DIR_X, grasp.post_grasp_retreat.direction.vector.x},
+            {DIR_Y, grasp.post_grasp_retreat.direction.vector.y},
+            {DIR_Z, grasp.post_grasp_retreat.direction.vector.z},
+        };
+    }
+    return jsonStruct;
+}
+
+bool Site::isOccupied() const {
+    return isSiteOccupied;
+}
+
+void Site::setOccupied(bool isInUse) {
+    isInUse = isInUse;
 }

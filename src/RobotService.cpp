@@ -128,9 +128,9 @@ bool getJoints(panda_controller::GetJoints::Request& req, panda_controller::GetJ
 
 bool pickFromSite(Site& site, Plate& plate) {
     moveit_msgs::Grasp& grasp = site.getGrasp();
-    openGripper(grasp.pre_grasp_posture, plate.getWidth());
+    openGripper(grasp.pre_grasp_posture, plate.getSizeY());
     closedGripper(grasp.grasp_posture);
-    const MoveItErrorCode err = moveGroupPtr->pick(plate.getObjectId(), grasp);
+    const MoveItErrorCode err = moveGroupPtr->pick(plate.getPlateId(), grasp);
     if (err != MoveItErrorCode::SUCCESS) {
         return false;
     }
@@ -138,8 +138,8 @@ bool pickFromSite(Site& site, Plate& plate) {
 }
 
 bool placeToSite(Site& site, Plate& plate) {
-    openGripper(site.getGrasp().pre_grasp_posture, plate.getWidth());
-    const MoveItErrorCode err = moveGroupPtr->place(plate.getObjectId(),{site.getPlaceLocation()});
+    openGripper(site.getGrasp().pre_grasp_posture, plate.getSizeY());
+    const MoveItErrorCode err = moveGroupPtr->place(plate.getPlateId(),{site.getPlaceLocation()});
     if (err != MoveItErrorCode::SUCCESS) {
         return false;
     }
@@ -148,14 +148,16 @@ bool placeToSite(Site& site, Plate& plate) {
 
 void grabTest() {
     tf2::Quaternion orientation;
-    // orientation.setRPY(-M_PI, 0, -M_PI_4);
-    orientation.setRPY(M_PI_2, M_PI_4, M_PI_2);
+    orientation.setRPY(-M_PI, 0, -M_PI_4);
+    //    orientation.setRPY(M_PI_2, M_PI_4, M_PI_2);
+
+    Plate myPlate("myTestPlate", WELLS_LENGTH_IN_M, WELLS_WIDTH_IN_M, WELLS_HEIGHT_IN_M);
 
     geometry_msgs::Pose sitePose;
     sitePose.orientation = tf2::toMsg(orientation);
-    sitePose.position.x = 0.15 + WELLS_LENGTH_IN_M / 2.0;
+    sitePose.position.x = 0.15 + myPlate.getSizeX() / 2.0;
     sitePose.position.y = 0.50;
-    sitePose.position.z = 0.01 + WELLS_HEIGHT_IN_M / 2.0;
+    sitePose.position.z = 0.01 + myPlate.getSizeZ() / 2.0;
     Site mySite("grabSite", sitePose);
 
     moveit_msgs::GripperTranslation approach;
@@ -169,9 +171,7 @@ void grabTest() {
     retreat.min_distance = 0.01;
     retreat.desired_distance = 0.05;
     mySite.setRetreat(retreat);
-
-    Plate myPlate(WELLS_LENGTH_IN_M, WELLS_WIDTH_IN_M, WELLS_HEIGHT_IN_M);
-    myPlate.putLocationToSite(sitePose);
+    myPlate.putAtSite(mySite);
     // add plate to scene
     planningScenePtr->applyCollisionObject(myPlate.getCollisonObject());
 
@@ -179,7 +179,7 @@ void grabTest() {
     placeToSite(mySite, myPlate);
 
     // remove plate from scene
-    planningScenePtr->removeCollisionObjects({myPlate.getObjectId()});
+    planningScenePtr->removeCollisionObjects({myPlate.getPlateId()});
 }
 
 bool transportPlate(Site& source, Site& destination, Plate& plate) {
@@ -215,18 +215,20 @@ void transportTest() {
     //  orientation.setRPY(-M_PI, 0, -M_PI_4);
     orientation.setRPY(M_PI_2, M_PI_4, M_PI_2);
 
+    Plate myPlate("testPlate", WELLS_LENGTH_IN_M, WELLS_WIDTH_IN_M, WELLS_HEIGHT_IN_M);
+
     geometry_msgs::Pose poseA;
     poseA.orientation = tf2::toMsg(orientation);
-    poseA.position.x = 0.15 + WELLS_LENGTH_IN_M / 2.0;
+    poseA.position.x = 0.15 + myPlate.getSizeX() / 2.0;
     poseA.position.y = 0.50;
-    poseA.position.z = 0.01 + WELLS_HEIGHT_IN_M / 2.0;
+    poseA.position.z = 0.01 + myPlate.getSizeZ() / 2.0;
     Site siteA("siteA", poseA);
 
     geometry_msgs::Pose poseB;
     poseB.orientation = tf2::toMsg(orientation);
-    poseB.position.x = 0.15 + WELLS_LENGTH_IN_M / 2.0;
+    poseB.position.x = 0.15 + myPlate.getSizeX() / 2.0;
     poseB.position.y = -0.50;
-    poseB.position.z = 0.01 + WELLS_HEIGHT_IN_M / 2.0;
+    poseB.position.z = 0.01 + myPlate.getSizeZ() / 2.0;
     Site siteB("siteB", poseB);
 
     moveit_msgs::GripperTranslation approach;
@@ -236,15 +238,14 @@ void transportTest() {
     siteA.setApproach(approach);
     siteB.setApproach(approach);
 
-    Plate myPlate(WELLS_LENGTH_IN_M, WELLS_WIDTH_IN_M, WELLS_HEIGHT_IN_M);
-    myPlate.putLocationToSite(poseA);
+    myPlate.putAtSite(siteA);
     // add plate to scene
     planningScenePtr->applyCollisionObject(myPlate.getCollisonObject());
 
     transportPlate(siteA, siteB, myPlate);
 
     // remove plate from scene
-    planningScenePtr->removeCollisionObjects({myPlate.getObjectId()});
+    planningScenePtr->removeCollisionObjects({myPlate.getPlateId()});
 }
 
 /**
