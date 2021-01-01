@@ -58,8 +58,7 @@ Plate::~Plate() {
 }
 
 /**
- * Sets the orientation and position of this plate to the corresponding Site. The Site is then 
- * marked as occupied.
+ * Sets the position of this plate to the corresponding Site. The Site is then marked as occupied.
  * 
  * @param site The Site to place this plate at.
  */
@@ -67,7 +66,7 @@ void Plate::putAtSite(Site& site) {
     site.setOccupied(true);
     plateObject.primitive_poses.resize(1);
     const geometry_msgs::PoseStamped& pose = site.getSitePose();
-    plateObject.primitive_poses[0].orientation = pose.pose.orientation;
+    // The orientation is just meant for the gripper, so we ignore it and use just the position.
     plateObject.primitive_poses[0].position = pose.pose.position;
     plateObject.operation = moveit_msgs::CollisionObject::ADD;
 }
