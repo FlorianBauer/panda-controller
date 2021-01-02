@@ -17,15 +17,15 @@ public:
     void putAtSite(Site& site);
     const std::string& getPlateId() const;
     moveit_msgs::CollisionObject& getCollisonObject();
-    const std::string& getType() const;
-    double getSizeX() const;
-    double getSizeY() const;
-    double getSizeZ() const;
+    const std::string& getTypeName() const;
+    double getDimX() const;
+    double getDimY() const;
+    double getDimZ() const;
     nlohmann::json getPlateAsJson() const;
 
 private:
     moveit_msgs::CollisionObject plateObject;
-    std::string type;
+    std::string loadName;
 };
 
 #endif /* PLATE_H */

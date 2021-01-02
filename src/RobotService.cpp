@@ -128,7 +128,7 @@ bool getJoints(panda_controller::GetJoints::Request& req, panda_controller::GetJ
 
 bool pickFromSite(Site& site, Plate& plate) {
     moveit_msgs::Grasp& grasp = site.getGrasp();
-    openGripper(grasp.pre_grasp_posture, plate.getSizeY());
+    openGripper(grasp.pre_grasp_posture, plate.getDimY());
     closedGripper(grasp.grasp_posture);
     const MoveItErrorCode err = moveGroupPtr->pick(plate.getPlateId(), grasp);
     if (err != MoveItErrorCode::SUCCESS) {
@@ -138,7 +138,7 @@ bool pickFromSite(Site& site, Plate& plate) {
 }
 
 bool placeToSite(Site& site, Plate& plate) {
-    openGripper(site.getGrasp().pre_grasp_posture, plate.getSizeY());
+    openGripper(site.getGrasp().pre_grasp_posture, plate.getDimY());
     const MoveItErrorCode err = moveGroupPtr->place(plate.getPlateId(),{site.getPlaceLocation()});
     if (err != MoveItErrorCode::SUCCESS) {
         return false;
@@ -155,9 +155,9 @@ void grabTest() {
 
     geometry_msgs::Pose sitePose;
     sitePose.orientation = tf2::toMsg(orientation);
-    sitePose.position.x = 0.15 + myPlate.getSizeX() / 2.0;
+    sitePose.position.x = 0.15 + myPlate.getDimX() / 2.0;
     sitePose.position.y = 0.50;
-    sitePose.position.z = 0.01 + myPlate.getSizeZ() / 2.0;
+    sitePose.position.z = 0.01 + myPlate.getDimZ() / 2.0;
     Site mySite("grabSite", sitePose);
 
     moveit_msgs::GripperTranslation approach;
@@ -219,16 +219,16 @@ void transportTest() {
 
     geometry_msgs::Pose poseA;
     poseA.orientation = tf2::toMsg(orientation);
-    poseA.position.x = 0.15 + myPlate.getSizeX() / 2.0;
+    poseA.position.x = 0.15 + myPlate.getDimX() / 2.0;
     poseA.position.y = 0.50;
-    poseA.position.z = 0.01 + myPlate.getSizeZ() / 2.0;
+    poseA.position.z = 0.01 + myPlate.getDimZ() / 2.0;
     Site siteA("siteA", poseA);
 
     geometry_msgs::Pose poseB;
     poseB.orientation = tf2::toMsg(orientation);
-    poseB.position.x = 0.15 + myPlate.getSizeX() / 2.0;
+    poseB.position.x = 0.15 + myPlate.getDimX() / 2.0;
     poseB.position.y = -0.50;
-    poseB.position.z = 0.01 + myPlate.getSizeZ() / 2.0;
+    poseB.position.z = 0.01 + myPlate.getDimZ() / 2.0;
     Site siteB("siteB", poseB);
 
     moveit_msgs::GripperTranslation approach;
