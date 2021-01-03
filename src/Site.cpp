@@ -12,7 +12,7 @@ static constexpr double FINGER_LENGTH = 0.20;
 /// Finger position relative to end-effector.
 static const tf2::Vector3 FINGER_REL_POS(0.0, 0.0, -FINGER_LENGTH);
 
-// Field identifiers for de-/serialization.
+// Field identifiers for JSON de-/serialization.
 static constexpr char SITE_ID[] = "id";
 static constexpr char POSE[] = "pose";
 static constexpr char POS_X[] = "posX";
@@ -31,7 +31,7 @@ static constexpr char DIR_Y[] = "dirY";
 static constexpr char DIR_Z[] = "dirZ";
 
 Site::Site(const std::string& identifier, const geometry_msgs::Pose& pose) {
-    siteId = identifier;
+    id = identifier;
     grasp.grasp_pose.header.frame_id = PANDA_LINK_BASE;
     locationPose = pose;
 
@@ -55,7 +55,7 @@ Site::Site(const std::string& identifier, const geometry_msgs::Pose& pose) {
 }
 
 Site::Site(const json& jsonStruct) {
-    siteId = jsonStruct[SITE_ID].get<std::string>();
+    id = jsonStruct[SITE_ID].get<std::string>();
     const json& jsonPose = jsonStruct[POSE];
     locationPose.position.x = jsonPose[POS_X].get<double>();
     locationPose.position.y = jsonPose[POS_Y].get<double>();
@@ -113,11 +113,10 @@ Site::Site(const Site& orig) {
 Site::~Site() {
 }
 
-geometry_msgs::PoseStamped Site::getSitePose() const {
+geometry_msgs::PoseStamped Site::getPose() const {
     geometry_msgs::PoseStamped pose;
     pose.header.frame_id = PANDA_LINK_BASE;
     pose.pose = locationPose;
-
     return pose;
 }
 
@@ -168,7 +167,7 @@ moveit_msgs::Grasp& Site::getGrasp() {
 }
 
 moveit_msgs::PlaceLocation Site::getPlaceLocation() const {
-    geometry_msgs::PoseStamped sitePose = getSitePose();
+    geometry_msgs::PoseStamped sitePose = getPose();
     tf2::Quaternion orientation;
     sitePose.pose.orientation = tf2::toMsg(orientation);
 
@@ -191,9 +190,9 @@ moveit_msgs::PlaceLocation Site::getPlaceLocation() const {
     return pl;
 }
 
-json Site::getSiteAsJson() const {
+json Site::toJson() const {
     json jsonStruct;
-    jsonStruct[SITE_ID] = siteId;
+    jsonStruct[SITE_ID] = id;
     jsonStruct[POSE] = {
         {POS_X, locationPose.position.x},
         {POS_Y, locationPose.position.y},

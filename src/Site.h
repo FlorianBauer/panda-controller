@@ -14,20 +14,20 @@ public:
     Site(const Site& orig);
     virtual ~Site();
 
-    const std::string& getSiteId() const;
-    geometry_msgs::PoseStamped getSitePose() const;
-    void setApproach(const moveit_msgs::GripperTranslation& approach);
+    const std::string& getId() const;
+    geometry_msgs::PoseStamped getPose() const;
     moveit_msgs::GripperTranslation getApproach() const;
-    void setRetreat(const moveit_msgs::GripperTranslation& retreat);
     moveit_msgs::GripperTranslation getRetreat() const;
     moveit_msgs::Grasp& getGrasp();
     moveit_msgs::PlaceLocation getPlaceLocation() const;
-    nlohmann::json getSiteAsJson() const;
+    nlohmann::json toJson() const;
+    void setApproach(const moveit_msgs::GripperTranslation& approach);
+    void setRetreat(const moveit_msgs::GripperTranslation& retreat);
     bool isOccupied() const;
     void setOccupied(bool isInUse);
 
 private:
-    std::string siteId;
+    std::string id;
     std::string description;
     moveit_msgs::Grasp grasp;
     geometry_msgs::Pose locationPose;
