@@ -1,23 +1,19 @@
 /**
- * Class for Plates describing the transportable object and its dimensions for grabbing. The JSON 
- * constructor is capable of using parsed Opentrons labware files as input. Definitions of common 
- * used labware can be found here:
- * https://github.com/Opentrons/opentrons/tree/master/shared-data/labware/definitions/2
+ * Class for Plates describing the transportable object and its dimensions and offsets for gripping.
  */
 #include "Plate.h"
 #include "ServiceDefs.h"
 
 using json = nlohmann::json;
 
-// Field identifiers for de-/serialization.
-static constexpr char PLATE_METADATA[] = "metadata";
-static constexpr char PLATE_DSIP_NAME[] = "displayName";
-static constexpr char PLATE_PARAMETERS[] = "parameters";
-static constexpr char PLATE_LOAD_NAME[] = "loadName";
-static constexpr char PLATE_DIM[] = "dimensions";
-static constexpr char DIM_X[] = "xDimension";
-static constexpr char DIM_Y[] = "yDimension";
-static constexpr char DIM_Z[] = "zDimension";
+// Field identifiers for JSON de-/serialization.
+static constexpr char PLATE_TYPE[] = "type";
+static constexpr char DIM_X[] = "dimX";
+static constexpr char DIM_Y[] = "dimY";
+static constexpr char DIM_Z[] = "dimZ";
+static constexpr char GRIPPER_OFFSET_X[] = "gripperOffsetX";
+static constexpr char GRIPPER_OFFSET_Y[] = "gripperOffsetY";
+static constexpr char GRIPPER_OFFSET_Z[] = "gripperOffsetZ";
 
 /// ID counter
 static unsigned idCounter = 0;
@@ -31,7 +27,7 @@ static unsigned idCounter = 0;
  * @param dimZ The height of the object in meter.
  */
 Plate::Plate(const std::string& typeName, double dimX, double dimY, double dimZ) {
-    loadName = typeName;
+    type = typeName;
     plateObject.id = typeName + std::to_string(++idCounter);
     plateObject.header.frame_id = PANDA_LINK_BASE;
 
@@ -51,17 +47,16 @@ Plate::Plate(const std::string& typeName, double dimX, double dimY, double dimZ)
  * @param jsonStruct The JSON struct to read the data from.
  */
 Plate::Plate(const json& jsonStruct) {
-    loadName = jsonStruct[PLATE_PARAMETERS][PLATE_LOAD_NAME].get<std::string>();
-    plateObject.id = loadName + std::to_string(++idCounter);
+    type = jsonStruct[PLATE_TYPE].get<std::string>();
+    plateObject.id = type + std::to_string(++idCounter);
     plateObject.header.frame_id = PANDA_LINK_BASE;
 
     plateObject.primitives.resize(1);
     plateObject.primitives[0].type = shape_msgs::SolidPrimitive::BOX;
     plateObject.primitives[0].dimensions.resize(3);
-    const json& jsonDims = jsonStruct[PLATE_DIM];
-    plateObject.primitives[0].dimensions[0] = jsonDims[DIM_X].get<double>() * 100.0;
-    plateObject.primitives[0].dimensions[1] = jsonDims[DIM_Y].get<double>() * 100.0;
-    plateObject.primitives[0].dimensions[2] = jsonDims[DIM_Z].get<double>() * 100.0;
+    plateObject.primitives[0].dimensions[0] = jsonStruct[DIM_X].get<double>();
+    plateObject.primitives[0].dimensions[1] = jsonStruct[DIM_Y].get<double>();
+    plateObject.primitives[0].dimensions[2] = jsonStruct[DIM_Z].get<double>();
 }
 
 /**
@@ -96,7 +91,7 @@ void Plate::putAtSite(Site& site) {
  * 
  * @return The identifier as string.
  */
-const std::string& Plate::getPlateId() const {
+const std::string& Plate::getId() const {
     return plateObject.id;
 }
 
@@ -105,8 +100,8 @@ const std::string& Plate::getPlateId() const {
  * 
  * @return The type as string.
  */
-const std::string& Plate::getTypeName() const {
-    return loadName;
+const std::string& Plate::getType() const {
+    return type;
 }
 
 /**
@@ -151,13 +146,11 @@ double Plate::getDimZ() const {
  * 
  * @return The JSON struct.
  */
-json Plate::getPlateAsJson() const {
+json Plate::toJson() const {
     json jsonStruct;
-    jsonStruct[PLATE_PARAMETERS] = {PLATE_LOAD_NAME, loadName};
-    jsonStruct[PLATE_DIM] = {
-        {DIM_X, plateObject.primitives[0].dimensions[0] / 100.0},
-        {DIM_Y, plateObject.primitives[0].dimensions[1] / 100.0},
-        {DIM_Z, plateObject.primitives[0].dimensions[2] / 100.0},
-    };
+    jsonStruct[PLATE_TYPE] = type;
+    jsonStruct[DIM_X] = plateObject.primitives[0].dimensions[0];
+    jsonStruct[DIM_Y] = plateObject.primitives[0].dimensions[1];
+    jsonStruct[DIM_Z] = plateObject.primitives[0].dimensions[2];
     return jsonStruct;
 }

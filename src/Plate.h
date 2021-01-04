@@ -15,17 +15,17 @@ public:
     virtual ~Plate();
 
     void putAtSite(Site& site);
-    const std::string& getPlateId() const;
+    const std::string& getId() const;
     moveit_msgs::CollisionObject& getCollisonObject();
-    const std::string& getTypeName() const;
+    const std::string& getType() const;
     double getDimX() const;
     double getDimY() const;
     double getDimZ() const;
-    nlohmann::json getPlateAsJson() const;
+    nlohmann::json toJson() const;
 
 private:
     moveit_msgs::CollisionObject plateObject;
-    std::string loadName;
+    std::string type;
 };
 
 #endif /* PLATE_H */
