@@ -48,7 +48,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/")
 include_directories("/opt/ros/${ROS_DISTRO}/include/")
 
 set(JSON_BuildTests OFF CACHE INTERNAL "")
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/extern/json/")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/third_party/json/")
 
 find_package(catkin REQUIRED
   COMPONENTS
