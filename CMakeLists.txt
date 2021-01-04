@@ -27,8 +27,8 @@ if(GIT_FOUND)
 endif()
 
 
-# Set C++14 as standard
-set(CMAKE_CXX_STANDARD 14)
+# Set C++17 as standard
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # General compiler flags
