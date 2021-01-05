@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.13)
 
 project("panda_controller")
 set(ROBOT_SERVICE "robot_service")
@@ -6,6 +6,7 @@ set(PROJECT_TEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/test")
 
 # Enable tests with -DBUILD_TESTS=ON
 option(BUILD_TESTS "Build all unit tests." OFF)
+set(CMAKE_BUILD_TYPE "Release")
 
 # Version number
 set("${ROBOT_SERVICE}_VERSION_MAJOR" 0)
@@ -34,7 +35,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # General compiler flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 
-# Enable multithreading
+# Enable multi-threading
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
