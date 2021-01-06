@@ -22,59 +22,9 @@
             </List>
         </DataType>
     </Property>
-
     <Command>
-        <Identifier>SetSiteWithAxisAngels</Identifier>
-        <DisplayName>Set Site with Axis Angles</DisplayName>
-        <Description>Adds or overwrites a Site. The orientation is defined via the axis angles Roll, Pitch and Yaw (RPY).</Description>
-        <Observable>No</Observable>
-        <Parameter>
-            <Identifier>SiteId</Identifier>
-            <DisplayName>Site ID</DisplayName>
-            <Description>The string identifier of the Site.</Description>
-            <DataType>
-                <DataTypeIdentifier>SiteId</DataTypeIdentifier>
-            </DataType>
-        </Parameter>
-        <Parameter>
-            <Identifier>Position</Identifier>
-            <DisplayName>Position</DisplayName>
-            <Description>The position of the Site.</Description>
-            <DataType>
-                <DataTypeIdentifier>Position</DataTypeIdentifier>
-            </DataType>
-        </Parameter>
-        <Parameter>
-            <Identifier>Roll</Identifier>
-            <DisplayName>Roll</DisplayName>
-            <Description>The roll angle in radians.</Description>
-            <DataType>
-                <!-- TODO: add constraint (0.0–2 * Pi) -->
-                <Basic>Real</Basic>
-            </DataType>
-        </Parameter>
-        <Parameter>
-            <Identifier>Pitch</Identifier>
-            <DisplayName>Pitch</DisplayName>
-            <Description>The pitch angle in radians.</Description>
-            <DataType>
-                <!-- TODO: add constraint (0.0–2 * Pi) -->
-                <Basic>Real</Basic>
-            </DataType>
-        </Parameter>
-        <Parameter>
-            <Identifier>Yaw</Identifier>
-            <DisplayName>Yaw</DisplayName>
-            <Description>The yaw angle in radians.</Description>
-            <DataType>
-                <!-- TODO: add constraint (0.0–2 * Pi) -->
-                <Basic>Real</Basic>
-            </DataType>
-        </Parameter>
-    </Command>
-    <Command>
-        <Identifier>SetSiteWithQuaternion</Identifier>
-        <DisplayName>Set Site with Quaternion</DisplayName>
+        <Identifier>SetSite</Identifier>
+        <DisplayName>Set Site</DisplayName>
         <Description>Adds or overwrites a Site. The orientation is defined a Quaternion (X, Y, Z, W).</Description>
         <Observable>No</Observable>
         <Parameter>
@@ -86,43 +36,11 @@
             </DataType>
         </Parameter>
         <Parameter>
-            <Identifier>Position</Identifier>
-            <DisplayName>Position</DisplayName>
-            <Description>The position of the Site.</Description>
+            <Identifier>Pose</Identifier>
+            <DisplayName>Pose</DisplayName>
+            <Description>The Pose to reach the Site.</Description>
             <DataType>
-                <DataTypeIdentifier>Position</DataTypeIdentifier>
-            </DataType>
-        </Parameter>
-        <Parameter>
-            <Identifier>OrientationX</Identifier>
-            <DisplayName>Orientation X</DisplayName>
-            <Description>The X value.</Description>
-            <DataType>
-                <Basic>Real</Basic>
-            </DataType>
-        </Parameter>
-        <Parameter>
-            <Identifier>OrientationY</Identifier>
-            <DisplayName>Orientation Y</DisplayName>
-            <Description>The Y value.</Description>
-            <DataType>
-                <Basic>Real</Basic>
-            </DataType>
-        </Parameter>
-        <Parameter>
-            <Identifier>OrientationZ</Identifier>
-            <DisplayName>Orientation Z</DisplayName>
-            <Description>The Z value.</Description>
-            <DataType>
-                <Basic>Real</Basic>
-            </DataType>
-        </Parameter>
-        <Parameter>
-            <Identifier>OrientationW</Identifier>
-            <DisplayName>Orientation W</DisplayName>
-            <Description>The W value.</Description>
-            <DataType>
-                <Basic>Real</Basic>
+                <DataTypeIdentifier>Pose</DataTypeIdentifier>
             </DataType>
         </Parameter>
     </Command>
@@ -158,9 +76,9 @@
     </DataTypeDefinition>
 
     <DataTypeDefinition>
-        <Identifier>Position</Identifier>
-        <DisplayName>Position</DisplayName>
-        <Description>The relative position of the Site relative to the robot base.</Description>
+        <Identifier>Pose</Identifier>
+        <DisplayName>Pose</DisplayName>
+        <Description>The pose of the gripper to reach the Site. The pose itself consists of two parts: The Position as vector (XYZ) and the Orientation as Quaternion (XYZW).</Description>
         <DataType>
             <Structure>
                 <Element>
@@ -232,6 +150,38 @@
                         </Constrained>
                     </DataType>
                 </Element>
+                <Element>
+                    <Identifier>OriX</Identifier>
+                    <DisplayName>Orientation X</DisplayName>
+                    <Description>The X value.</Description>
+                    <DataType>
+                        <Basic>Real</Basic>
+                    </DataType>
+                </Element>
+                <Element>
+                    <Identifier>OriY</Identifier>
+                    <DisplayName>Orientation Y</DisplayName>
+                    <Description>The Y value.</Description>
+                    <DataType>
+                        <Basic>Real</Basic>
+                    </DataType>
+                </Element>
+                <Element>
+                    <Identifier>OriZ</Identifier>
+                    <DisplayName>Orientation Z</DisplayName>
+                    <Description>The Z value.</Description>
+                    <DataType>
+                        <Basic>Real</Basic>
+                    </DataType>
+                </Element>
+                <Element>
+                    <Identifier>OriW</Identifier>
+                    <DisplayName>Orientation W</DisplayName>
+                    <Description>The W value.</Description>
+                    <DataType>
+                        <Basic>Real</Basic>
+                    </DataType>
+                </Element>
             </Structure>
         </DataType>
     </DataTypeDefinition>
@@ -291,32 +241,9 @@
                     </DataType>
                 </Element>
                 <Element>
-                    <Identifier>MinDistance</Identifier>
-                    <DisplayName>Minimum Distance</DisplayName>
-                    <Description>The minimum distance do move.</Description>
-                    <DataType>
-                        <Constrained>
-                            <DataType>
-                                <Basic>Real</Basic>
-                            </DataType>
-                            <Constraints>
-                                <Unit>
-                                    <Label>m</Label>
-                                    <Factor>1.0</Factor>
-                                    <Offset>0</Offset>
-                                    <UnitComponent>
-                                        <SIUnit>Meter</SIUnit>
-                                        <Exponent>1</Exponent>
-                                    </UnitComponent>
-                                </Unit>
-                            </Constraints>
-                        </Constrained>
-                    </DataType>
-                </Element>
-                <Element>
-                    <Identifier>PrefDistance</Identifier>
-                    <DisplayName>Preferred Distance</DisplayName>
-                    <Description>The preferred distance do move.</Description>
+                    <Identifier>Distance</Identifier>
+                    <DisplayName>Distance</DisplayName>
+                    <Description>The distance do move.</Description>
                     <DataType>
                         <Constrained>
                             <DataType>
