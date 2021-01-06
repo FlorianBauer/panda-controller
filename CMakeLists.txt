@@ -105,14 +105,18 @@ include_directories(${THIS_PACKAGE_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${EIGEN3
 
 # Build the ROS client node
 set(ROBOT_CLIENT "robot_client")
-add_executable(${ROBOT_CLIENT} "${CMAKE_CURRENT_SOURCE_DIR}/src/RobotClient.cpp")
+add_executable(${ROBOT_CLIENT} "${CMAKE_CURRENT_SOURCE_DIR}/src/RobotClient.cpp"
+                                "${CMAKE_CURRENT_SOURCE_DIR}/src/Plate.cpp"
+                                "${CMAKE_CURRENT_SOURCE_DIR}/src/Site.cpp"
+                                "${CMAKE_CURRENT_SOURCE_DIR}/src/FileManager.cpp")
 add_dependencies(${ROBOT_CLIENT} panda_controller_gencpp)
 target_link_libraries(${ROBOT_CLIENT} ${catkin_LIBRARIES})
 
 # Build the ROS service node
 add_executable(${ROBOT_SERVICE} "${CMAKE_CURRENT_SOURCE_DIR}/src/RobotService.cpp"
                                 "${CMAKE_CURRENT_SOURCE_DIR}/src/Plate.cpp"
-                                "${CMAKE_CURRENT_SOURCE_DIR}/src/Site.cpp")
+                                "${CMAKE_CURRENT_SOURCE_DIR}/src/Site.cpp"
+                                "${CMAKE_CURRENT_SOURCE_DIR}/src/FileManager.cpp")
 add_dependencies(${ROBOT_SERVICE} panda_controller_gencpp)
 target_link_libraries(${ROBOT_SERVICE}
     Threads::Threads
