@@ -110,7 +110,10 @@ add_executable(${ROBOT_CLIENT} "${CMAKE_CURRENT_SOURCE_DIR}/src/RobotClient.cpp"
                                 "${CMAKE_CURRENT_SOURCE_DIR}/src/Site.cpp"
                                 "${CMAKE_CURRENT_SOURCE_DIR}/src/FileManager.cpp")
 add_dependencies(${ROBOT_CLIENT} panda_controller_gencpp)
-target_link_libraries(${ROBOT_CLIENT} ${catkin_LIBRARIES})
+target_link_libraries(${ROBOT_CLIENT} PRIVATE
+    nlohmann_json::nlohmann_json
+    ${catkin_LIBRARIES}
+)
 
 # Build the ROS service node
 add_executable(${ROBOT_SERVICE} "${CMAKE_CURRENT_SOURCE_DIR}/src/RobotService.cpp"
@@ -118,8 +121,7 @@ add_executable(${ROBOT_SERVICE} "${CMAKE_CURRENT_SOURCE_DIR}/src/RobotService.cp
                                 "${CMAKE_CURRENT_SOURCE_DIR}/src/Site.cpp"
                                 "${CMAKE_CURRENT_SOURCE_DIR}/src/FileManager.cpp")
 add_dependencies(${ROBOT_SERVICE} panda_controller_gencpp)
-target_link_libraries(${ROBOT_SERVICE}
-    Threads::Threads
+target_link_libraries(${ROBOT_SERVICE} PRIVATE
     nlohmann_json::nlohmann_json
     ${catkin_LIBRARIES}
 )
