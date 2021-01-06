@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Feature SiLA2Version="1.0" FeatureVersion="1.0" MaturityLevel="Draft" Originator="de.fau" Category="robot"
+         xmlns="http://www.sila-standard.org"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.sila-standard.org https://gitlab.com/SiLA2/sila_base/raw/master/schema/FeatureDefinition.xsd">
+    <Identifier>SiteManager</Identifier>
+    <DisplayName>Site Manager</DisplayName>
+    <Description>
+        Manager to set and remove Sites which define the pick-up and drop locations for the robot gripper.
+    </Description>
+
+    <Property>
+        <Identifier>Sites</Identifier>
+        <DisplayName>Sites</DisplayName>
+        <Description>Available Sites.</Description>
+        <Observable>No</Observable>
+        <DataType>
+            <List>
+                <DataType>
+                    <DataTypeIdentifier>SiteId</DataTypeIdentifier>
+                </DataType>
+            </List>
+        </DataType>
+    </Property>
+
+    <Command>
+        <Identifier>SetSiteWithAxisAngels</Identifier>
+        <DisplayName>Set Site with Axis Angles</DisplayName>
+        <Description>Adds or overwrites a Site. The orientation is defined via the axis angles Roll, Pitch and Yaw (RPY).</Description>
+        <Observable>No</Observable>
+        <Parameter>
+            <Identifier>SiteId</Identifier>
+            <DisplayName>Site ID</DisplayName>
+            <Description>The string identifier of the Site.</Description>
+            <DataType>
+                <DataTypeIdentifier>SiteId</DataTypeIdentifier>
+            </DataType>
+        </Parameter>
+        <Parameter>
+            <Identifier>Position</Identifier>
+            <DisplayName>Position</DisplayName>
+            <Description>The position of the Site.</Description>
+            <DataType>
+                <DataTypeIdentifier>Position</DataTypeIdentifier>
+            </DataType>
+        </Parameter>
+        <Parameter>
+            <Identifier>Roll</Identifier>
+            <DisplayName>Roll</DisplayName>
+            <Description>The roll angle in radians.</Description>
+            <DataType>
+                <!-- TODO: add constraint (0.0–2 * Pi) -->
+                <Basic>Real</Basic>
+            </DataType>
+        </Parameter>
+        <Parameter>
+            <Identifier>Pitch</Identifier>
+            <DisplayName>Pitch</DisplayName>
+            <Description>The pitch angle in radians.</Description>
+            <DataType>
+                <!-- TODO: add constraint (0.0–2 * Pi) -->
+                <Basic>Real</Basic>
+            </DataType>
+        </Parameter>
+        <Parameter>
+            <Identifier>Yaw</Identifier>
+            <DisplayName>Yaw</DisplayName>
+            <Description>The yaw angle in radians.</Description>
+            <DataType>
+                <!-- TODO: add constraint (0.0–2 * Pi) -->
+                <Basic>Real</Basic>
+            </DataType>
+        </Parameter>
+    </Command>
+    <Command>
+        <Identifier>SetSiteWithQuaternion</Identifier>
+        <DisplayName>Set Site with Quaternion</DisplayName>
+        <Description>Adds or overwrites a Site. The orientation is defined a Quaternion (X, Y, Z, W).</Description>
+        <Observable>No</Observable>
+        <Parameter>
+            <Identifier>SiteId</Identifier>
+            <DisplayName>Site ID</DisplayName>
+            <Description>The string identifier of the Site.</Description>
+            <DataType>
+                <DataTypeIdentifier>SiteId</DataTypeIdentifier>
+            </DataType>
+        </Parameter>
+        <Parameter>
+            <Identifier>Position</Identifier>
+            <DisplayName>Position</DisplayName>
+            <Description>The position of the Site.</Description>
+            <DataType>
+                <DataTypeIdentifier>Position</DataTypeIdentifier>
+            </DataType>
+        </Parameter>
+        <Parameter>
+            <Identifier>OrientationX</Identifier>
+            <DisplayName>Orientation X</DisplayName>
+            <Description>The X value.</Description>
+            <DataType>
+                <Basic>Real</Basic>
+            </DataType>
+        </Parameter>
+        <Parameter>
+            <Identifier>OrientationY</Identifier>
+            <DisplayName>Orientation Y</DisplayName>
+            <Description>The Y value.</Description>
+            <DataType>
+                <Basic>Real</Basic>
+            </DataType>
+        </Parameter>
+        <Parameter>
+            <Identifier>OrientationZ</Identifier>
+            <DisplayName>Orientation Z</DisplayName>
+            <Description>The Z value.</Description>
+            <DataType>
+                <Basic>Real</Basic>
+            </DataType>
+        </Parameter>
+        <Parameter>
+            <Identifier>OrientationW</Identifier>
+            <DisplayName>Orientation W</DisplayName>
+            <Description>The W value.</Description>
+            <DataType>
+                <Basic>Real</Basic>
+            </DataType>
+        </Parameter>
+    </Command>
+    <Command>
+        <Identifier>DeleteSite</Identifier>
+        <DisplayName>Delete Site</DisplayName>
+        <Description>Removes a Site.</Description>
+        <Observable>No</Observable>
+        <Parameter>
+            <Identifier>SiteId</Identifier>
+            <DisplayName>Site ID</DisplayName>
+            <Description>The string identifier of the Site.</Description>
+            <DataType>
+                <DataTypeIdentifier>SiteId</DataTypeIdentifier>
+            </DataType>
+        </Parameter>
+    </Command>
+
+    <DataTypeDefinition>
+        <Identifier>SiteId</Identifier>
+        <DisplayName>Site ID</DisplayName>
+        <Description>The string identifier of the Site.</Description>
+        <DataType>
+            <Constrained>
+                <DataType>
+                    <Basic>String</Basic>
+                </DataType>
+                <Constraints>
+                    <Length>255</Length>
+                </Constraints>
+            </Constrained>
+        </DataType>
+    </DataTypeDefinition>
+
+    <DataTypeDefinition>
+        <Identifier>Position</Identifier>
+        <DisplayName>Position</DisplayName>
+        <Description>The relative position of the Site relative to the robot base.</Description>
+        <DataType>
+            <Structure>
+                <Element>
+                    <Identifier>X</Identifier>
+                    <DisplayName>X</DisplayName>
+                    <Description>The X position of the Site.</Description>
+                    <DataType>
+                        <Constrained>
+                            <DataType>
+                                <Basic>Real</Basic>
+                            </DataType>
+                            <Constraints>
+                                <Unit>
+                                    <Label>m</Label>
+                                    <Factor>1.0</Factor>
+                                    <Offset>0</Offset>
+                                    <UnitComponent>
+                                        <SIUnit>Meter</SIUnit>
+                                        <Exponent>1</Exponent>
+                                    </UnitComponent>
+                                </Unit>
+                            </Constraints>
+                        </Constrained>
+                    </DataType>
+                </Element>
+                <Element>
+                    <Identifier>Y</Identifier>
+                    <DisplayName>Y</DisplayName>
+                    <Description>The Y position of the Site.</Description>
+                    <DataType>
+                        <Constrained>
+                            <DataType>
+                                <Basic>Real</Basic>
+                            </DataType>
+                            <Constraints>
+                                <Unit>
+                                    <Label>m</Label>
+                                    <Factor>1.0</Factor>
+                                    <Offset>0</Offset>
+                                    <UnitComponent>
+                                        <SIUnit>Meter</SIUnit>
+                                        <Exponent>1</Exponent>
+                                    </UnitComponent>
+                                </Unit>
+                            </Constraints>
+                        </Constrained>
+                    </DataType>
+                </Element>
+                <Element>
+                    <Identifier>Z</Identifier>
+                    <DisplayName>Z</DisplayName>
+                    <Description>The Z position defining the relative height.</Description>
+                    <DataType>
+                        <Constrained>
+                            <DataType>
+                                <Basic>Real</Basic>
+                            </DataType>
+                            <Constraints>
+                                <Unit>
+                                    <Label>m</Label>
+                                    <Factor>1.0</Factor>
+                                    <Offset>0</Offset>
+                                    <UnitComponent>
+                                        <SIUnit>Meter</SIUnit>
+                                        <Exponent>1</Exponent>
+                                    </UnitComponent>
+                                </Unit>
+                            </Constraints>
+                        </Constrained>
+                    </DataType>
+                </Element>
+            </Structure>
+        </DataType>
+    </DataTypeDefinition>
+    
+    <DataTypeDefinition>
+        <Identifier>MoveDirection</Identifier>
+        <DisplayName>Move Direction</DisplayName>
+        <Description>The direction and distance to move on approach and retreat movements.</Description>
+        <DataType>
+            <Structure>
+                <Element>
+                    <Identifier>X</Identifier>
+                    <DisplayName>X</DisplayName>
+                    <Description>The X direction.</Description>
+                    <DataType>
+                        <Constrained>
+                            <DataType>
+                                <Basic>Real</Basic>
+                            </DataType>
+                            <Constraints>
+                                <MinimalInclusive>-1.0</MinimalInclusive>
+                                <MaximalInclusive>1.0</MaximalInclusive>
+                            </Constraints>
+                        </Constrained>
+                    </DataType>
+                </Element>
+                <Element>
+                    <Identifier>Y</Identifier>
+                    <DisplayName>Y</DisplayName>
+                    <Description>The Y direction.</Description>
+                    <DataType>
+                        <Constrained>
+                            <DataType>
+                                <Basic>Real</Basic>
+                            </DataType>
+                            <Constraints>
+                                <MinimalInclusive>-1.0</MinimalInclusive>
+                                <MaximalInclusive>1.0</MaximalInclusive>
+                            </Constraints>
+                        </Constrained>
+                    </DataType>
+                </Element>
+                <Element>
+                    <Identifier>Z</Identifier>
+                    <DisplayName>Z</DisplayName>
+                    <Description>The Z direction.</Description>
+                    <DataType>
+                        <Constrained>
+                            <DataType>
+                                <Basic>Real</Basic>
+                            </DataType>
+                            <Constraints>
+                                <MinimalInclusive>-1.0</MinimalInclusive>
+                                <MaximalInclusive>1.0</MaximalInclusive>
+                            </Constraints>
+                        </Constrained>
+                    </DataType>
+                </Element>
+                <Element>
+                    <Identifier>MinDistance</Identifier>
+                    <DisplayName>Minimum Distance</DisplayName>
+                    <Description>The minimum distance do move.</Description>
+                    <DataType>
+                        <Constrained>
+                            <DataType>
+                                <Basic>Real</Basic>
+                            </DataType>
+                            <Constraints>
+                                <Unit>
+                                    <Label>m</Label>
+                                    <Factor>1.0</Factor>
+                                    <Offset>0</Offset>
+                                    <UnitComponent>
+                                        <SIUnit>Meter</SIUnit>
+                                        <Exponent>1</Exponent>
+                                    </UnitComponent>
+                                </Unit>
+                            </Constraints>
+                        </Constrained>
+                    </DataType>
+                </Element>
+                <Element>
+                    <Identifier>PrefDistance</Identifier>
+                    <DisplayName>Preferred Distance</DisplayName>
+                    <Description>The preferred distance do move.</Description>
+                    <DataType>
+                        <Constrained>
+                            <DataType>
+                                <Basic>Real</Basic>
+                            </DataType>
+                            <Constraints>
+                                <Unit>
+                                    <Label>m</Label>
+                                    <Factor>1.0</Factor>
+                                    <Offset>0</Offset>
+                                    <UnitComponent>
+                                        <SIUnit>Meter</SIUnit>
+                                        <Exponent>1</Exponent>
+                                    </UnitComponent>
+                                </Unit>
+                            </Constraints>
+                        </Constrained>
+                    </DataType>
+                </Element>
+            </Structure>
+        </DataType>
+    </DataTypeDefinition>
+</Feature>
