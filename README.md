@@ -1,6 +1,15 @@
 # Panda Controller
 
-## Build the project
+## Requirements
+
+The following packages are required and can be installed with `sudo apt install __<package>__`
+`qtbase5-dev`
+`libssl-dev`
+`libavahi-client-dev`
+`libavahi-common-dev`
+
+
+## Build the Project
 
 ```
 mkdir -p ~/catkin_ws/src/
@@ -17,7 +26,7 @@ source /opt/ros/noetic/setup.bash
 catkin_make
 ```
 
-## Run the project in MoveIt
+## Run the Project in MoveIt
 
 Start a terminal, source the workspace and launch MoveIt:
 ```
