@@ -1,13 +1,19 @@
 /** 
  * The ROS service which receives the ROS messages from the `robot_client` and executes the actual
- * movements. Only low-level commands are done here. High-level tasks (e.g.  collision detection) 
+ * movements. Only low-level commands are done here. High-level tasks (e.g. collision detection) 
  * are in the responsibility of the client.
  */
 #include <iostream>
+#include <fstream>
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
+#include <filesystem>
 #include <ros/ros.h>
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <nlohmann/json.hpp>
 #include "panda_controller/GetJoints.h"
 #include "panda_controller/GetPose.h"
 #include "panda_controller/MoveTo.h"
@@ -16,7 +22,10 @@
 #include "Plate.h"
 #include "ServiceDefs.h"
 #include "Site.h"
+#include "FileManager.h"
 
+namespace fs = std::filesystem;
+using json = nlohmann::json;
 using moveit::planning_interface::MoveItErrorCode;
 
 constexpr double WELLS_LENGTH_IN_M = 0.12776;
@@ -39,6 +48,54 @@ static void printBuildInfo() {
             << "Build Type: " << BUILD_TYPE << "\n"
             << "Build Timestamp: " << BUILD_TIMESTAMP << "\n"
             << "Compiler: " << COMPILER_ID << " " << COMPILER_VERSION << "\n";
+}
+
+void loadCollisionObjectsIntoScene() {
+    const fs::path collObjDir = FileManager::getAppDir() / "collision_objects";
+    const std::vector<fs::path> collFiles = FileManager::collectJsonFilesFromDir(collObjDir);
+    if (collFiles.empty()) {
+        return;
+    }
+
+    std::vector<moveit_msgs::CollisionObject> collObjs;
+    collObjs.resize(collFiles.size() + 2);
+
+    for (const auto& file : collFiles) {
+        // read a JSON file
+        std::ifstream jsonStream(file);
+        json jsonStruct;
+        try {
+            jsonStream >> jsonStruct;
+        } catch (const std::exception& ex) {
+            std::cerr << "Could not load: " << file << "\n" << ex.what();
+            jsonStream.close();
+            continue;
+        }
+        jsonStream.close();
+        std::cout << "Loaded: " << jsonStruct["id"] << " from " << file << "\n";
+
+        moveit_msgs::CollisionObject collBox;
+        collBox.id = jsonStruct["id"].get<std::string>();
+        collBox.header.frame_id = PANDA_LINK_BASE;
+        collBox.primitives.resize(1);
+        collBox.primitives[0].type = shape_msgs::SolidPrimitive::BOX;
+        collBox.primitive_poses.resize(1);
+        collBox.primitive_poses[0].position.x = jsonStruct["posX"];
+        collBox.primitive_poses[0].position.y = jsonStruct["posY"];
+        collBox.primitive_poses[0].position.z = jsonStruct["posZ"];
+
+        tf2::Quaternion orientation;
+        orientation.setRPY(jsonStruct["rotR"], jsonStruct["rotP"], jsonStruct["rotY"]);
+        collBox.primitive_poses[0].orientation = tf2::toMsg(orientation);
+
+        collBox.primitives[0].dimensions.resize(3);
+        collBox.primitives[0].dimensions[0] = jsonStruct["dimX"]; // length;
+        collBox.primitives[0].dimensions[1] = jsonStruct["dimY"]; // width
+        collBox.primitives[0].dimensions[2] = jsonStruct["dimZ"]; // hight
+        collBox.operation = moveit_msgs::CollisionObject::ADD;
+        collObjs.push_back(collBox);
+    }
+    planningScenePtr->applyCollisionObjects(collObjs);
 }
 
 /**
@@ -130,7 +187,7 @@ bool pickFromSite(Site& site, Plate& plate) {
     moveit_msgs::Grasp& grasp = site.getGrasp();
     openGripper(grasp.pre_grasp_posture, plate.getDimY());
     closedGripper(grasp.grasp_posture);
-    const MoveItErrorCode err = moveGroupPtr->pick(plate.getPlateId(), grasp);
+    const MoveItErrorCode err = moveGroupPtr->pick(plate.getId(), grasp);
     if (err != MoveItErrorCode::SUCCESS) {
         return false;
     }
@@ -139,7 +196,7 @@ bool pickFromSite(Site& site, Plate& plate) {
 
 bool placeToSite(Site& site, Plate& plate) {
     openGripper(site.getGrasp().pre_grasp_posture, plate.getDimY());
-    const MoveItErrorCode err = moveGroupPtr->place(plate.getPlateId(),{site.getPlaceLocation()});
+    const MoveItErrorCode err = moveGroupPtr->place(plate.getId(),{site.getPlaceLocation()});
     if (err != MoveItErrorCode::SUCCESS) {
         return false;
     }
@@ -179,7 +236,7 @@ void grabTest() {
     placeToSite(mySite, myPlate);
 
     // remove plate from scene
-    planningScenePtr->removeCollisionObjects({myPlate.getPlateId()});
+    planningScenePtr->removeCollisionObjects({myPlate.getId()});
 }
 
 bool transportPlate(Site& source, Site& destination, Plate& plate) {
@@ -238,6 +295,10 @@ void transportTest() {
     siteA.setApproach(approach);
     siteB.setApproach(approach);
 
+    const fs::path sitesDir = FileManager::getAppDir() / SITES_DIR;
+    FileManager::saveJsonToFile(siteA.toJson(), sitesDir / "siteA.json");
+    FileManager::saveJsonToFile(siteB.toJson(), sitesDir / "siteB.json");
+
     myPlate.putAtSite(siteA);
     // add plate to scene
     planningScenePtr->applyCollisionObject(myPlate.getCollisonObject());
@@ -245,7 +306,7 @@ void transportTest() {
     transportPlate(siteA, siteB, myPlate);
 
     // remove plate from scene
-    planningScenePtr->removeCollisionObjects({myPlate.getPlateId()});
+    planningScenePtr->removeCollisionObjects({myPlate.getId()});
 }
 
 /**
@@ -263,7 +324,7 @@ bool getPose(panda_controller::GetPose::Request& req, panda_controller::GetPose:
     res.ori_z = curPose.pose.orientation.z;
     res.ori_w = curPose.pose.orientation.w;
 
-    //    grabTest();
+    // grabTest();
     transportTest();
 
     return true;
@@ -276,6 +337,8 @@ int main(int argc, char* argv[]) {
     moveGroupPtr = new moveit::planning_interface::MoveGroupInterface(PANDA_ARM);
     moveGroupPtr->setPlanningTime(15.0);
     planningScenePtr = new moveit::planning_interface::PlanningSceneInterface;
+
+    loadCollisionObjectsIntoScene();
 
     ros::NodeHandle node;
     const std::vector<ros::ServiceServer> services = {

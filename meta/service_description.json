@@ -1,0 +1,18 @@
+{
+  "service_name": "PandaController",
+  "service_description": "A SiLA 2 service to control a Panda robot arm from Franka Emika.",
+  "service_type": "PandaRobotController",
+  "authors": "Florian Bauer <florian.bauer.dev@gmail.com>",
+  "creation_date": "2021-01-07",
+  "version": "0.0.1",
+  "vendor_url": "https://www.cs7.tf.fau.de",
+  "SiLA_standard_feature_list": [
+    "SiLAService"
+  ],
+  "SiLA_feature_list": [
+	"SiteManager"
+  ],
+  "communication_port": "50054",
+  "IP_address": "127.0.0.1",
+  "hostname": "localhost"
+}

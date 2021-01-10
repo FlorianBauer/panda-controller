@@ -4,6 +4,16 @@ project("panda_controller")
 set(ROBOT_SERVICE "RobotService")
 set(PROJECT_TEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/test")
 
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+# Set the local gRPC installation directory.
+# (see https://gitlab.com/SiLA2/sila_cpp/-/blob/master/BUILDING.md#grpc)
+set(LOCAL_INSTALL_DIR "~/.local")
+list(APPEND CMAKE_PREFIX_PATH "${LOCAL_INSTALL_DIR}")
+
 # Enable tests with -DBUILD_TESTS=ON
 option(BUILD_TESTS "Build all unit tests." OFF)
 set(CMAKE_BUILD_TYPE "Release")
@@ -27,7 +37,6 @@ if(GIT_FOUND)
     )
 endif()
 
-
 # Set C++17 as standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -48,6 +57,7 @@ configure_file(
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/")
 include_directories("/opt/ros/${ROS_DISTRO}/include/")
 
+# Include the JSON library from the git submodule.
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/third_party/json/")
 
@@ -103,23 +113,65 @@ catkin_package(
 
 include_directories(${THIS_PACKAGE_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIRS})
 
-# Build the ROS client node
-set(ROBOT_CLIENT "robot_client")
-add_executable(${ROBOT_CLIENT} "${CMAKE_CURRENT_SOURCE_DIR}/src/RobotClient.cpp"
-                                "${CMAKE_CURRENT_SOURCE_DIR}/src/Plate.cpp"
-                                "${CMAKE_CURRENT_SOURCE_DIR}/src/Site.cpp"
-                                "${CMAKE_CURRENT_SOURCE_DIR}/src/FileManager.cpp")
-add_dependencies(${ROBOT_CLIENT} panda_controller_gencpp)
-target_link_libraries(${ROBOT_CLIENT} PRIVATE
-    nlohmann_json::nlohmann_json
-    ${catkin_LIBRARIES}
+# Find the sila_cpp library.
+# (see https://gitlab.com/SiLA2/sila_cpp/-/blob/master/BUILDING.md#sila_cpp)
+if(NOT TARGET sila_cpp)
+    find_package(sila_cpp CONFIG REQUIRED)
+else()
+    message(FATAL_ERROR 
+            "Could not find the sila_cpp library. Please install the library first on your system. \
+            Instructions: https://gitlab.com/SiLA2/sila_cpp/-/blob/master/BUILDING.md#sila_cpp")
+endif()
+
+set(PROTOS
+    "${CMAKE_CURRENT_SOURCE_DIR}/meta/SiteManager.proto"
 )
 
-# Build the ROS service node
-add_executable(${ROBOT_SERVICE} "${CMAKE_CURRENT_SOURCE_DIR}/src/RobotService.cpp"
-                                "${CMAKE_CURRENT_SOURCE_DIR}/src/Plate.cpp"
-                                "${CMAKE_CURRENT_SOURCE_DIR}/src/Site.cpp"
-                                "${CMAKE_CURRENT_SOURCE_DIR}/src/FileManager.cpp")
+protoc_generate_cpp(PROTO_SRCS IMPL_SRCS ${PROTOS})
+
+set(PANDA_CONTROLLER "PandaController")
+add_library(${PANDA_CONTROLLER}Features
+    ${PROTO_SRCS}
+    ${IMPL_SRCS}
+)
+
+target_link_libraries(${PANDA_CONTROLLER}Features
+    sila2::sila_cpp
+)
+
+# The SiLA Server takes the role of the ROS client node.
+set(SILA_SERVER "PandaControllerServer")
+add_executable(${SILA_SERVER} "${CMAKE_CURRENT_SOURCE_DIR}/${SILA_SERVER}.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Plate.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Site.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/FileManager.cpp"
+)
+
+add_dependencies(${SILA_SERVER} panda_controller_gencpp)
+target_link_libraries(${SILA_SERVER}
+    ${catkin_LIBRARIES}
+    nlohmann_json::nlohmann_json
+    sila2::sila_cpp
+    ${PANDA_CONTROLLER}Features
+)
+
+# The server needs the FDL files which are compiled into the binary using the resource file.
+target_sources(${SILA_SERVER} PRIVATE "${PANDA_CONTROLLER}.qrc")
+
+# Copy the libs to the directory of the executables so that they can find them.
+add_custom_command(TARGET ${SILA_SERVER} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+        $<TARGET_FILE:sila2::sila_cpp>
+        $<TARGET_FILE:QtZeroConf>
+        $<TARGET_FILE_DIR:${SILA_SERVER}>
+)
+
+# Build the ROS service node.
+add_executable(${ROBOT_SERVICE} "${CMAKE_CURRENT_SOURCE_DIR}/src/${ROBOT_SERVICE}.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Plate.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Site.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/FileManager.cpp"
+)
 add_dependencies(${ROBOT_SERVICE} panda_controller_gencpp)
 target_link_libraries(${ROBOT_SERVICE} PRIVATE
     nlohmann_json::nlohmann_json

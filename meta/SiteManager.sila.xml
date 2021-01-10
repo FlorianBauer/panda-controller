@@ -8,7 +8,6 @@
     <Description>
         Manager to set and remove Sites which define the pick-up and drop locations for the robot gripper.
     </Description>
-
     <Property>
         <Identifier>Sites</Identifier>
         <DisplayName>Sites</DisplayName>
@@ -17,7 +16,7 @@
         <DataType>
             <List>
                 <DataType>
-                    <DataTypeIdentifier>SiteId</DataTypeIdentifier>
+                    <Basic>String</Basic>
                 </DataType>
             </List>
         </DataType>
@@ -58,7 +57,6 @@
             </DataType>
         </Parameter>
     </Command>
-
     <DataTypeDefinition>
         <Identifier>SiteId</Identifier>
         <DisplayName>Site ID</DisplayName>
@@ -69,12 +67,11 @@
                     <Basic>String</Basic>
                 </DataType>
                 <Constraints>
-                    <Length>255</Length>
+                    <MaximalLength>255</MaximalLength>
                 </Constraints>
-            </Constrained>
+           </Constrained>
         </DataType>
     </DataTypeDefinition>
-
     <DataTypeDefinition>
         <Identifier>Pose</Identifier>
         <DisplayName>Pose</DisplayName>
@@ -185,7 +182,6 @@
             </Structure>
         </DataType>
     </DataTypeDefinition>
-    
     <DataTypeDefinition>
         <Identifier>MoveDirection</Identifier>
         <DisplayName>Move Direction</DisplayName>
