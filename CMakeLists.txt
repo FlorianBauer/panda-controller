@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 
 project("panda_controller")
-set(ROBOT_SERVICE "robot_service")
+set(ROBOT_SERVICE "RobotService")
 set(PROJECT_TEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/test")
 
 # Enable tests with -DBUILD_TESTS=ON
