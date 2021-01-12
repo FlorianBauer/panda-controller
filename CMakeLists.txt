@@ -137,6 +137,7 @@ add_library(${PANDA_CONTROLLER}Features
 
 target_link_libraries(${PANDA_CONTROLLER}Features
     sila2::sila_cpp
+    nlohmann_json::nlohmann_json
 )
 
 # The SiLA Server takes the role of the ROS client node.

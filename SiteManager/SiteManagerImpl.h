@@ -8,6 +8,8 @@
 #ifndef SITEMANAGERIMPL_H
 #define SITEMANAGERIMPL_H
 
+#include <map>
+#include <nlohmann/json.hpp>
 #include <sila_cpp/server/SiLAFeature.h>
 #include <sila_cpp/data_types.h>
 #include <sila_cpp/server/command/UnobservableCommand.h>
@@ -77,12 +79,15 @@ public:
      *
      * @throw Validation Error if the given Parameter(s) are invalid
      */
-    sila2::de::fau::robot::sitemanager::v1::DeleteSite_Responses DeleteSite(DeleteSiteWrapper* Command);
+    sila2::de::fau::robot::sitemanager::v1::DeleteSite_Responses DeleteSite(DeleteSiteWrapper* command);
 
 private:
     SetSiteCommand m_SetSiteCommand;
     DeleteSiteCommand m_DeleteSiteCommand;
-    const SitesProperty m_SitesProperty;
+    SitesProperty m_SitesProperty;
+    std::map<std::string, nlohmann::json> m_JsonSites;
+
+    static std::map<std::string, nlohmann::json> loadJsonFilesToMap();
 };
 
 #endif  // SITEMANAGERIMPL_H

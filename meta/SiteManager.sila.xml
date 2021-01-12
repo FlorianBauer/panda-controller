@@ -24,7 +24,7 @@
     <Command>
         <Identifier>SetSite</Identifier>
         <DisplayName>Set Site</DisplayName>
-        <Description>Adds or overwrites a Site. The orientation is defined a Quaternion (X, Y, Z, W).</Description>
+        <Description>Adds or overwrites a Site. The orientation is defined by an Quaternion (XYZW).</Description>
         <Observable>No</Observable>
         <Parameter>
             <Identifier>SiteId</Identifier>
@@ -67,6 +67,7 @@
                     <Basic>String</Basic>
                 </DataType>
                 <Constraints>
+                    <MinimalLength>1</MinimalLength>
                     <MaximalLength>255</MaximalLength>
                 </Constraints>
            </Constrained>
