@@ -76,17 +76,9 @@ SetSite_Responses CSiteManagerImpl::SetSite(SetSiteWrapper* command) {
     const auto iter = m_JsonSites.find(idToSet);
     json jsonStruct;
     const bool isSiteIdInList = (iter != m_JsonSites.end());
+    const auto& pose = request.pose().pose();
     if (isSiteIdInList) {
-        std::cerr << "id found " << "\n";
-        json jsonStruct = iter->second;
-        //  TODO: Update the pose of the Site.
-    } else {
-        std::cerr << " add to list " << "\n";
-        // Add a new ID to list.
-        m_SitesProperty.append(request.siteid().siteid());
-
-        jsonStruct[SITE_ID] = idToSet;
-        const auto& pose = request.pose().pose();
+        jsonStruct = iter->second;
         jsonStruct[POSE] = {
             {POS_X, pose.x().value()},
             {POS_Y, pose.y().value()},
@@ -96,12 +88,26 @@ SetSite_Responses CSiteManagerImpl::SetSite(SetSiteWrapper* command) {
             {ORI_Z, pose.oriz().value()},
             {ORI_W, pose.oriw().value()},
         };
+    } else {
+        // Add a new ID to property list.
+        m_SitesProperty.append(request.siteid().siteid());
+        jsonStruct[SITE_ID] = idToSet;
+        jsonStruct[POSE] = {
+            {POS_X, pose.x().value()},
+            {POS_Y, pose.y().value()},
+            {POS_Z, pose.z().value()},
+            {ORI_X, pose.orix().value()},
+            {ORI_Y, pose.oriy().value()},
+            {ORI_Z, pose.oriz().value()},
+            {ORI_W, pose.oriw().value()},
+        };
+        // Add entry to map.
         m_JsonSites[idToSet] = jsonStruct;
     }
 
     // Write JSON data to file.
-    const fs::path file = FileManager::getAppDir() / SITES_DIR / (idToSet + JSON_FILE_EXT);
-    FileManager::saveJsonToFile(jsonStruct, file);
+    const fs::path jsonFile = FileManager::getAppDir() / SITES_DIR / (idToSet + JSON_FILE_EXT);
+    FileManager::saveJsonToFile(jsonStruct, jsonFile);
 
     return SetSite_Responses{};
 }
