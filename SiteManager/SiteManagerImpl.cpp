@@ -58,7 +58,8 @@ CSiteManagerImpl::CSiteManagerImpl(SiLA2::CSiLAServer* parent)
 , m_SetSiteCommand{this, "SetSite"}
 , m_DeleteSiteCommand{this, "DeleteSite"}
 , m_SitesProperty{this, "Sites"}
-, m_JsonSites(loadJsonFilesToMap()) {
+, m_JsonSites(loadJsonFilesToMap())
+, m_SitesDir(FileManager::getAppDir() / SITES_DIR) {
 
     std::vector<SiLA2::CString> siteIds;
     for (auto const& elem : m_JsonSites) {
@@ -106,7 +107,7 @@ SetSite_Responses CSiteManagerImpl::SetSite(SetSiteWrapper* command) {
     }
 
     // Write JSON data to file.
-    const fs::path jsonFile = FileManager::getAppDir() / SITES_DIR / (idToSet + JSON_FILE_EXT);
+    const fs::path jsonFile = m_SitesDir / (idToSet + JSON_FILE_EXT);
     FileManager::saveJsonToFile(jsonStruct, jsonFile);
 
     return SetSite_Responses{};
@@ -125,7 +126,7 @@ DeleteSite_Responses CSiteManagerImpl::DeleteSite(DeleteSiteWrapper* command) {
             siteIds.push_back(SiLA2::CString(elem.first));
         }
         m_SitesProperty.setValue(siteIds);
-        const fs::path jsonFile = FileManager::getAppDir() / SITES_DIR / (idToDelete + JSON_FILE_EXT);
+        const fs::path jsonFile = m_SitesDir / (idToDelete + JSON_FILE_EXT);
         fs::remove(jsonFile);
     } else {
         throw SiLA2::CDefinedExecutionError{

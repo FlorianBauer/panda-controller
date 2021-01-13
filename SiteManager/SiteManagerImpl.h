@@ -9,6 +9,7 @@
 #define SITEMANAGERIMPL_H
 
 #include <map>
+#include <filesystem>
 #include <nlohmann/json.hpp>
 #include <sila_cpp/server/SiLAFeature.h>
 #include <sila_cpp/data_types.h>
@@ -86,6 +87,7 @@ private:
     DeleteSiteCommand m_DeleteSiteCommand;
     SitesProperty m_SitesProperty;
     std::map<std::string, nlohmann::json> m_JsonSites;
+    const std::filesystem::path m_SitesDir;
 
     static std::map<std::string, nlohmann::json> loadJsonFilesToMap();
 };
