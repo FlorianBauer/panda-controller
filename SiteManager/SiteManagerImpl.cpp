@@ -108,8 +108,8 @@ SetSite_Responses CSiteManagerImpl::SetSite(SetSiteWrapper* command) {
 
 DeleteSite_Responses CSiteManagerImpl::DeleteSite(DeleteSiteWrapper* command) {
     const auto request = command->parameters();
-    const std::string& idToSet = request.siteid().siteid().value();
-    const auto iter = m_JsonSites.find(idToSet);
+    const std::string& idToDelete = request.siteid().siteid().value();
+    const auto iter = m_JsonSites.find(idToDelete);
     const bool isSiteIdInList = (iter != m_JsonSites.end());
     if (isSiteIdInList) {
         m_JsonSites.erase(iter);
@@ -119,10 +119,12 @@ DeleteSite_Responses CSiteManagerImpl::DeleteSite(DeleteSiteWrapper* command) {
             siteIds.push_back(SiLA2::CString(elem.first));
         }
         m_SitesProperty.setValue(siteIds);
-        // TODO: delete file
+        const fs::path jsonFile = FileManager::getAppDir() / SITES_DIR / (idToDelete + JSON_FILE_EXT);
+        fs::remove(jsonFile);
     } else {
-        std::cerr << "Site ID not found.\n";
-        // TODO: throw sila Exception
+        throw SiLA2::CDefinedExecutionError{
+            "SiteIdNotFound",
+            "The given Site ID does not exist or could not be found."};
     }
 
     return DeleteSite_Responses{};

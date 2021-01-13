@@ -56,6 +56,9 @@
                 <DataTypeIdentifier>SiteId</DataTypeIdentifier>
             </DataType>
         </Parameter>
+        <DefinedExecutionErrors>
+            <Identifier>SiteIdNotFound</Identifier>
+        </DefinedExecutionErrors>
     </Command>
     <DataTypeDefinition>
         <Identifier>SiteId</Identifier>
@@ -70,7 +73,7 @@
                     <MinimalLength>1</MinimalLength>
                     <MaximalLength>255</MaximalLength>
                 </Constraints>
-           </Constrained>
+            </Constrained>
         </DataType>
     </DataTypeDefinition>
     <DataTypeDefinition>
@@ -263,4 +266,9 @@
             </Structure>
         </DataType>
     </DataTypeDefinition>
+    <DefinedExecutionError>
+        <Identifier>SiteIdNotFound</Identifier>
+        <DisplayName>Site ID not found</DisplayName>
+        <Description>The given Site ID does not exist or could not be found.</Description>
+    </DefinedExecutionError>
 </Feature>
