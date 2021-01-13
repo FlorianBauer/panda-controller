@@ -70,8 +70,7 @@
                     <Basic>String</Basic>
                 </DataType>
                 <Constraints>
-                    <MinimalLength>1</MinimalLength>
-                    <MaximalLength>255</MaximalLength>
+                    <Pattern>[a-zA-Z0-9_'-]+</Pattern>
                 </Constraints>
             </Constrained>
         </DataType>
