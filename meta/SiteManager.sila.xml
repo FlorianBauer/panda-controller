@@ -5,9 +5,7 @@
          xsi:schemaLocation="http://www.sila-standard.org https://gitlab.com/SiLA2/sila_base/raw/master/schema/FeatureDefinition.xsd">
     <Identifier>SiteManager</Identifier>
     <DisplayName>Site Manager</DisplayName>
-    <Description>
-        Manager to set and remove Sites which define the pick-up and drop locations for the robot gripper.
-    </Description>
+    <Description>Manager to set and remove sites which define the pick-up and drop locations for the robot gripper.</Description>
 
     <Property>
         <Identifier>Sites</Identifier>
@@ -26,12 +24,12 @@
     <Command>
         <Identifier>SetSite</Identifier>
         <DisplayName>Set Site</DisplayName>
-        <Description>Adds or overwrites a Site. The orientation is defined by an Quaternion (XYZW).</Description>
+        <Description>Adds or overwrites a site. The orientation is defined by an quaternion (XYZW).</Description>
         <Observable>No</Observable>
         <Parameter>
             <Identifier>SiteId</Identifier>
             <DisplayName>Site ID</DisplayName>
-            <Description>The string identifier of the Site.</Description>
+            <Description>The site to set.</Description>
             <DataType>
                 <DataTypeIdentifier>SiteId</DataTypeIdentifier>
             </DataType>
@@ -39,7 +37,7 @@
         <Parameter>
             <Identifier>Pose</Identifier>
             <DisplayName>Pose</DisplayName>
-            <Description>The Pose to reach the Site.</Description>
+            <Description>The pose to reach the site.</Description>
             <DataType>
                 <DataTypeIdentifier>Pose</DataTypeIdentifier>
             </DataType>
@@ -49,12 +47,12 @@
     <Command>
         <Identifier>DeleteSite</Identifier>
         <DisplayName>Delete Site</DisplayName>
-        <Description>Removes a Site.</Description>
+        <Description>Removes a Site from the manager.</Description>
         <Observable>No</Observable>
         <Parameter>
             <Identifier>SiteId</Identifier>
             <DisplayName>Site ID</DisplayName>
-            <Description>The string identifier of the Site.</Description>
+            <Description>The site to delete.</Description>
             <DataType>
                 <DataTypeIdentifier>SiteId</DataTypeIdentifier>
             </DataType>
@@ -67,7 +65,7 @@
     <DataTypeDefinition>
         <Identifier>SiteId</Identifier>
         <DisplayName>Site ID</DisplayName>
-        <Description>The string identifier of the Site.</Description>
+        <Description>The string identifier of the site.</Description>
         <DataType>
             <Constrained>
                 <DataType>
@@ -83,13 +81,13 @@
     <DataTypeDefinition>
         <Identifier>Pose</Identifier>
         <DisplayName>Pose</DisplayName>
-        <Description>The pose of the gripper to reach the Site. The pose itself consists of two parts: The Position as vector (XYZ) and the Orientation as Quaternion (XYZW).</Description>
+        <Description>The pose of the gripper to reach the site. The pose itself consists of two parts: The position as vector (XYZ) and the orientation as quaternion (XYZW).</Description>
         <DataType>
             <Structure>
                 <Element>
                     <Identifier>X</Identifier>
                     <DisplayName>X</DisplayName>
-                    <Description>The X position of the Site.</Description>
+                    <Description>The X position of the site.</Description>
                     <DataType>
                         <Constrained>
                             <DataType>
@@ -112,7 +110,7 @@
                 <Element>
                     <Identifier>Y</Identifier>
                     <DisplayName>Y</DisplayName>
-                    <Description>The Y position of the Site.</Description>
+                    <Description>The Y position of the site.</Description>
                     <DataType>
                         <Constrained>
                             <DataType>
@@ -192,9 +190,9 @@
     </DataTypeDefinition>
 
     <DataTypeDefinition>
-        <Identifier>MoveDirection</Identifier>
-        <DisplayName>Move Direction</DisplayName>
-        <Description>The direction and distance to move on approach and retreat movements.</Description>
+        <Identifier>RelativeMove</Identifier>
+        <DisplayName>Relative Move</DisplayName>
+        <Description>Move a relative distance to a given direction. This is used to define approach an retreat actions.</Description>
         <DataType>
             <Structure>
                 <Element>
@@ -275,6 +273,6 @@
     <DefinedExecutionError>
         <Identifier>SiteIdNotFound</Identifier>
         <DisplayName>Site ID not found</DisplayName>
-        <Description>The given Site ID does not exist or could not be found.</Description>
+        <Description>The given site ID could not be found or does not exist.</Description>
     </DefinedExecutionError>
 </Feature>

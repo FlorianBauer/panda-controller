@@ -10,7 +10,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 # Set the local gRPC installation directory.
-# (see https://gitlab.com/SiLA2/sila_cpp/-/blob/master/BUILDING.md#grpc)
+# See https://gitlab.com/SiLA2/sila_cpp/-/blob/master/BUILDING.md#grpc
 set(LOCAL_INSTALL_DIR "~/.local")
 list(APPEND CMAKE_PREFIX_PATH "${LOCAL_INSTALL_DIR}")
 
@@ -114,7 +114,7 @@ catkin_package(
 include_directories(${THIS_PACKAGE_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIRS})
 
 # Find the sila_cpp library.
-# (see https://gitlab.com/SiLA2/sila_cpp/-/blob/master/BUILDING.md#sila_cpp)
+# See https://gitlab.com/SiLA2/sila_cpp/-/blob/master/BUILDING.md#sila_cpp
 if(NOT TARGET sila_cpp)
     find_package(sila_cpp CONFIG REQUIRED)
 else()
@@ -125,6 +125,7 @@ endif()
 
 set(PROTOS
     "${CMAKE_CURRENT_SOURCE_DIR}/meta/SiteManager.proto"
+    "${CMAKE_CURRENT_SOURCE_DIR}/meta/RobotController.proto"
 )
 
 protoc_generate_cpp(PROTO_SRCS IMPL_SRCS ${PROTOS})

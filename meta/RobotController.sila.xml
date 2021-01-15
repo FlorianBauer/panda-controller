@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Feature SiLA2Version="1.0" FeatureVersion="1.0" MaturityLevel="Draft" Originator="de.fau" Category="robot"
+         xmlns="http://www.sila-standard.org"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.sila-standard.org https://gitlab.com/SiLA2/sila_base/raw/master/schema/FeatureDefinition.xsd">
+    <Identifier>RobotController</Identifier>
+    <DisplayName>Robot Controller</DisplayName>
+    <Description>Controller for a Panda robot arm.</Description>
+
+    <Command>
+        <Identifier>MoveToPose</Identifier>
+        <DisplayName>Move To Pose</DisplayName>
+        <Description>Move to a given position and with a given orientation.</Description>
+        <Observable>Yes</Observable>
+        <Parameter>
+            <Identifier>Pose</Identifier>
+            <DisplayName>Pose</DisplayName>
+            <Description>The pose to move to.</Description>
+            <DataType>
+                <DataTypeIdentifier>Pose</DataTypeIdentifier>
+            </DataType>
+        </Parameter>
+    </Command>
+
+    <Command>
+        <Identifier>MoveToSite</Identifier>
+        <DisplayName>Move To Site</DisplayName>
+        <Description>Move to a given site without approaching.</Description>
+        <Observable>Yes</Observable>
+        <Parameter>
+            <Identifier>SiteId</Identifier>
+            <DisplayName>Site ID</DisplayName>
+            <Description>Site to move to.</Description>
+            <DataType>
+                <DataTypeIdentifier>SiteId</DataTypeIdentifier>
+            </DataType>
+        </Parameter>
+        <DefinedExecutionErrors>
+            <Identifier>SiteIdNotFound</Identifier>
+            <Identifier>InaccessibleSite</Identifier>
+        </DefinedExecutionErrors>
+    </Command>
+
+    <Command>
+        <Identifier>Retreat</Identifier>
+        <DisplayName>Retreat</DisplayName>
+        <Description>Carefully pull back from the current site, if not already retracted.</Description>
+        <Observable>Yes</Observable>
+    </Command>
+
+    <Command>
+        <Identifier>ApproachTo</Identifier>
+        <DisplayName>Approach To</DisplayName>
+        <Description>Moving to the safe pose to approach a site (without changing gripping).</Description>
+        <Observable>Yes</Observable>
+        <Parameter>
+            <Identifier>SiteId</Identifier>
+            <DisplayName>Site ID</DisplayName>
+            <Description>Site to approach.</Description>
+            <DataType>
+                <DataTypeIdentifier>SiteId</DataTypeIdentifier>
+            </DataType>
+        </Parameter>
+        <DefinedExecutionErrors>
+            <Identifier>SiteIdNotFound</Identifier>
+            <Identifier>InaccessibleSite</Identifier>
+        </DefinedExecutionErrors>
+    </Command>
+
+    <Command>
+        <Identifier>TransportPlate</Identifier>
+        <DisplayName>Transport Plate</DisplayName>
+        <Description>Transports a plate between the two given sites.</Description>
+        <Observable>Yes</Observable>
+        <Parameter>
+            <Identifier>OriginSiteId</Identifier>
+            <DisplayName>Origin Site ID</DisplayName>
+            <Description>Site to move the plate from.</Description>
+            <DataType>
+                <DataTypeIdentifier>SiteId</DataTypeIdentifier>
+            </DataType>
+        </Parameter>
+        <Parameter>
+            <Identifier>DestinationSiteId</Identifier>
+            <DisplayName>Destination Site ID</DisplayName>
+            <Description>Site to move the plate to.</Description>
+            <DataType>
+                <DataTypeIdentifier>SiteId</DataTypeIdentifier>
+            </DataType>
+        </Parameter>
+        <Parameter>
+            <Identifier>PlateType</Identifier>
+            <DisplayName>Plate Type</DisplayName>
+            <Description>The plate type to grab.</Description>
+            <DataType>
+                <Basic>String</Basic>
+            </DataType>
+        </Parameter>
+        <DefinedExecutionErrors>
+            <Identifier>SiteIdNotFound</Identifier>
+            <Identifier>InaccessibleSite</Identifier>
+            <Identifier>LostPlate</Identifier>
+        </DefinedExecutionErrors>
+    </Command>
+
+    <Command>
+        <Identifier>PickPlate</Identifier>
+        <DisplayName>Pick Plate</DisplayName>
+        <Description>Pick up a plate from a given site.</Description>
+        <Observable>No</Observable>
+        <Parameter>
+            <Identifier>SiteId</Identifier>
+            <DisplayName>Site ID</DisplayName>
+            <Description>Site to pick plate from.</Description>
+            <DataType>
+                <DataTypeIdentifier>SiteId</DataTypeIdentifier>
+            </DataType>
+        </Parameter>
+        <Parameter>
+            <Identifier>PlateType</Identifier>
+            <DisplayName>Plate Type</DisplayName>
+            <Description>The plate type to grab.</Description>
+            <DataType>
+                <Basic>String</Basic>
+            </DataType>
+        </Parameter>
+        <DefinedExecutionErrors>
+            <Identifier>SiteIdNotFound</Identifier>
+            <Identifier>InaccessibleSite</Identifier>
+            <Identifier>LostPlate</Identifier>
+        </DefinedExecutionErrors>
+    </Command>
+
+    <Command>
+        <Identifier>PlacePlate</Identifier>
+        <DisplayName>Place Plate</DisplayName>
+        <Description>Place a plate on a given site.</Description>
+        <Observable>No</Observable>
+        <Parameter>
+            <Identifier>SiteId</Identifier>
+            <DisplayName>Site ID</DisplayName>
+            <Description>Site to place the plate on.</Description>
+            <DataType>
+                <DataTypeIdentifier>SiteId</DataTypeIdentifier>
+            </DataType>
+        </Parameter>
+        <Parameter>
+            <Identifier>PlateType</Identifier>
+            <DisplayName>Plate Type</DisplayName>
+            <Description>The plate type to grab.</Description>
+            <DataType>
+                <Basic>String</Basic>
+            </DataType>
+        </Parameter>
+        <DefinedExecutionErrors>
+            <Identifier>SiteNotFound</Identifier>
+            <Identifier>InaccessibleSite</Identifier>
+            <Identifier>LostPlate</Identifier>
+        </DefinedExecutionErrors>
+    </Command>
+
+    <Command>
+        <Identifier>CheckOccupied</Identifier>
+        <DisplayName>Check Occupied</DisplayName>
+        <Description>Check if the given site is occupied with a sample.</Description>
+        <Observable>No</Observable>
+        <Parameter>
+            <Identifier>SiteId</Identifier>
+            <DisplayName>Site ID</DisplayName>
+            <Description>The Site to check.</Description>
+            <DataType>
+                <DataTypeIdentifier>SiteId</DataTypeIdentifier>
+            </DataType>
+        </Parameter>
+        <Response>
+            <Identifier>IsOccupied</Identifier>
+            <DisplayName>Is Occupied</DisplayName>
+            <Description>Boolean describing if site is occupied or not.</Description>
+            <DataType>
+                <Basic>Boolean</Basic>
+            </DataType>
+        </Response>
+        <DefinedExecutionErrors>
+            <Identifier>SiteIdNotFound</Identifier>
+        </DefinedExecutionErrors>
+    </Command>
+
+    <Command>
+        <Identifier>FollowPath</Identifier>
+        <DisplayName>Follow Path</DisplayName>
+        <Description>Follows a path of poses.</Description>
+        <Observable>No</Observable>
+        <Parameter>
+            <Identifier>PoseList</Identifier>
+            <DisplayName>Pose List</DisplayName>
+            <Description>A list of poses to follow along.</Description>
+            <DataType>
+                <List>
+                    <DataType>
+                        <DataTypeIdentifier>Pose</DataTypeIdentifier>
+                    </DataType>
+                </List>
+            </DataType>
+        </Parameter>
+    </Command>
+
+    <Command>
+        <Identifier>SetToFrame</Identifier>
+        <DisplayName>Set To Frame</DisplayName>
+        <Description>Sets the absolute joint values.</Description>
+        <Observable>No</Observable>
+        <Parameter>
+            <Identifier>Frame</Identifier>
+            <DisplayName>Frame</DisplayName>
+            <Description>The frame to set the joints to.</Description>
+            <DataType>
+                <DataTypeIdentifier>Frame</DataTypeIdentifier>
+            </DataType>
+        </Parameter>
+    </Command>
+
+    <Command>
+        <Identifier>FollowFrames</Identifier>
+        <DisplayName>Follow Frames</DisplayName>
+        <Description>Successively set the absolute joint values.</Description>
+        <Observable>No</Observable>
+        <Parameter>
+            <Identifier>FrameList</Identifier>
+            <DisplayName>FrameList</DisplayName>
+            <Description>The list of frames to sequence.</Description>
+            <DataType>
+                <Constrained>
+                    <DataType>
+                        <List>
+                            <DataType>
+                                <DataTypeIdentifier>Frame</DataTypeIdentifier>
+                            </DataType>
+                        </List>
+                    </DataType>
+                    <Constraints>
+                        <MinimalElementCount>1</MinimalElementCount>
+                    </Constraints>
+                </Constrained>
+            </DataType>
+        </Parameter>
+    </Command>
+
+    <DataTypeDefinition>
+        <Identifier>Frame</Identifier>
+        <DisplayName>Frame</DisplayName>
+        <Description>Absolute joint values describing a frame.</Description>
+        <DataType>
+            <Constrained>
+                <DataType>
+                    <List>
+                        <DataType>
+                            <Basic>Real</Basic>
+                        </DataType>
+                    </List>
+                </DataType>
+                <Constraints>
+                    <ElementCount>7</ElementCount>
+                </Constraints>
+            </Constrained>
+        </DataType>
+    </DataTypeDefinition>
+
+    <DataTypeDefinition>
+        <Identifier>SiteId</Identifier>
+        <DisplayName>Site ID</DisplayName>
+        <Description>The string identifier of the Site.</Description>
+        <DataType>
+            <Constrained>
+                <DataType>
+                    <Basic>String</Basic>
+                </DataType>
+                <Constraints>
+                    <Pattern>[a-zA-Z0-9_'-]+</Pattern>
+                </Constraints>
+            </Constrained>
+        </DataType>
+    </DataTypeDefinition>
+
+    <DataTypeDefinition>
+        <Identifier>Pose</Identifier>
+        <DisplayName>Pose</DisplayName>
+        <Description>The pose of the gripper to reach the Site. The pose itself consists of two parts: The Position as vector (XYZ) and the Orientation as Quaternion (XYZW).</Description>
+        <DataType>
+            <Structure>
+                <Element>
+                    <Identifier>X</Identifier>
+                    <DisplayName>X</DisplayName>
+                    <Description>The X position of the Site.</Description>
+                    <DataType>
+                        <Constrained>
+                            <DataType>
+                                <Basic>Real</Basic>
+                            </DataType>
+                            <Constraints>
+                                <Unit>
+                                    <Label>m</Label>
+                                    <Factor>1.0</Factor>
+                                    <Offset>0</Offset>
+                                    <UnitComponent>
+                                        <SIUnit>Meter</SIUnit>
+                                        <Exponent>1</Exponent>
+                                    </UnitComponent>
+                                </Unit>
+                            </Constraints>
+                        </Constrained>
+                    </DataType>
+                </Element>
+                <Element>
+                    <Identifier>Y</Identifier>
+                    <DisplayName>Y</DisplayName>
+                    <Description>The Y position of the Site.</Description>
+                    <DataType>
+                        <Constrained>
+                            <DataType>
+                                <Basic>Real</Basic>
+                            </DataType>
+                            <Constraints>
+                                <Unit>
+                                    <Label>m</Label>
+                                    <Factor>1.0</Factor>
+                                    <Offset>0</Offset>
+                                    <UnitComponent>
+                                        <SIUnit>Meter</SIUnit>
+                                        <Exponent>1</Exponent>
+                                    </UnitComponent>
+                                </Unit>
+                            </Constraints>
+                        </Constrained>
+                    </DataType>
+                </Element>
+                <Element>
+                    <Identifier>Z</Identifier>
+                    <DisplayName>Z</DisplayName>
+                    <Description>The Z position defining the relative height.</Description>
+                    <DataType>
+                        <Constrained>
+                            <DataType>
+                                <Basic>Real</Basic>
+                            </DataType>
+                            <Constraints>
+                                <Unit>
+                                    <Label>m</Label>
+                                    <Factor>1.0</Factor>
+                                    <Offset>0</Offset>
+                                    <UnitComponent>
+                                        <SIUnit>Meter</SIUnit>
+                                        <Exponent>1</Exponent>
+                                    </UnitComponent>
+                                </Unit>
+                            </Constraints>
+                        </Constrained>
+                    </DataType>
+                </Element>
+                <Element>
+                    <Identifier>OriX</Identifier>
+                    <DisplayName>Orientation X</DisplayName>
+                    <Description>The X value.</Description>
+                    <DataType>
+                        <Basic>Real</Basic>
+                    </DataType>
+                </Element>
+                <Element>
+                    <Identifier>OriY</Identifier>
+                    <DisplayName>Orientation Y</DisplayName>
+                    <Description>The Y value.</Description>
+                    <DataType>
+                        <Basic>Real</Basic>
+                    </DataType>
+                </Element>
+                <Element>
+                    <Identifier>OriZ</Identifier>
+                    <DisplayName>Orientation Z</DisplayName>
+                    <Description>The Z value.</Description>
+                    <DataType>
+                        <Basic>Real</Basic>
+                    </DataType>
+                </Element>
+                <Element>
+                    <Identifier>OriW</Identifier>
+                    <DisplayName>Orientation W</DisplayName>
+                    <Description>The W value.</Description>
+                    <DataType>
+                        <Basic>Real</Basic>
+                    </DataType>
+                </Element>
+            </Structure>
+        </DataType>
+    </DataTypeDefinition>
+
+    <DefinedExecutionError>
+        <Identifier>LostPlate</Identifier>
+        <DisplayName>Lost Plate</DisplayName>
+        <Description>In case of not being able to grip the plate or losing it in transaction.</Description>
+    </DefinedExecutionError>
+
+    <DefinedExecutionError>
+        <Identifier>InaccessibleSite</Identifier>
+        <DisplayName>Inaccessible Site</DisplayName>
+        <Description>Unable to access the site specified due to robot limitations.</Description>
+    </DefinedExecutionError>
+    
+    <DefinedExecutionError>
+        <Identifier>SiteIdNotFound</Identifier>
+        <DisplayName>Site ID not found</DisplayName>
+        <Description>The given Site ID does not exist or could not be found.</Description>
+    </DefinedExecutionError>
+</Feature>

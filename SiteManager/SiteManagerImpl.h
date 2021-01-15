@@ -15,7 +15,7 @@
 #include <sila_cpp/data_types.h>
 #include <sila_cpp/server/command/UnobservableCommand.h>
 #include <sila_cpp/server/property/UnobservableProperty.h>
-#include "MoveDirection.h"
+#include "RelativeMove.h"
 #include "Pose.h"
 #include "SiteManager.grpc.pb.h"
 
