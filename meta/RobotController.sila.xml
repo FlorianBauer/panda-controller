@@ -7,6 +7,30 @@
     <DisplayName>Robot Controller</DisplayName>
     <Description>Controller for a Panda robot arm.</Description>
 
+    <Property>
+        <Identifier>GetCurrentPose</Identifier>
+        <DisplayName>Get Current Pose</DisplayName>
+        <Description>Get the current position and orientation of the robot hand.</Description>
+        <Observable>No</Observable>
+        <DataType>
+            <DataTypeIdentifier>Pose</DataTypeIdentifier>
+        </DataType>
+    </Property>
+
+<!--
+    The C++ Template for the Frame-DataType can not be gernerated correctly with the current 
+    silacodegenerator v0.3.3-dev. (2021-01-16, florian.bauer.dev@gmail.com)
+
+    <Property>
+        <Identifier>GetCurrentFrame</Identifier>
+        <DisplayName>Get Current Frame</DisplayName>
+        <Description>Get the current joint values.</Description>
+        <Observable>No</Observable>
+        <DataType>
+            <DataTypeIdentifier>Frame</DataTypeIdentifier>
+        </DataType>
+    </Property>-->
+
     <Command>
         <Identifier>MoveToPose</Identifier>
         <DisplayName>Move To Pose</DisplayName>
