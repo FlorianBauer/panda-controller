@@ -55,7 +55,6 @@ configure_file(
 )
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/")
-include_directories("/opt/ros/${ROS_DISTRO}/include/")
 
 # Include the JSON library from the git submodule.
 set(JSON_BuildTests OFF CACHE INTERNAL "")
