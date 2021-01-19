@@ -20,10 +20,15 @@ sudo apt install qtbase5-dev libssl-dev libavahi-client-dev libavahi-common-dev
 
 ### Build and Install a Linux Real-Time Kernel
 
+The Real-Time kernel is necessary for dealing with actual hardware. If only a simulation via MoveIt 
+and RViz is sufficient, this step can be omitted.
+
 TODO: add install instructions
 
-[Ranka Emika Set-Up Guide](https://frankaemika.github.io/docs/installation_linux.html#setting-up-the-real-time-kernel)
+_Links for troubleshooting:_  
+[Ranka Emika Set-Up Guide](https://frankaemika.github.io/docs/installation_linux.html#setting-up-the-real-time-kernel)  
 [RT Kernel Set-Up Guide](https://medium.com/@patdhlk/realtime-linux-e97628b51d5d)
+
 
 ### Build and Install gRPC
 
@@ -51,15 +56,15 @@ cmake -DgRPC_INSTALL=ON \
       -DgRPC_BUILD_TESTS=OFF \
       -DgRPC_SSL_PROVIDER=package \
       -DCMAKE_INSTALL_PREFIX=$LOCAL_INSTALL_DIR \
-      -DBUILD_SHARED_LIBS=ON
+      -DBUILD_SHARED_LIBS=ON \
       ../..
 make -j 4
 make install
 popd
 ```
 
-_Links for troubleshooting:_
-[sila_cpp build instructions](https://gitlab.com/SiLA2/sila_cpp/-/blob/master/BUILDING.md#grpc)
+_Links for troubleshooting:_  
+[sila_cpp Build Instructions](https://gitlab.com/SiLA2/sila_cpp/-/blob/master/BUILDING.md#grpc)  
 [gRPC Quickstart](https://grpc.io/docs/languages/cpp/quickstart/)
 
 
@@ -79,54 +84,73 @@ cmake --build .
 ```
 
 3. Install `sila_cpp`
-```
+```bash
 cmake --install .
 ```
+
+_Links for troubleshooting:_  
+[sila_cpp Build Instructions](https://gitlab.com/SiLA2/sila_cpp/-/blob/master/BUILDING.md)
 
 
 ## Build the Project
 
-```
+1. Create a Catkin workspace.
+```bash
 mkdir -p ~/catkin_ws/src/
 ```
-* Copy these project files into the `src`-dir.
-* Also add the `panda_moveit_config` from https://github.com/ros-planning/panda_moveit_config
-(`git clone https://github.com/ros-planning/panda_moveit_config.git -b melodic-devel`).
-* Ensure a `package.xml`-file with all the dependencies exists.
 
-Build with:
-```
+2. If the recommended simulation mode should be available as well, the MoveIt-config shall also be built.  
+    2.1 Change into the workspace `src`-dir: `cd ~/catkin_ws/src/`  
+    2.2 Add the `panda_moveit_config` from https://github.com/ros-planning/panda_moveit_config  
+        `git clone https://github.com/ros-planning/panda_moveit_config.git -b melodic-devel`
+
+3. Build the project.
+```bash
 cd ~/catkin_ws/
 source /opt/ros/noetic/setup.bash
 catkin_make
 ```
 
+4. Copy the Feature Definition Language files into the directory of the generated binary.
+```bash
+mkdir -p ./build/panda-controller/bin/meta
+cp ./src/panda-controller/meta/SiteManager.sila.xml ./build/panda-controller/bin/meta/SiteManager.sila.xml
+cp ./src/panda-controller/meta/RobotController.sila.xml ./build/panda-controller/bin/meta/RobotController.sila.xml
+```
+
 ## Run the Project in MoveIt
 
-Start a terminal, source the workspace and launch MoveIt:
-```
+1. Start a terminal, source the workspace and launch MoveIt.
+```bash
 source devel/setup.bash
 roslaunch panda_moveit_config demo.launch
-# On real hardware [!sic]:
-# roslaunch franka_control franka_control.launch
 ```
 
-Start another terminal, source the workspace and run the built ROS service:
-```
+2. Start another terminal, source the workspace and run the built ROS service node.
+```bash
 source devel/setup.bash
-rosrun panda_controller robot_service
+./build/panda-controller/bin/RobotService
 ```
 
-To start the ROS client in yet another terminal:
-```
+3. Now start the actual SiLA Server.
+```bash
 source devel/setup.bash
-rosrun panda_controller robot_client
+./build/panda-controller/bin/PandaControllerServer
 ```
 
-The executables could also be used without `rosrun`. Therefore, simply execute the files
-in a sourced environment with `./devel/lib/panda_controller/robot_service` and 
-`./devel/lib/panda_controller/robot_client`.
+_Troubleshooting:_
+* If a `lib*.so: cannot open shared object file: No such file or directory` error is shown on 
+start-up of the SiLA server, check the environment was sourced correctly (e.g. with `env`) and is 
+not executed as root-user.
+* If a `WARNING: Could not open FDL file` appears, check if the corresponding Feature Definition 
+Language files are actually available in the `./build/panda-controller/bin/meta/`-directory.
+* On an `Failed to call service` error in the Server, check if the corresponding ROS node (aka 
+`RobotService) is running.
+* On an `[registerPublisher] Failed to contact master at [localhost:11311].  Retrying...` error, 
+ensure the corresponding roslaunch script is running (`panda_moveit_config` in simulation or the 
+launch file for the actual Franka Control Interface (FCI)).
 
+_Various Notes:_
 To omit sourcing the workspace every time in a new terminal, the setup can be amended into 
 `.bashrc` with `echo 'source ~/catkin_ws/devel/setup.bash' >> ~/.bashrc`
 
