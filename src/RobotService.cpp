@@ -135,10 +135,10 @@ bool moveToPosition(panda_controller::MoveTo::Request& req, panda_controller::Mo
     targetPose.orientation.z = req.ori_z;
     targetPose.orientation.w = req.ori_w;
     moveGroupPtr->setPoseTarget(targetPose);
-    moveGroupPtr->move();
-    ROS_INFO("moveTo success");
-    res.was_success = true;
-    return true;
+    const MoveItErrorCode err = moveGroupPtr->move();
+    const bool wasSuccessful = (err == MoveItErrorCode::SUCCESS);
+    res.was_success = wasSuccessful;
+    return wasSuccessful;
 }
 
 /**
