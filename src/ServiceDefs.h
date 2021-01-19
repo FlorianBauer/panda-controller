@@ -12,5 +12,6 @@ static constexpr char SRV_GET_JOINTS[] = "get_joints";
 static constexpr char SRV_GET_POSE[] = "get_pose";
 static constexpr char SRV_MOVE_TO[] = "move_to";
 static constexpr char SRV_SET_JOINTS[] = "set_joints";
+static constexpr size_t MAX_JOINTS = 7;
 
 #endif /* SERVICEDEFS_H */

@@ -7,7 +7,21 @@
 //============================================================================
 
 #include "RobotControllerImpl.h"
+
+#include <fstream>
+#include <vector>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <nlohmann/json.hpp>
 #include <sila_cpp/common/logging.h>
+#include <sila_cpp/framework/error_handling/ValidationError.h>
+#include "RobotClient.h"
+#include "ServiceDefs.h"
+#include "panda_controller/GetPose.h"
+#include "panda_controller/GetJoints.h"
+#include "panda_controller/MoveTo.h"
+#include "panda_controller/SetJoints.h"
+#include "FileManager.h"
+#include "RobotController.pb.h"
 
 using namespace sila2::de::fau::robot::robotcontroller::v1;
 
@@ -40,21 +54,38 @@ m_GetCurrentPoseProperty{this,
     m_FollowFramesCommand.setExecutor(this, &CRobotControllerImpl::FollowFrames);
 }
 
+/**
+ * Moves the robot hand to the given pose. Since path planning is active on this request, an invalid 
+ * pose or an pose causing a collision will throw a validation error.
+ * 
+ * @param command The SiLA command.
+ * @return A empty response.
+ */
 MoveToPose_Responses CRobotControllerImpl::MoveToPose(MoveToPoseWrapper* command) {
     const auto request = command->parameters();
     qDebug() << "Request contains:" << request;
-    // TODO: Validate request parameters...
+    const auto& pose = request.pose().pose();
+    ros::ServiceClient moveClient = m_RosNode.serviceClient<panda_controller::MoveTo>(SRV_MOVE_TO);
+    panda_controller::MoveTo move;
+    move.request.pos_x = pose.x().value();
+    move.request.pos_y = pose.y().value();
+    move.request.pos_z = pose.z().value();
+    move.request.ori_x = pose.orix().value();
+    move.request.ori_y = pose.oriy().value();
+    move.request.ori_z = pose.oriz().value();
+    move.request.ori_w = pose.oriw().value();
 
-    // TODO: Write actual Command implementation logic...
-    const double NUM_STEPS = 10.0;
-    for (int i = 0; i <= NUM_STEPS; ++i) {
-        // do stuff...
-        command->setExecutionInfo(SiLA2::CReal{i / NUM_STEPS});
+    ROS_INFO("Call MoveTo");
+    if (moveClient.call(move)) {
+        ROS_INFO("Was Success: %d", move.response.was_success);
+    } else {
+        ROS_ERROR("Failed to call service MoveTo");
+        throw SiLA2::CValidationError{
+            "InvalidPose",
+            "The given pose is invalid, not within reach or would cause a collision."};
     }
 
-    auto Response = MoveToPose_Responses{};
-    // TODO: Fill the response fields
-    return Response;
+    return MoveToPose_Responses{};
 }
 
 MoveToSite_Responses CRobotControllerImpl::MoveToSite(MoveToSiteWrapper* command) {
@@ -173,16 +204,34 @@ FollowPath_Responses CRobotControllerImpl::FollowPath(FollowPathWrapper* command
     return Response;
 }
 
+/**
+ * Sets all joints of the robot to the requested values. No checks or path planning is done.
+ * 
+ * @param command The SiLA command.
+ * @return A empty response.
+ */
 SetToFrame_Responses CRobotControllerImpl::SetToFrame(SetToFrameWrapper* command) {
-    const auto Request = command->parameters();
-    qDebug() << "Request contains:" << Request;
-    // TODO: Validate request parameters...
+    const auto& request = command->parameters();
+    qDebug() << "Request contains:" << request;
+    const auto& frame = request.frame().frame();
 
-    // TODO: Write actual Command implementation logic...
+    ros::ServiceClient jointClient = m_RosNode.serviceClient<panda_controller::SetJoints>(SRV_SET_JOINTS);
+    panda_controller::SetJoints joints;
 
-    auto Response = SetToFrame_Responses{};
-    // TODO: Fill the response fields
-    return Response;
+    for (size_t i = 0; i < MAX_JOINTS; i++) {
+        joints.request.joints[i] = frame.at(i).value();
+    }
+
+    ROS_INFO("Call SetJoints");
+    if (jointClient.call(joints)) {
+        ROS_INFO("Was Success: %d", joints.response.was_success);
+    } else {
+        ROS_ERROR("Failed to call service SetJoints");
+        // TODO: throw a defined SiLA execution exception
+        return {};
+    }
+
+    return SetToFrame_Responses{};
 }
 
 FollowFrames_Responses CRobotControllerImpl::FollowFrames(FollowFramesWrapper* command) {

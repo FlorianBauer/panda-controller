@@ -8,6 +8,7 @@
 #ifndef ROBOTCONTROLLERIMPL_H
 #define ROBOTCONTROLLERIMPL_H
 
+#include <ros/ros.h>
 #include <sila_cpp/server/SiLAFeature.h>
 #include <sila_cpp/data_types.h>
 #include <sila_cpp/server/command/UnobservableCommand.h>
@@ -302,7 +303,8 @@ private:
     FollowPathCommand m_FollowPathCommand;
     SetToFrameCommand m_SetToFrameCommand;
     FollowFramesCommand m_FollowFramesCommand;
-    const GetCurrentPoseProperty m_GetCurrentPoseProperty;
+    GetCurrentPoseProperty m_GetCurrentPoseProperty;
+    ros::NodeHandle m_RosNode;
 };
 
 #endif  // ROBOTCONTROLLERIMPL_H
