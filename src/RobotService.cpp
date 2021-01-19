@@ -1,7 +1,7 @@
 /** 
- * The ROS service which receives the ROS messages from the `robot_client` and executes the actual
- * movements. Only low-level commands are done here. High-level tasks (e.g. collision detection) 
- * are in the responsibility of the client.
+ * The ROS service node which receives the ROS messages from the client (aka 
+ * `PandaControllerServer`) and executes the actual movements. Only low-level commands should be 
+ * handled here. High-level tasks are in the responsibility of the client.
  */
 #include <iostream>
 #include <fstream>
