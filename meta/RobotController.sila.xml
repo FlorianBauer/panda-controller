@@ -7,17 +7,7 @@
     <DisplayName>Robot Controller</DisplayName>
     <Description>Controller for a Panda robot arm.</Description>
 
-    <Property>
-        <Identifier>GetCurrentPose</Identifier>
-        <DisplayName>Get Current Pose</DisplayName>
-        <Description>Get the current position and orientation of the robot hand.</Description>
-        <Observable>No</Observable>
-        <DataType>
-            <DataTypeIdentifier>Pose</DataTypeIdentifier>
-        </DataType>
-    </Property>
-
-<!--
+    <!--
     The C++ Template for the Frame-DataType can not be gernerated correctly with the current 
     silacodegenerator v0.3.3-dev. (2021-01-16, florian.bauer.dev@gmail.com)
 
@@ -32,6 +22,42 @@
     </Property>-->
 
     <Command>
+        <Identifier>GetCurrentFrame</Identifier>
+        <DisplayName>Get Current Frame</DisplayName>
+        <Description>Get the current joint values.</Description>
+        <Observable>No</Observable>
+        <Response>
+            <Identifier>Frame</Identifier>
+            <DisplayName>Frame</DisplayName>
+            <Description>The absolute joint values.</Description>
+            <DataType>
+                <DataTypeIdentifier>Frame</DataTypeIdentifier>
+            </DataType>
+        </Response>
+        <DefinedExecutionErrors>
+            <Identifier>ServiceUnavailable</Identifier>
+        </DefinedExecutionErrors>
+    </Command>
+
+    <Command>
+        <Identifier>GetCurrentPose</Identifier>
+        <DisplayName>Get Current Pose</DisplayName>
+        <Description>Get the current position and orientation of the robot hand.</Description>
+        <Observable>No</Observable>
+        <Response>
+            <Identifier>Pose</Identifier>
+            <DisplayName>Pose</DisplayName>
+            <Description>The pose to query.</Description>
+            <DataType>
+                <DataTypeIdentifier>Pose</DataTypeIdentifier>
+            </DataType>
+        </Response>
+        <DefinedExecutionErrors>
+            <Identifier>ServiceUnavailable</Identifier>
+        </DefinedExecutionErrors>
+    </Command>
+
+    <Command>
         <Identifier>MoveToPose</Identifier>
         <DisplayName>Move To Pose</DisplayName>
         <Description>Move to a given position and with a given orientation.</Description>
@@ -44,6 +70,10 @@
                 <DataTypeIdentifier>Pose</DataTypeIdentifier>
             </DataType>
         </Parameter>
+        <DefinedExecutionErrors>
+            <Identifier>ServiceUnavailable</Identifier>
+            <Identifier>InvalidPose</Identifier>
+        </DefinedExecutionErrors>
     </Command>
 
     <Command>
@@ -60,6 +90,7 @@
             </DataType>
         </Parameter>
         <DefinedExecutionErrors>
+            <Identifier>ServiceUnavailable</Identifier>
             <Identifier>SiteIdNotFound</Identifier>
             <Identifier>InaccessibleSite</Identifier>
         </DefinedExecutionErrors>
@@ -121,6 +152,7 @@
             </DataType>
         </Parameter>
         <DefinedExecutionErrors>
+            <Identifier>ServiceUnavailable</Identifier>
             <Identifier>SiteIdNotFound</Identifier>
             <Identifier>InaccessibleSite</Identifier>
             <Identifier>LostPlate</Identifier>
@@ -415,6 +447,18 @@
             </Structure>
         </DataType>
     </DataTypeDefinition>
+
+    <DefinedExecutionError>
+        <Identifier>ServiceUnavailable</Identifier>
+        <DisplayName>Service Unavailable</DisplayName>
+        <Description>The call to the given service was not possible.</Description>
+    </DefinedExecutionError>
+
+    <DefinedExecutionError>
+        <Identifier>InvalidPose</Identifier>
+        <DisplayName>Invalid Pose</DisplayName>
+        <Description>The given pose is invalid, not within reach or would cause a collision.</Description>
+    </DefinedExecutionError>
 
     <DefinedExecutionError>
         <Identifier>LostPlate</Identifier>

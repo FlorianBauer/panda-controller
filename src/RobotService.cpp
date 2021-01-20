@@ -174,12 +174,12 @@ bool setJoints(panda_controller::SetJoints::Request& req, panda_controller::SetJ
 bool getJoints(panda_controller::GetJoints::Request& req, panda_controller::GetJoints::Response& res) {
     const std::vector<double> curJoints = moveGroupPtr->getCurrentJointValues();
     res.joints[0] = curJoints[0];
-    res.joints[1] = curJoints[0];
-    res.joints[2] = curJoints[0];
-    res.joints[3] = curJoints[0];
-    res.joints[4] = curJoints[0];
-    res.joints[5] = curJoints[0];
-    res.joints[6] = curJoints[0];
+    res.joints[1] = curJoints[1];
+    res.joints[2] = curJoints[2];
+    res.joints[3] = curJoints[3];
+    res.joints[4] = curJoints[4];
+    res.joints[5] = curJoints[5];
+    res.joints[6] = curJoints[6];
     return true;
 }
 
@@ -201,42 +201,6 @@ bool placeToSite(Site& site, Plate& plate) {
         return false;
     }
     return true;
-}
-
-void grabTest() {
-    tf2::Quaternion orientation;
-    orientation.setRPY(-M_PI, 0, -M_PI_4);
-    //    orientation.setRPY(M_PI_2, M_PI_4, M_PI_2);
-
-    Plate myPlate("myTestPlate", WELLS_LENGTH_IN_M, WELLS_WIDTH_IN_M, WELLS_HEIGHT_IN_M);
-
-    geometry_msgs::Pose sitePose;
-    sitePose.orientation = tf2::toMsg(orientation);
-    sitePose.position.x = 0.15 + myPlate.getDimX() / 2.0;
-    sitePose.position.y = 0.50;
-    sitePose.position.z = 0.01 + myPlate.getDimZ() / 2.0;
-    Site mySite("grabSite", sitePose);
-
-    moveit_msgs::GripperTranslation approach;
-    approach.direction.vector.x = 1.0;
-    approach.min_distance = 0.01;
-    approach.desired_distance = 0.05;
-    mySite.setApproach(approach);
-
-    moveit_msgs::GripperTranslation retreat;
-    retreat.direction.vector.z = 1.0;
-    retreat.min_distance = 0.01;
-    retreat.desired_distance = 0.05;
-    mySite.setRetreat(retreat);
-    myPlate.putAtSite(mySite);
-    // add plate to scene
-    planningScenePtr->applyCollisionObject(myPlate.getCollisonObject());
-
-    pickFromSite(mySite, myPlate);
-    placeToSite(mySite, myPlate);
-
-    // remove plate from scene
-    planningScenePtr->removeCollisionObjects({myPlate.getId()});
 }
 
 bool transportPlate(Site& source, Site& destination, Plate& plate) {
@@ -267,48 +231,6 @@ bool transportPlate(Site& source, Site& destination, Plate& plate) {
     return true;
 }
 
-void transportTest() {
-    tf2::Quaternion orientation;
-    //  orientation.setRPY(-M_PI, 0, -M_PI_4);
-    orientation.setRPY(M_PI_2, M_PI_4, M_PI_2);
-
-    Plate myPlate("testPlate", WELLS_LENGTH_IN_M, WELLS_WIDTH_IN_M, WELLS_HEIGHT_IN_M);
-
-    geometry_msgs::Pose poseA;
-    poseA.orientation = tf2::toMsg(orientation);
-    poseA.position.x = 0.15 + myPlate.getDimX() / 2.0;
-    poseA.position.y = 0.50;
-    poseA.position.z = 0.01 + myPlate.getDimZ() / 2.0;
-    Site siteA("siteA", poseA);
-
-    geometry_msgs::Pose poseB;
-    poseB.orientation = tf2::toMsg(orientation);
-    poseB.position.x = 0.15 + myPlate.getDimX() / 2.0;
-    poseB.position.y = -0.50;
-    poseB.position.z = 0.01 + myPlate.getDimZ() / 2.0;
-    Site siteB("siteB", poseB);
-
-    moveit_msgs::GripperTranslation approach;
-    approach.direction.vector.x = 1.0;
-    approach.min_distance = 0.01;
-    approach.desired_distance = 0.05;
-    siteA.setApproach(approach);
-    siteB.setApproach(approach);
-
-    const fs::path sitesDir = FileManager::getAppDir() / SITES_DIR;
-    FileManager::saveJsonToFile(siteA.toJson(), sitesDir / "siteA.json");
-    FileManager::saveJsonToFile(siteB.toJson(), sitesDir / "siteB.json");
-
-    myPlate.putAtSite(siteA);
-    // add plate to scene
-    planningScenePtr->applyCollisionObject(myPlate.getCollisonObject());
-
-    transportPlate(siteA, siteB, myPlate);
-
-    // remove plate from scene
-    planningScenePtr->removeCollisionObjects({myPlate.getId()});
-}
-
 /**
  * Get the current pose.
  * 
@@ -323,9 +245,6 @@ bool getPose(panda_controller::GetPose::Request& req, panda_controller::GetPose:
     res.ori_y = curPose.pose.orientation.y;
     res.ori_z = curPose.pose.orientation.z;
     res.ori_w = curPose.pose.orientation.w;
-
-    // grabTest();
-    transportTest();
 
     return true;
 }
