@@ -126,16 +126,10 @@ source devel/setup.bash
 roslaunch panda_moveit_config demo.launch
 ```
 
-2. Start another terminal, source the workspace and run the built ROS service node.
+2. After RViz has launched, start the actual SiLA Server.
 ```bash
 source devel/setup.bash
-./build/panda-controller/bin/RobotService
-```
-
-3. Now start the actual SiLA Server.
-```bash
-source devel/setup.bash
-./build/panda-controller/bin/PandaControllerServer
+./build/panda-controller/bin/PandaControlServer
 ```
 
 _Troubleshooting:_
@@ -144,8 +138,6 @@ start-up of the SiLA server, check the environment was sourced correctly (e.g. w
 not executed as root-user.
 * If a `WARNING: Could not open FDL file` appears, check if the corresponding Feature Definition 
 Language files are actually available in the `./build/panda-controller/bin/meta/`-directory.
-* On an `Failed to call service` error in the Server, check if the corresponding ROS node (aka 
-`RobotService) is running.
 * On an `[registerPublisher] Failed to contact master at [localhost:11311].  Retrying...` error, 
 ensure the corresponding roslaunch script is running (`panda_moveit_config` in simulation or the 
 launch file for the actual Franka Control Interface (FCI)).
