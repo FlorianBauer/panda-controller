@@ -8,7 +8,10 @@
 #ifndef ROBOTCONTROLLERIMPL_H
 #define ROBOTCONTROLLERIMPL_H
 
+#include <memory>
 #include <ros/ros.h>
+#include <moveit/planning_scene_interface/planning_scene_interface.h>
+#include <moveit/move_group_interface/move_group_interface.h>
 #include <sila_cpp/server/SiLAFeature.h>
 #include <sila_cpp/data_types.h>
 #include <sila_cpp/server/command/UnobservableCommand.h>
@@ -16,6 +19,9 @@
 #include <sila_cpp/server/property/UnobservableProperty.h>
 #include "Pose.h"
 #include "RobotController.grpc.pb.h"
+#include "ServiceDefs.h"
+#include "Site.h"
+#include "SiteManager/SiteManagerImpl.h"
 
 /**
  * @brief The CRobotControllerImpl class implements the RobotController feature
@@ -106,7 +112,7 @@ public:
      *
      * @param parent The SiLA server instance that contains this Feature
      */
-    explicit CRobotControllerImpl(SiLA2::CSiLAServer* parent);
+    explicit CRobotControllerImpl(SiLA2::CSiLAServer* parent, const std::shared_ptr<CSiteManagerImpl> siteManagerPtr);
 
     /**
      * @brief GetCurrentFrame Command
@@ -334,6 +340,7 @@ public:
     sila2::de::fau::robot::robotcontroller::v1::FollowFrames_Responses FollowFrames(FollowFramesWrapper* command);
 
 private:
+    const std::shared_ptr<CSiteManagerImpl> m_SiteManagerPtr;
     GetCurrentFrameCommand m_GetCurrentFrameCommand;
     GetCurrentPoseCommand m_GetCurrentPoseCommand;
     MoveToPoseCommand m_MoveToPoseCommand;
@@ -348,6 +355,8 @@ private:
     SetToFrameCommand m_SetToFrameCommand;
     FollowFramesCommand m_FollowFramesCommand;
     ros::NodeHandle m_RosNode;
+    moveit::planning_interface::MoveGroupInterface m_MoveGroup{PANDA_ARM};
+    moveit::planning_interface::PlanningSceneInterface m_PlanningScene;
 };
 
 #endif  // ROBOTCONTROLLERIMPL_H

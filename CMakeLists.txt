@@ -75,28 +75,10 @@ find_package(catkin REQUIRED
     tf2_ros
     tf2_eigen
     tf2_geometry_msgs
-    roscpp
-    rospy
-    std_msgs
-    message_generation
-)
-
-# Generate services in the 'srv' folder
-add_service_files(
-    FILES
-    FollowFrames.srv
-    FollowPath.srv
-    GetCurrentFrame.srv
-    GetCurrentPose.srv
-    MoveToPose.srv
-    SetToFrame.srv
 )
 
 # Generate added messages and services with any dependencies listed here
-generate_messages(
-    DEPENDENCIES
-    std_msgs  # Or other packages containing msgs
-)
+generate_messages()
 
 find_package(Eigen3 REQUIRED)
 
@@ -140,10 +122,11 @@ add_library(${PANDA_CONTROLLER}Features
 target_link_libraries(${PANDA_CONTROLLER}Features
     sila2::sila_cpp
     nlohmann_json::nlohmann_json
+    ${catkin_LIBRARIES}
 )
 
 # The SiLA Server takes the role of the ROS client node.
-set(SILA_SERVER "PandaControllerServer")
+set(SILA_SERVER "PandaControlServer")
 add_executable(${SILA_SERVER} "${CMAKE_CURRENT_SOURCE_DIR}/${SILA_SERVER}.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/Plate.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/Site.cpp"
@@ -152,14 +135,11 @@ add_executable(${SILA_SERVER} "${CMAKE_CURRENT_SOURCE_DIR}/${SILA_SERVER}.cpp"
 
 add_dependencies(${SILA_SERVER} panda_controller_gencpp)
 target_link_libraries(${SILA_SERVER}
-    ${catkin_LIBRARIES}
     nlohmann_json::nlohmann_json
     sila2::sila_cpp
     ${PANDA_CONTROLLER}Features
+    ${catkin_LIBRARIES}
 )
-
-# The server needs the FDL files which are compiled into the binary using the resource file.
-target_sources(${SILA_SERVER} PRIVATE "${PANDA_CONTROLLER}.qrc")
 
 # Copy the libs to the directory of the executables so that they can find them.
 add_custom_command(TARGET ${SILA_SERVER} POST_BUILD
@@ -167,16 +147,4 @@ add_custom_command(TARGET ${SILA_SERVER} POST_BUILD
         $<TARGET_FILE:sila2::sila_cpp>
         $<TARGET_FILE:QtZeroConf>
         $<TARGET_FILE_DIR:${SILA_SERVER}>
-)
-
-# Build the ROS service node.
-add_executable(${ROBOT_SERVICE} "${CMAKE_CURRENT_SOURCE_DIR}/src/${ROBOT_SERVICE}.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/Plate.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/Site.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/FileManager.cpp"
-)
-add_dependencies(${ROBOT_SERVICE} panda_controller_gencpp)
-target_link_libraries(${ROBOT_SERVICE} PRIVATE
-    nlohmann_json::nlohmann_json
-    ${catkin_LIBRARIES}
 )
