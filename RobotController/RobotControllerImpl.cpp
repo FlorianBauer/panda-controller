@@ -133,7 +133,13 @@ MoveToPose_Responses CRobotControllerImpl::MoveToPose(MoveToPoseWrapper* command
 MoveToSite_Responses CRobotControllerImpl::MoveToSite(MoveToSiteWrapper* command) {
     const auto request = command->parameters();
     qDebug() << "Request contains:" << request;
-    // TODO: Validate request parameters...
+
+    if (!m_SiteManagerPtr->hasSiteId(request.siteid().siteid().value())) {
+        // Throw an validation exception if site is not available.
+        throw SiLA2::CDefinedExecutionError{
+            "SiteIdNotFound",
+            "The given Site ID does not exist or could not be found."};
+    }
 
     // TODO: Write actual Command implementation logic...
     const double NUM_STEPS = 10.0;

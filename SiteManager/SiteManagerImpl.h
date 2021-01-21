@@ -82,6 +82,8 @@ public:
      */
     sila2::de::fau::robot::sitemanager::v1::DeleteSite_Responses DeleteSite(DeleteSiteWrapper* command);
 
+    bool hasSiteId(const std::string& siteId) const;
+
 private:
     SetSiteCommand m_SetSiteCommand;
     DeleteSiteCommand m_DeleteSiteCommand;
