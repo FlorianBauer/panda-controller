@@ -7,20 +7,6 @@
     <DisplayName>Robot Controller</DisplayName>
     <Description>Controller for a Panda robot arm.</Description>
 
-    <!--
-    The C++ Template for the Frame-DataType can not be gernerated correctly with the current 
-    silacodegenerator v0.3.3-dev. (2021-01-16, florian.bauer.dev@gmail.com)
-
-    <Property>
-        <Identifier>GetCurrentFrame</Identifier>
-        <DisplayName>Get Current Frame</DisplayName>
-        <Description>Get the current joint values.</Description>
-        <Observable>No</Observable>
-        <DataType>
-            <DataTypeIdentifier>Frame</DataTypeIdentifier>
-        </DataType>
-    </Property>-->
-
     <Command>
         <Identifier>GetCurrentFrame</Identifier>
         <DisplayName>Get Current Frame</DisplayName>
@@ -471,7 +457,7 @@
         <DisplayName>Inaccessible Site</DisplayName>
         <Description>Unable to access the site specified due to robot limitations.</Description>
     </DefinedExecutionError>
-    
+
     <DefinedExecutionError>
         <Identifier>SiteIdNotFound</Identifier>
         <DisplayName>Site ID not found</DisplayName>
