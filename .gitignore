@@ -6,6 +6,7 @@
 !.gitmodules
 !*.md
 !*.yml
+!PandaControlServer.cpp
 !CMakeLists.txt
 !package.xml
 
