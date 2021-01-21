@@ -357,6 +357,9 @@ private:
     ros::NodeHandle m_RosNode;
     moveit::planning_interface::MoveGroupInterface m_MoveGroup{PANDA_ARM};
     moveit::planning_interface::PlanningSceneInterface m_PlanningScene;
+
+    void openGripper(trajectory_msgs::JointTrajectory& posture, double width);
+    void closedGripper(trajectory_msgs::JointTrajectory& posture);
 };
 
 #endif  // ROBOTCONTROLLERIMPL_H

@@ -289,3 +289,30 @@ FollowFrames_Responses CRobotControllerImpl::FollowFrames(FollowFramesWrapper* c
     // TODO: Fill the response fields
     return response;
 }
+
+/**
+ * Opens the gripper to the given amount + 1 cm extra space.
+ * 
+ * @param posture The posture to apply the operation on.
+ * @param width The width in m to open the gripper.
+ */
+void CRobotControllerImpl::openGripper(trajectory_msgs::JointTrajectory& posture, double width) {
+    posture.points.resize(1);
+    posture.points[0].positions.resize(2);
+    posture.points[0].positions[0] = width / 2.0 + 0.005;
+    posture.points[0].positions[1] = width / 2.0 + 0.005;
+    posture.points[0].time_from_start = ros::Duration(0.5);
+}
+
+/**
+ * Closes the gripper.
+ * 
+ * @param posture The posture to apply the operation on.
+ */
+void CRobotControllerImpl::closedGripper(trajectory_msgs::JointTrajectory& posture) {
+    posture.points.resize(1);
+    posture.points[0].positions.resize(2);
+    posture.points[0].positions[0] = 0.00;
+    posture.points[0].positions[1] = 0.00;
+    posture.points[0].time_from_start = ros::Duration(0.5);
+}
