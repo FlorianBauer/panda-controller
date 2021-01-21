@@ -16,10 +16,12 @@
 #include <sila_cpp/framework/error_handling/ExecutionError.h>
 #include "RobotClient.h"
 #include "ServiceDefs.h"
-#include "panda_controller/GetPose.h"
-#include "panda_controller/GetJoints.h"
-#include "panda_controller/MoveTo.h"
-#include "panda_controller/SetJoints.h"
+#include "panda_controller/FollowFrames.h"
+#include "panda_controller/FollowPath.h"
+#include "panda_controller/GetCurrentFrame.h"
+#include "panda_controller/GetCurrentPose.h"
+#include "panda_controller/MoveToPose.h"
+#include "panda_controller/SetToFrame.h"
 #include "FileManager.h"
 #include "RobotController.pb.h"
 
@@ -60,32 +62,25 @@ m_FollowFramesCommand{this, "FollowFrames"}
  * Get the current frame of the robot. A Frame consists of the absolute values of all joints.
  * 
  * @param command The SiLA command.
- * @return The absulout values of all robot joints.
+ * @return The values of all robot joints.
  */
 GetCurrentFrame_Responses CRobotControllerImpl::GetCurrentFrame(GetCurrentFrameWrapper* command) {
     const auto request = command->parameters();
     qDebug() << "Request contains:" << request;
-    ros::ServiceClient getJointsClient = m_RosNode.serviceClient<panda_controller::GetJoints>(SRV_GET_JOINTS);
-    panda_controller::GetJoints curJoints;
-    ROS_INFO("Call GetJoints");
-    if (getJointsClient.call(curJoints)) {
-        ROS_INFO("Was Success: [ %f, %f, %f, %f, %f, %f, %f ]",
-                curJoints.response.joints[0],
-                curJoints.response.joints[1],
-                curJoints.response.joints[2],
-                curJoints.response.joints[3],
-                curJoints.response.joints[4],
-                curJoints.response.joints[5],
-                curJoints.response.joints[6]);
-    } else {
-        ROS_ERROR("Failed to call service GetPose");
+    ros::ServiceClient currentFrameClient = m_RosNode.serviceClient<panda_controller::GetCurrentFrame>(SRV_GET_CURRENT_FRAME);
+    panda_controller::GetCurrentFrame getCurrentFrame;
+    const bool wasSuccess = currentFrameClient.call(getCurrentFrame);
+    if (!wasSuccess) {
+        ROS_ERROR("Failed to call service GetCurrentFrame");
+        // TODO: throw a defined SiLA execution exception
         return {};
     }
 
     auto response = GetCurrentFrame_Responses{};
+    const auto frame = response.mutable_frame();
     for (size_t i = 0; i < MAX_JOINTS; i++) {
-        response.mutable_frame()->add_frame();
-        response.mutable_frame()->mutable_frame(i)->set_value(curJoints.response.joints[i]);
+        const auto joint = frame->add_frame();
+        joint->set_value(getCurrentFrame.response.joints[i]);
     }
     return response;
 }
@@ -99,31 +94,23 @@ GetCurrentFrame_Responses CRobotControllerImpl::GetCurrentFrame(GetCurrentFrameW
 GetCurrentPose_Responses CRobotControllerImpl::GetCurrentPose(GetCurrentPoseWrapper* command) {
     const auto request = command->parameters();
     qDebug() << "Request contains:" << request;
-    ros::ServiceClient getPoseClient = m_RosNode.serviceClient<panda_controller::GetPose>(SRV_GET_POSE);
-    panda_controller::GetPose pose;
-    ROS_INFO("Call GetPose");
-    if (getPoseClient.call(pose)) {
-        ROS_INFO("Was Success: XYZ XYZW [ %f, %f, %f, %f, %f, %f, %f ]",
-                pose.response.pos_x,
-                pose.response.pos_y,
-                pose.response.pos_z,
-                pose.response.ori_x,
-                pose.response.ori_y,
-                pose.response.ori_z,
-                pose.response.ori_w);
-    } else {
-        ROS_ERROR("Failed to call service GetPose");
+    ros::ServiceClient currentPoseClient = m_RosNode.serviceClient<panda_controller::GetCurrentPose>(SRV_GET_CURRENT_POSE);
+    panda_controller::GetCurrentPose getCurrentPose;
+    const bool wasSuccess = currentPoseClient.call(getCurrentPose);
+    if (!wasSuccess) {
+        ROS_ERROR("Failed to call service GetCurrentPose");
+        // TODO: throw a defined SiLA execution exception
         return {};
     }
 
     const Pose retPose = {
-        .X = pose.response.pos_x,
-        .Y = pose.response.pos_y,
-        .Z = pose.response.pos_z,
-        .OriX = pose.response.ori_x,
-        .OriY = pose.response.ori_y,
-        .OriZ = pose.response.ori_z,
-        .OriW = pose.response.ori_w
+        .X = getCurrentPose.response.pos_x,
+        .Y = getCurrentPose.response.pos_y,
+        .Z = getCurrentPose.response.pos_z,
+        .OriX = getCurrentPose.response.ori_x,
+        .OriY = getCurrentPose.response.ori_y,
+        .OriZ = getCurrentPose.response.ori_z,
+        .OriW = getCurrentPose.response.ori_w
     };
 
     auto response = GetCurrentPose_Responses{};
@@ -142,21 +129,18 @@ MoveToPose_Responses CRobotControllerImpl::MoveToPose(MoveToPoseWrapper* command
     const auto request = command->parameters();
     qDebug() << "Request contains:" << request;
     const auto& pose = request.pose().pose();
-    ros::ServiceClient moveClient = m_RosNode.serviceClient<panda_controller::MoveTo>(SRV_MOVE_TO);
-    panda_controller::MoveTo move;
-    move.request.pos_x = pose.x().value();
-    move.request.pos_y = pose.y().value();
-    move.request.pos_z = pose.z().value();
-    move.request.ori_x = pose.orix().value();
-    move.request.ori_y = pose.oriy().value();
-    move.request.ori_z = pose.oriz().value();
-    move.request.ori_w = pose.oriw().value();
+    ros::ServiceClient moveToPoseClient = m_RosNode.serviceClient<panda_controller::MoveToPose>(SRV_MOVE_TO_POSE);
+    panda_controller::MoveToPose moveToPose;
+    moveToPose.request.pos_x = pose.x().value();
+    moveToPose.request.pos_y = pose.y().value();
+    moveToPose.request.pos_z = pose.z().value();
+    moveToPose.request.ori_x = pose.orix().value();
+    moveToPose.request.ori_y = pose.oriy().value();
+    moveToPose.request.ori_z = pose.oriz().value();
+    moveToPose.request.ori_w = pose.oriw().value();
 
-    ROS_INFO("Call MoveTo");
-    if (moveClient.call(move)) {
-        ROS_INFO("Was Success: %d", move.response.was_success);
-    } else {
-        ROS_ERROR("Failed to call service MoveTo");
+    const bool wasSuccess = moveToPoseClient.call(moveToPose);
+    if (!wasSuccess) {
         throw SiLA2::CDefinedExecutionError{
             "InvalidPose",
             "The given pose is invalid, not within reach or would cause a collision."};
@@ -292,18 +276,16 @@ SetToFrame_Responses CRobotControllerImpl::SetToFrame(SetToFrameWrapper* command
     qDebug() << "Request contains:" << request;
     const auto& frame = request.frame().frame();
 
-    ros::ServiceClient jointClient = m_RosNode.serviceClient<panda_controller::SetJoints>(SRV_SET_JOINTS);
-    panda_controller::SetJoints joints;
+    ros::ServiceClient setToFrameClient = m_RosNode.serviceClient<panda_controller::SetToFrame>(SRV_SET_TO_FRAME);
+    panda_controller::SetToFrame setToFrame;
 
     for (size_t i = 0; i < MAX_JOINTS; i++) {
-        joints.request.joints[i] = frame.at(i).value();
+        setToFrame.request.joints[i] = frame.at(i).value();
     }
 
-    ROS_INFO("Call SetJoints");
-    if (jointClient.call(joints)) {
-        ROS_INFO("Was Success: %d", joints.response.was_success);
-    } else {
-        ROS_ERROR("Failed to call service SetJoints");
+    const bool wasSuccess = setToFrameClient.call(setToFrame);
+    if (!wasSuccess) {
+        ROS_ERROR("Failed to call service SetToFrame");
         // TODO: throw a defined SiLA execution exception
         return {};
     }

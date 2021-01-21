@@ -14,10 +14,12 @@
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <nlohmann/json.hpp>
-#include "panda_controller/GetJoints.h"
-#include "panda_controller/GetPose.h"
-#include "panda_controller/MoveTo.h"
-#include "panda_controller/SetJoints.h"
+#include "panda_controller/FollowFrames.h"
+#include "panda_controller/FollowPath.h"
+#include "panda_controller/GetCurrentFrame.h"
+#include "panda_controller/GetCurrentPose.h"
+#include "panda_controller/MoveToPose.h"
+#include "panda_controller/SetToFrame.h"
 #include "Config.h"
 #include "Plate.h"
 #include "ServiceDefs.h"
@@ -125,7 +127,7 @@ void closedGripper(trajectory_msgs::JointTrajectory& posture) {
     posture.points[0].time_from_start = ros::Duration(0.5);
 }
 
-bool moveToPosition(panda_controller::MoveTo::Request& req, panda_controller::MoveTo::Response& res) {
+bool moveToPose(panda_controller::MoveToPose::Request& req, panda_controller::MoveToPose::Response& res) {
     geometry_msgs::Pose targetPose;
     targetPose.position.x = req.pos_x;
     targetPose.position.y = req.pos_y;
@@ -136,9 +138,7 @@ bool moveToPosition(panda_controller::MoveTo::Request& req, panda_controller::Mo
     targetPose.orientation.w = req.ori_w;
     moveGroupPtr->setPoseTarget(targetPose);
     const MoveItErrorCode err = moveGroupPtr->move();
-    const bool wasSuccessful = (err == MoveItErrorCode::SUCCESS);
-    res.was_success = wasSuccessful;
-    return wasSuccessful;
+    return (err == MoveItErrorCode::SUCCESS);
 }
 
 /**
@@ -146,10 +146,10 @@ bool moveToPosition(panda_controller::MoveTo::Request& req, panda_controller::Mo
  * equivalent to `moveTo` but without path planning or collision detection.
  * 
  * @param req The request containing a array with all joint values.
- * @param res The response containing a bool signaling the success of the operation.
+ * @param res The empty response.
  * @return `true` on success, otherwise `false`.
  */
-bool setJoints(panda_controller::SetJoints::Request& req, panda_controller::SetJoints::Response& res) {
+bool setToFrame(panda_controller::SetToFrame::Request& req, panda_controller::SetToFrame::Response& res) {
     const std::vector<double> jointValues = {
         req.joints[0],
         req.joints[1],
@@ -161,9 +161,8 @@ bool setJoints(panda_controller::SetJoints::Request& req, panda_controller::SetJ
     };
     moveGroupPtr->setJointValueTarget(jointValues);
     moveGroupPtr->move();
-    ROS_INFO("setJoints success");
-    res.was_success = true;
-    return true;
+    const MoveItErrorCode err = moveGroupPtr->move();
+    return (err == MoveItErrorCode::SUCCESS);
 }
 
 /**
@@ -171,7 +170,7 @@ bool setJoints(panda_controller::SetJoints::Request& req, panda_controller::SetJ
  * 
  * @return `true` on success, otherwise `false`.
  */
-bool getJoints(panda_controller::GetJoints::Request& req, panda_controller::GetJoints::Response& res) {
+bool getCurrentFrame(panda_controller::GetCurrentFrame::Request& req, panda_controller::GetCurrentFrame::Response& res) {
     const std::vector<double> curJoints = moveGroupPtr->getCurrentJointValues();
     res.joints[0] = curJoints[0];
     res.joints[1] = curJoints[1];
@@ -197,10 +196,7 @@ bool pickFromSite(Site& site, Plate& plate) {
 bool placeToSite(Site& site, Plate& plate) {
     openGripper(site.getGrasp().pre_grasp_posture, plate.getDimY());
     const MoveItErrorCode err = moveGroupPtr->place(plate.getId(),{site.getPlaceLocation()});
-    if (err != MoveItErrorCode::SUCCESS) {
-        return false;
-    }
-    return true;
+    return (err == MoveItErrorCode::SUCCESS);
 }
 
 bool transportPlate(Site& source, Site& destination, Plate& plate) {
@@ -236,7 +232,7 @@ bool transportPlate(Site& source, Site& destination, Plate& plate) {
  * 
  * @return `true` on success, otherwise `false`.
  */
-bool getPose(panda_controller::GetPose::Request& req, panda_controller::GetPose::Response& res) {
+bool getCurrentPose(panda_controller::GetCurrentPose::Request& req, panda_controller::GetCurrentPose::Response& res) {
     const geometry_msgs::PoseStamped curPose = moveGroupPtr->getCurrentPose(PANDA_LINK_HAND);
     res.pos_x = curPose.pose.position.x;
     res.pos_y = curPose.pose.position.y;
@@ -245,7 +241,6 @@ bool getPose(panda_controller::GetPose::Request& req, panda_controller::GetPose:
     res.ori_y = curPose.pose.orientation.y;
     res.ori_z = curPose.pose.orientation.z;
     res.ori_w = curPose.pose.orientation.w;
-
     return true;
 }
 
@@ -261,10 +256,10 @@ int main(int argc, char* argv[]) {
 
     ros::NodeHandle node;
     const std::vector<ros::ServiceServer> services = {
-        node.advertiseService(SRV_GET_JOINTS, getJoints),
-        node.advertiseService(SRV_GET_POSE, getPose),
-        node.advertiseService(SRV_MOVE_TO, moveToPosition),
-        node.advertiseService(SRV_SET_JOINTS, setJoints)
+        node.advertiseService(SRV_GET_CURRENT_FRAME, getCurrentFrame),
+        node.advertiseService(SRV_GET_CURRENT_POSE, getCurrentPose),
+        node.advertiseService(SRV_MOVE_TO_POSE, moveToPose),
+        node.advertiseService(SRV_SET_TO_FRAME, setToFrame)
     };
 
     ROS_INFO("Services are now available.");

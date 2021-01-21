@@ -84,10 +84,12 @@ find_package(catkin REQUIRED
 # Generate services in the 'srv' folder
 add_service_files(
     FILES
-    GetJoints.srv
-    GetPose.srv
-    MoveTo.srv
-    SetJoints.srv
+    FollowFrames.srv
+    FollowPath.srv
+    GetCurrentFrame.srv
+    GetCurrentPose.srv
+    MoveToPose.srv
+    SetToFrame.srv
 )
 
 # Generate added messages and services with any dependencies listed here

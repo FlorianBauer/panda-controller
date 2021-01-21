@@ -6,4 +6,3 @@ float64 ori_y
 float64 ori_z
 float64 ori_w
 ---
-bool was_success
