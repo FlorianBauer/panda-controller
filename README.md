@@ -1,6 +1,11 @@
 # Panda Controller
 
+A SiLA 2 complaint robot arm controller for an [Panda](https://www.franka.de/technology) from 
+[Franka Emika](https://www.franka.de/). 
+
+
 ## Requirements
+
 
 ### Packages and ROS
 
@@ -9,7 +14,7 @@
 sudo apt install -y build-essential autoconf libtool pkg-config cmake
 ```
 
-2. Install [ROS](http://wiki.ros.org/) from the [Install Site](http://wiki.ros.org/ROS/Installation).
+2. Install [ROS](https://wiki.ros.org/) from the [Install Site](https://wiki.ros.org/ROS/Installation).
 It is recommended to install `ROS Noetic` and the `ros-<distro>-desktop-full` package.
 
 3. Install the following packages required for SiLA.
@@ -118,6 +123,7 @@ cp ./src/panda-controller/meta/SiteManager.sila.xml ./build/panda-controller/bin
 cp ./src/panda-controller/meta/RobotController.sila.xml ./build/panda-controller/bin/meta/RobotController.sila.xml
 ```
 
+
 ## Run the Project in MoveIt
 
 1. Start a terminal, source the workspace and launch MoveIt.
@@ -126,7 +132,7 @@ source devel/setup.bash
 roslaunch panda_moveit_config demo.launch
 ```
 
-2. After RViz has launched, start the actual SiLA Server.
+2. After RViz has launched, open a new terminal and start the actual SiLA Server.
 ```bash
 source devel/setup.bash
 ./build/panda-controller/bin/PandaControlServer
