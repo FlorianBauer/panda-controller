@@ -25,8 +25,9 @@ sudo apt install qtbase5-dev libssl-dev libavahi-client-dev libavahi-common-dev
 
 ### Build and Install a Linux Real-Time Kernel
 
-The Real-Time kernel is necessary for dealing with actual hardware. If only a simulation via MoveIt 
-and RViz is sufficient, this step can be omitted.
+The Real-Time kernel is necessary for dealing with actual hardware. If only a simulation via 
+[MoveIt](https://ros-planning.github.io/moveit_tutorials/) and RViz is sufficient, this step can be 
+omitted.
 
 TODO: add install instructions
 
@@ -126,7 +127,7 @@ cp ./src/panda-controller/meta/RobotController.sila.xml ./build/panda-controller
 
 ## Run the Project in MoveIt
 
-1. Start a terminal, source the workspace and launch MoveIt.
+1. Start a terminal, source the workspace and launch [MoveIt](https://ros-planning.github.io/moveit_tutorials/).
 ```bash
 source devel/setup.bash
 roslaunch panda_moveit_config demo.launch
