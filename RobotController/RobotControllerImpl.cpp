@@ -75,7 +75,7 @@ GetCurrentFrame_Responses CRobotControllerImpl::GetCurrentFrame(GetCurrentFrameW
 }
 
 /**
- * Get the current Pose (position + orientation as quaternion) of the robot hand.
+ * Get the current Pose (position + orientation as quaternion) of the end-effector.
  * 
  * @param command The SiLA command.
  * @return The pose consist of position (xyz) and orientation (xyzw).
@@ -84,7 +84,7 @@ GetCurrentPose_Responses CRobotControllerImpl::GetCurrentPose(GetCurrentPoseWrap
     const auto request = command->parameters();
     qDebug() << "Request contains:" << request;
 
-    const geometry_msgs::PoseStamped curPose = m_Arm.getCurrentPose(PANDA_LINK_HAND);
+    const geometry_msgs::PoseStamped curPose = m_Arm.getCurrentPose(PANDA_LINK_EEF);
     const Pose retPose = {
         .X = curPose.pose.position.x,
         .Y = curPose.pose.position.y,
@@ -101,8 +101,8 @@ GetCurrentPose_Responses CRobotControllerImpl::GetCurrentPose(GetCurrentPoseWrap
 }
 
 /**
- * Moves the robot hand to the given pose. Since path planning is active on this request, an invalid 
- * pose or an pose causing a collision will throw a validation error.
+ * Moves the robot end-effector to the given pose. Since path planning is active on this request, 
+ * an invalid pose or an pose causing a collision will throw a validation error.
  * 
  * @param command The SiLA command.
  * @return A empty response.
@@ -120,9 +120,8 @@ MoveToPose_Responses CRobotControllerImpl::MoveToPose(MoveToPoseWrapper* command
     targetPose.orientation.y = pose.oriy().value();
     targetPose.orientation.z = pose.oriz().value();
     targetPose.orientation.w = pose.oriw().value();
-    m_Arm.setPoseTarget(targetPose);
+    m_Arm.setPoseTarget(targetPose, PANDA_LINK_EEF);
     const MoveItErrorCode err = m_Arm.move();
-
     if (err != MoveItErrorCode::SUCCESS) {
         throw SiLA2::CDefinedExecutionError{
             "InvalidPose",
