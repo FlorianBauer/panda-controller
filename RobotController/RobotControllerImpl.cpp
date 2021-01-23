@@ -38,6 +38,7 @@ m_FollowFramesCommand{this, "FollowFrames"},
 m_SetGripperCommand{this, "SetGripper"},
 m_CloseGripperCommand{this, "CloseGripper"}
 {
+    m_Arm.setGoalOrientationTolerance(0.05);
     m_GetCurrentFrameCommand.setExecutor(this, &CRobotControllerImpl::GetCurrentFrame);
     m_GetCurrentPoseCommand.setExecutor(this, &CRobotControllerImpl::GetCurrentPose);
     m_MoveToPoseCommand.setExecutor(this, &CRobotControllerImpl::MoveToPose);
@@ -216,15 +217,32 @@ CheckOccupied_Responses CRobotControllerImpl::CheckOccupied(CheckOccupiedWrapper
 }
 
 FollowPath_Responses CRobotControllerImpl::FollowPath(FollowPathWrapper* command) {
-    const auto Request = command->parameters();
-    qDebug() << "Request contains:" << Request;
-    // TODO: Validate request parameters...
+    const auto request = command->parameters();
+    qDebug() << "Request contains:" << request;
 
-    // TODO: Write actual Command implementation logic...
+    double progress = 0.0;
+    const auto& poseList = request.poselist();
+    geometry_msgs::Pose targetPose;
+    for (const auto& pose : poseList) {
+        targetPose.position.x = pose.pose().x().value();
+        targetPose.position.y = pose.pose().y().value();
+        targetPose.position.z = pose.pose().z().value();
+        targetPose.orientation.x = pose.pose().orix().value();
+        targetPose.orientation.y = pose.pose().oriy().value();
+        targetPose.orientation.z = pose.pose().oriz().value();
+        targetPose.orientation.w = pose.pose().oriw().value();
 
-    auto Response = FollowPath_Responses{};
-    // TODO: Fill the response fields
-    return Response;
+        m_Arm.setPoseTarget(targetPose, PANDA_LINK_EEF);
+        const MoveItErrorCode err = m_Arm.move();
+        if (err != MoveItErrorCode::SUCCESS) {
+            throw SiLA2::CDefinedExecutionError{
+                "InvalidPose",
+                "The given pose is invalid, not within reach or would cause a collision."};
+        }
+        command->setExecutionInfo(SiLA2::CReal{++progress / poseList.size()});
+    }
+
+    return FollowPath_Responses{};
 }
 
 /**
