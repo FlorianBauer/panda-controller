@@ -20,9 +20,6 @@
                 <DataTypeIdentifier>Frame</DataTypeIdentifier>
             </DataType>
         </Response>
-        <DefinedExecutionErrors>
-            <Identifier>ServiceUnavailable</Identifier>
-        </DefinedExecutionErrors>
     </Command>
 
     <Command>
@@ -38,9 +35,6 @@
                 <DataTypeIdentifier>Pose</DataTypeIdentifier>
             </DataType>
         </Response>
-        <DefinedExecutionErrors>
-            <Identifier>ServiceUnavailable</Identifier>
-        </DefinedExecutionErrors>
     </Command>
 
     <Command>
@@ -57,7 +51,6 @@
             </DataType>
         </Parameter>
         <DefinedExecutionErrors>
-            <Identifier>ServiceUnavailable</Identifier>
             <Identifier>InvalidPose</Identifier>
         </DefinedExecutionErrors>
     </Command>
@@ -76,36 +69,24 @@
             </DataType>
         </Parameter>
         <DefinedExecutionErrors>
-            <Identifier>ServiceUnavailable</Identifier>
             <Identifier>SiteIdNotFound</Identifier>
-            <Identifier>InaccessibleSite</Identifier>
+            <Identifier>InvalidPose</Identifier>
         </DefinedExecutionErrors>
     </Command>
 
     <Command>
-        <Identifier>Retreat</Identifier>
-        <DisplayName>Retreat</DisplayName>
-        <Description>Carefully pull back from the current site, if not already retracted.</Description>
-        <Observable>Yes</Observable>
-    </Command>
-
-    <Command>
-        <Identifier>ApproachTo</Identifier>
-        <DisplayName>Approach To</DisplayName>
-        <Description>Moving to the safe pose to approach a site (without changing gripping).</Description>
+        <Identifier>MoveRelative</Identifier>
+        <DisplayName>Move Relative</DisplayName>
+        <Description>Move in the given direction without changing the current orientation of the robot hand.</Description>
         <Observable>Yes</Observable>
         <Parameter>
-            <Identifier>SiteId</Identifier>
-            <DisplayName>Site ID</DisplayName>
-            <Description>Site to approach.</Description>
+            <Identifier>RelativeMove</Identifier>
+            <DisplayName>Relative Move</DisplayName>
+            <Description>The position changing move operation.</Description>
             <DataType>
-                <DataTypeIdentifier>SiteId</DataTypeIdentifier>
+                <DataTypeIdentifier>RelativeMove</DataTypeIdentifier>
             </DataType>
         </Parameter>
-        <DefinedExecutionErrors>
-            <Identifier>SiteIdNotFound</Identifier>
-            <Identifier>InaccessibleSite</Identifier>
-        </DefinedExecutionErrors>
     </Command>
 
     <Command>
@@ -138,9 +119,7 @@
             </DataType>
         </Parameter>
         <DefinedExecutionErrors>
-            <Identifier>ServiceUnavailable</Identifier>
             <Identifier>SiteIdNotFound</Identifier>
-            <Identifier>InaccessibleSite</Identifier>
             <Identifier>LostPlate</Identifier>
         </DefinedExecutionErrors>
     </Command>
@@ -168,8 +147,7 @@
         </Parameter>
         <DefinedExecutionErrors>
             <Identifier>SiteIdNotFound</Identifier>
-            <Identifier>InaccessibleSite</Identifier>
-            <Identifier>LostPlate</Identifier>
+            <Identifier>InvalidPose</Identifier>
         </DefinedExecutionErrors>
     </Command>
 
@@ -196,8 +174,7 @@
         </Parameter>
         <DefinedExecutionErrors>
             <Identifier>SiteNotFound</Identifier>
-            <Identifier>InaccessibleSite</Identifier>
-            <Identifier>LostPlate</Identifier>
+            <Identifier>InvalidPose</Identifier>
         </DefinedExecutionErrors>
     </Command>
 
@@ -287,6 +264,43 @@
         </Parameter>
     </Command>
 
+    <Command>
+        <Identifier>SetGripper</Identifier>
+        <DisplayName>Set Gripper</DisplayName>
+        <Description>Sets the distance of the two finger to the given width. This operation can be used to open or close the gripper.</Description>
+        <Observable>No</Observable>
+        <Parameter>
+            <Identifier>Width</Identifier>
+            <DisplayName>Width</DisplayName>
+            <Description>The width between the two finger.</Description>
+            <DataType>
+                <Constrained>
+                    <DataType>
+                        <Basic>Real</Basic>
+                    </DataType>
+                    <Constraints>
+                        <Unit>
+                            <Label>cm</Label>
+                            <Factor>1.0</Factor>
+                            <Offset>0</Offset>
+                            <UnitComponent>
+                                <SIUnit>Meter</SIUnit>
+                                <Exponent>-2</Exponent>
+                            </UnitComponent>
+                        </Unit>
+                    </Constraints>
+                </Constrained>
+            </DataType>
+        </Parameter>
+    </Command>
+
+    <Command>
+        <Identifier>CloseGripper</Identifier>
+        <DisplayName>Close Gripper</DisplayName>
+        <Description>Closes the gripper.</Description>
+        <Observable>No</Observable>
+    </Command>
+
     <DataTypeDefinition>
         <Identifier>Frame</Identifier>
         <DisplayName>Frame</DisplayName>
@@ -345,7 +359,7 @@
                                     <Offset>0</Offset>
                                     <UnitComponent>
                                         <SIUnit>Meter</SIUnit>
-                                        <Exponent>1</Exponent>
+                                        <Exponent>0</Exponent>
                                     </UnitComponent>
                                 </Unit>
                             </Constraints>
@@ -368,7 +382,7 @@
                                     <Offset>0</Offset>
                                     <UnitComponent>
                                         <SIUnit>Meter</SIUnit>
-                                        <Exponent>1</Exponent>
+                                        <Exponent>0</Exponent>
                                     </UnitComponent>
                                 </Unit>
                             </Constraints>
@@ -391,7 +405,7 @@
                                     <Offset>0</Offset>
                                     <UnitComponent>
                                         <SIUnit>Meter</SIUnit>
-                                        <Exponent>1</Exponent>
+                                        <Exponent>0</Exponent>
                                     </UnitComponent>
                                 </Unit>
                             </Constraints>
@@ -434,33 +448,119 @@
         </DataType>
     </DataTypeDefinition>
 
+    <DataTypeDefinition>
+        <Identifier>RelativeMove</Identifier>
+        <DisplayName>Relative Move</DisplayName>
+        <Description>A relative move to the given direction without changing the orientation of the robot hand.</Description>
+        <DataType>
+            <Structure>
+                <Element>
+                    <Identifier>X</Identifier>
+                    <DisplayName>X</DisplayName>
+                    <Description>The X direction.</Description>
+                    <DataType>
+                        <Constrained>
+                            <DataType>
+                                <Basic>Real</Basic>
+                            </DataType>
+                            <Constraints>
+                                <MinimalInclusive>-1.0</MinimalInclusive>
+                                <MaximalInclusive>1.0</MaximalInclusive>
+                            </Constraints>
+                        </Constrained>
+                    </DataType>
+                </Element>
+                <Element>
+                    <Identifier>Y</Identifier>
+                    <DisplayName>Y</DisplayName>
+                    <Description>The Y direction.</Description>
+                    <DataType>
+                        <Constrained>
+                            <DataType>
+                                <Basic>Real</Basic>
+                            </DataType>
+                            <Constraints>
+                                <MinimalInclusive>-1.0</MinimalInclusive>
+                                <MaximalInclusive>1.0</MaximalInclusive>
+                            </Constraints>
+                        </Constrained>
+                    </DataType>
+                </Element>
+                <Element>
+                    <Identifier>Z</Identifier>
+                    <DisplayName>Z</DisplayName>
+                    <Description>The Z direction.</Description>
+                    <DataType>
+                        <Constrained>
+                            <DataType>
+                                <Basic>Real</Basic>
+                            </DataType>
+                            <Constraints>
+                                <MinimalInclusive>-1.0</MinimalInclusive>
+                                <MaximalInclusive>1.0</MaximalInclusive>
+                            </Constraints>
+                        </Constrained>
+                    </DataType>
+                </Element>
+                <Element>
+                    <Identifier>MinDist</Identifier>
+                    <DisplayName>Minimal Distance</DisplayName>
+                    <Description>The minimal distance to move.</Description>
+                    <DataType>
+                        <Constrained>
+                            <DataType>
+                                <Basic>Real</Basic>
+                            </DataType>
+                            <Constraints>
+                                <Unit>
+                                    <Label>m</Label>
+                                    <Factor>1.0</Factor>
+                                    <Offset>0</Offset>
+                                    <UnitComponent>
+                                        <SIUnit>Meter</SIUnit>
+                                        <Exponent>0</Exponent>
+                                    </UnitComponent>
+                                </Unit>
+                            </Constraints>
+                        </Constrained>
+                    </DataType>
+                </Element>
+                <Element>
+                    <Identifier>DesiredDist</Identifier>
+                    <DisplayName>Desired Distance</DisplayName>
+                    <Description>The desired distance to move.</Description>
+                    <DataType>
+                        <Constrained>
+                            <DataType>
+                                <Basic>Real</Basic>
+                            </DataType>
+                            <Constraints>
+                                <Unit>
+                                    <Label>m</Label>
+                                    <Factor>1.0</Factor>
+                                    <Offset>0</Offset>
+                                    <UnitComponent>
+                                        <SIUnit>Meter</SIUnit>
+                                        <Exponent>0</Exponent>
+                                    </UnitComponent>
+                                </Unit>
+                            </Constraints>
+                        </Constrained>
+                    </DataType>
+                </Element>
+            </Structure>
+        </DataType>
+    </DataTypeDefinition>
+
     <DefinedExecutionError>
-        <Identifier>ServiceUnavailable</Identifier>
-        <DisplayName>Service Unavailable</DisplayName>
-        <Description>The call to the given service was not possible.</Description>
+        <Identifier>SiteIdNotFound</Identifier>
+        <DisplayName>Site ID not found</DisplayName>
+        <Description>The given Site ID does not exist or could not be found.</Description>
     </DefinedExecutionError>
 
     <DefinedExecutionError>
         <Identifier>InvalidPose</Identifier>
         <DisplayName>Invalid Pose</DisplayName>
         <Description>The given pose is invalid, not within reach or would cause a collision.</Description>
-    </DefinedExecutionError>
-
-    <DefinedExecutionError>
-        <Identifier>LostPlate</Identifier>
-        <DisplayName>Lost Plate</DisplayName>
-        <Description>In case of not being able to grip the plate or losing it in transaction.</Description>
-    </DefinedExecutionError>
-
-    <DefinedExecutionError>
-        <Identifier>InaccessibleSite</Identifier>
-        <DisplayName>Inaccessible Site</DisplayName>
-        <Description>Unable to access the site specified due to robot limitations.</Description>
-    </DefinedExecutionError>
-
-    <DefinedExecutionError>
-        <Identifier>SiteIdNotFound</Identifier>
-        <DisplayName>Site ID not found</DisplayName>
-        <Description>The given Site ID does not exist or could not be found.</Description>
     </DefinedExecutionError>
 </Feature>

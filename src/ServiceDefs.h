@@ -2,6 +2,7 @@
 #define SERVICEDEFS_H
 
 static constexpr char PANDA_ARM[] = "panda_arm";
+static constexpr char PANDA_HAND[] = "hand";
 static constexpr char PANDA_LINK_BASE[] = "panda_link0";
 static constexpr char PANDA_LINK_HAND[] = "panda_hand";
 static constexpr char PANDA_FINGER_1[] = "panda_finger_joint1";
