@@ -160,13 +160,6 @@ MoveRelative_Responses CRobotControllerImpl::MoveRelative(MoveRelativeWrapper* c
     qDebug() << "Request contains:" << request;
     // TODO: Validate request parameters...
 
-    // TODO: Write actual Command implementation logic...
-    const double NUM_STEPS = 10.0;
-    for (int i = 0; i <= NUM_STEPS; ++i) {
-        // do stuff...
-        command->setExecutionInfo(SiLA2::CReal{i / NUM_STEPS});
-    }
-
     return MoveRelative_Responses{};
 }
 

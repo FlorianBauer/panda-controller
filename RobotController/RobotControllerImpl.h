@@ -41,11 +41,9 @@ class CRobotControllerImpl final : public SiLA2::CSiLAFeature<sila2::de::fau::ro
     using GetCurrentPoseWrapper = SiLA2::CUnobservableCommandWrapper<
             sila2::de::fau::robot::robotcontroller::v1::GetCurrentPose_Parameters,
             sila2::de::fau::robot::robotcontroller::v1::GetCurrentPose_Responses>;
-    using MoveToPoseCommand = SiLA2::CObservableCommandManager<
-            &CRobotControllerImpl::RequestMoveToPose,
-            &CRobotControllerImpl::RequestMoveToPose_Info,
-            &CRobotControllerImpl::RequestMoveToPose_Result>;
-    using MoveToPoseWrapper = SiLA2::CObservableCommandWrapper<
+    using MoveToPoseCommand =
+            SiLA2::CUnobservableCommandManager<&CRobotControllerImpl::RequestMoveToPose>;
+    using MoveToPoseWrapper = SiLA2::CUnobservableCommandWrapper<
             sila2::de::fau::robot::robotcontroller::v1::MoveToPose_Parameters,
             sila2::de::fau::robot::robotcontroller::v1::MoveToPose_Responses>;
     using MoveToSiteCommand = SiLA2::CObservableCommandManager<
@@ -55,11 +53,9 @@ class CRobotControllerImpl final : public SiLA2::CSiLAFeature<sila2::de::fau::ro
     using MoveToSiteWrapper = SiLA2::CObservableCommandWrapper<
             sila2::de::fau::robot::robotcontroller::v1::MoveToSite_Parameters,
             sila2::de::fau::robot::robotcontroller::v1::MoveToSite_Responses>;
-    using MoveRelativeCommand = SiLA2::CObservableCommandManager<
-            &CRobotControllerImpl::RequestMoveRelative,
-            &CRobotControllerImpl::RequestMoveRelative_Info,
-            &CRobotControllerImpl::RequestMoveRelative_Result>;
-    using MoveRelativeWrapper = SiLA2::CObservableCommandWrapper<
+    using MoveRelativeCommand =
+            SiLA2::CUnobservableCommandManager<&CRobotControllerImpl::RequestMoveRelative>;
+    using MoveRelativeWrapper = SiLA2::CUnobservableCommandWrapper<
             sila2::de::fau::robot::robotcontroller::v1::MoveRelative_Parameters,
             sila2::de::fau::robot::robotcontroller::v1::MoveRelative_Responses>;
     using TransportPlateCommand = SiLA2::CObservableCommandManager<
@@ -69,14 +65,18 @@ class CRobotControllerImpl final : public SiLA2::CSiLAFeature<sila2::de::fau::ro
     using TransportPlateWrapper = SiLA2::CObservableCommandWrapper<
             sila2::de::fau::robot::robotcontroller::v1::TransportPlate_Parameters,
             sila2::de::fau::robot::robotcontroller::v1::TransportPlate_Responses>;
-    using PickPlateCommand =
-            SiLA2::CUnobservableCommandManager<&CRobotControllerImpl::RequestPickPlate>;
-    using PickPlateWrapper = SiLA2::CUnobservableCommandWrapper<
+    using PickPlateCommand = SiLA2::CObservableCommandManager<
+            &CRobotControllerImpl::RequestPickPlate,
+            &CRobotControllerImpl::RequestPickPlate_Info,
+            &CRobotControllerImpl::RequestPickPlate_Result>;
+    using PickPlateWrapper = SiLA2::CObservableCommandWrapper<
             sila2::de::fau::robot::robotcontroller::v1::PickPlate_Parameters,
             sila2::de::fau::robot::robotcontroller::v1::PickPlate_Responses>;
-    using PlacePlateCommand =
-            SiLA2::CUnobservableCommandManager<&CRobotControllerImpl::RequestPlacePlate>;
-    using PlacePlateWrapper = SiLA2::CUnobservableCommandWrapper<
+    using PlacePlateCommand = SiLA2::CObservableCommandManager<
+            &CRobotControllerImpl::RequestPlacePlate,
+            &CRobotControllerImpl::RequestPlacePlate_Info,
+            &CRobotControllerImpl::RequestPlacePlate_Result>;
+    using PlacePlateWrapper = SiLA2::CObservableCommandWrapper<
             sila2::de::fau::robot::robotcontroller::v1::PlacePlate_Parameters,
             sila2::de::fau::robot::robotcontroller::v1::PlacePlate_Responses>;
     using CheckOccupiedCommand =
@@ -84,9 +84,11 @@ class CRobotControllerImpl final : public SiLA2::CSiLAFeature<sila2::de::fau::ro
     using CheckOccupiedWrapper = SiLA2::CUnobservableCommandWrapper<
             sila2::de::fau::robot::robotcontroller::v1::CheckOccupied_Parameters,
             sila2::de::fau::robot::robotcontroller::v1::CheckOccupied_Responses>;
-    using FollowPathCommand =
-            SiLA2::CUnobservableCommandManager<&CRobotControllerImpl::RequestFollowPath>;
-    using FollowPathWrapper = SiLA2::CUnobservableCommandWrapper<
+    using FollowPathCommand = SiLA2::CObservableCommandManager<
+            &CRobotControllerImpl::RequestFollowPath,
+            &CRobotControllerImpl::RequestFollowPath_Info,
+            &CRobotControllerImpl::RequestFollowPath_Result>;
+    using FollowPathWrapper = SiLA2::CObservableCommandWrapper<
             sila2::de::fau::robot::robotcontroller::v1::FollowPath_Parameters,
             sila2::de::fau::robot::robotcontroller::v1::FollowPath_Responses>;
     using SetToFrameCommand =
@@ -94,9 +96,11 @@ class CRobotControllerImpl final : public SiLA2::CSiLAFeature<sila2::de::fau::ro
     using SetToFrameWrapper = SiLA2::CUnobservableCommandWrapper<
             sila2::de::fau::robot::robotcontroller::v1::SetToFrame_Parameters,
             sila2::de::fau::robot::robotcontroller::v1::SetToFrame_Responses>;
-    using FollowFramesCommand =
-            SiLA2::CUnobservableCommandManager<&CRobotControllerImpl::RequestFollowFrames>;
-    using FollowFramesWrapper = SiLA2::CUnobservableCommandWrapper<
+    using FollowFramesCommand = SiLA2::CObservableCommandManager<
+            &CRobotControllerImpl::RequestFollowFrames,
+            &CRobotControllerImpl::RequestFollowFrames_Info,
+            &CRobotControllerImpl::RequestFollowFrames_Result>;
+    using FollowFramesWrapper = SiLA2::CObservableCommandWrapper<
             sila2::de::fau::robot::robotcontroller::v1::FollowFrames_Parameters,
             sila2::de::fau::robot::robotcontroller::v1::FollowFrames_Responses>;
     using SetGripperCommand =

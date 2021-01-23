@@ -41,7 +41,7 @@
         <Identifier>MoveToPose</Identifier>
         <DisplayName>Move To Pose</DisplayName>
         <Description>Move to a given position and with a given orientation.</Description>
-        <Observable>Yes</Observable>
+        <Observable>No</Observable>
         <Parameter>
             <Identifier>Pose</Identifier>
             <DisplayName>Pose</DisplayName>
@@ -78,7 +78,7 @@
         <Identifier>MoveRelative</Identifier>
         <DisplayName>Move Relative</DisplayName>
         <Description>Move in the given direction without changing the current orientation of the robot hand.</Description>
-        <Observable>Yes</Observable>
+        <Observable>No</Observable>
         <Parameter>
             <Identifier>RelativeMove</Identifier>
             <DisplayName>Relative Move</DisplayName>
@@ -128,7 +128,7 @@
         <Identifier>PickPlate</Identifier>
         <DisplayName>Pick Plate</DisplayName>
         <Description>Pick up a plate from a given site.</Description>
-        <Observable>No</Observable>
+        <Observable>Yes</Observable>
         <Parameter>
             <Identifier>SiteId</Identifier>
             <DisplayName>Site ID</DisplayName>
@@ -155,7 +155,7 @@
         <Identifier>PlacePlate</Identifier>
         <DisplayName>Place Plate</DisplayName>
         <Description>Place a plate on a given site.</Description>
-        <Observable>No</Observable>
+        <Observable>Yes</Observable>
         <Parameter>
             <Identifier>SiteId</Identifier>
             <DisplayName>Site ID</DisplayName>
@@ -208,7 +208,7 @@
         <Identifier>FollowPath</Identifier>
         <DisplayName>Follow Path</DisplayName>
         <Description>Follows a path of poses.</Description>
-        <Observable>No</Observable>
+        <Observable>Yes</Observable>
         <Parameter>
             <Identifier>PoseList</Identifier>
             <DisplayName>Pose List</DisplayName>
@@ -242,7 +242,7 @@
         <Identifier>FollowFrames</Identifier>
         <DisplayName>Follow Frames</DisplayName>
         <Description>Successively set the absolute joint values.</Description>
-        <Observable>No</Observable>
+        <Observable>Yes</Observable>
         <Parameter>
             <Identifier>FrameList</Identifier>
             <DisplayName>FrameList</DisplayName>
