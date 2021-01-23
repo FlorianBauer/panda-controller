@@ -257,13 +257,26 @@ SetToFrame_Responses CRobotControllerImpl::SetToFrame(SetToFrameWrapper* command
 FollowFrames_Responses CRobotControllerImpl::FollowFrames(FollowFramesWrapper* command) {
     const auto request = command->parameters();
     qDebug() << "Request contains:" << request;
-    // TODO: Validate request parameters...
 
-    // TODO: Write actual Command implementation logic...
+    double progress = 0.0;
+    std::vector<double> jointValues(MAX_JOINTS);
+    const auto& frameList = request.framelist();
+    for (const auto& frame : frameList) {
+        for (size_t i = 0; i < jointValues.size(); i++) {
+            jointValues[i] = frame.frame().at(i).value();
+        }
 
-    auto response = FollowFrames_Responses{};
-    // TODO: Fill the response fields
-    return response;
+        m_Arm.setJointValueTarget(jointValues);
+        const MoveItErrorCode err = m_Arm.move();
+        if (err != MoveItErrorCode::SUCCESS) {
+            ROS_ERROR("Failed to Set Frame");
+            // TODO: throw a defined SiLA execution exception
+            return {};
+        }
+        command->setExecutionInfo(SiLA2::CReal{++progress / frameList.size()});
+    }
+
+    return FollowFrames_Responses{};
 }
 
 /**
