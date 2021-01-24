@@ -279,15 +279,15 @@
                         <Basic>Real</Basic>
                     </DataType>
                     <Constraints>
-                        <MinimalInclusive>0.0</MinimalInclusive>
-                        <MaximalInclusive>8.0</MaximalInclusive>
+                        <MinimalInclusive>0</MinimalInclusive>
+                        <MaximalInclusive>8</MaximalInclusive>
                         <Unit>
                             <Label>cm</Label>
-                            <Factor>1.0</Factor>
+                            <Factor>0.01</Factor>
                             <Offset>0</Offset>
                             <UnitComponent>
                                 <SIUnit>Meter</SIUnit>
-                                <Exponent>-2</Exponent>
+                                <Exponent>1</Exponent>
                             </UnitComponent>
                         </Unit>
                     </Constraints>
@@ -363,7 +363,7 @@
                                     <Offset>0</Offset>
                                     <UnitComponent>
                                         <SIUnit>Meter</SIUnit>
-                                        <Exponent>0</Exponent>
+                                        <Exponent>1</Exponent>
                                     </UnitComponent>
                                 </Unit>
                             </Constraints>
@@ -388,7 +388,7 @@
                                     <Offset>0</Offset>
                                     <UnitComponent>
                                         <SIUnit>Meter</SIUnit>
-                                        <Exponent>0</Exponent>
+                                        <Exponent>1</Exponent>
                                     </UnitComponent>
                                 </Unit>
                             </Constraints>
@@ -413,7 +413,7 @@
                                     <Offset>0</Offset>
                                     <UnitComponent>
                                         <SIUnit>Meter</SIUnit>
-                                        <Exponent>0</Exponent>
+                                        <Exponent>1</Exponent>
                                     </UnitComponent>
                                 </Unit>
                             </Constraints>
@@ -553,12 +553,12 @@
                             </DataType>
                             <Constraints>
                                 <Unit>
-                                    <Label>m</Label>
-                                    <Factor>1.0</Factor>
+                                    <Label>cm</Label>
+                                    <Factor>0.01</Factor>
                                     <Offset>0</Offset>
                                     <UnitComponent>
                                         <SIUnit>Meter</SIUnit>
-                                        <Exponent>0</Exponent>
+                                        <Exponent>1</Exponent>
                                     </UnitComponent>
                                 </Unit>
                             </Constraints>
@@ -576,12 +576,12 @@
                             </DataType>
                             <Constraints>
                                 <Unit>
-                                    <Label>m</Label>
-                                    <Factor>1.0</Factor>
+                                    <Label>cm</Label>
+                                    <Factor>0.01</Factor>
                                     <Offset>0</Offset>
                                     <UnitComponent>
                                         <SIUnit>Meter</SIUnit>
-                                        <Exponent>0</Exponent>
+                                        <Exponent>1</Exponent>
                                     </UnitComponent>
                                 </Unit>
                             </Constraints>
