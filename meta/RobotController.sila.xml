@@ -267,7 +267,7 @@
     <Command>
         <Identifier>SetGripper</Identifier>
         <DisplayName>Set Gripper</DisplayName>
-        <Description>Sets the distance of the two finger to the given width. This operation can be used to open or close the gripper.</Description>
+        <Description>Sets the distance between the two finger to the given width. This operation can be used to open or close the gripper.</Description>
         <Observable>No</Observable>
         <Parameter>
             <Identifier>Width</Identifier>
@@ -279,6 +279,8 @@
                         <Basic>Real</Basic>
                     </DataType>
                     <Constraints>
+                        <MinimalInclusive>0.0</MinimalInclusive>
+                        <MaximalInclusive>8.0</MaximalInclusive>
                         <Unit>
                             <Label>cm</Label>
                             <Factor>1.0</Factor>
@@ -340,7 +342,7 @@
     <DataTypeDefinition>
         <Identifier>Pose</Identifier>
         <DisplayName>Pose</DisplayName>
-        <Description>The pose of the gripper to reach the Site. The pose itself consists of two parts: The Position as vector (XYZ) and the Orientation as Quaternion (XYZW).</Description>
+        <Description>The pose of the end-effector. The pose itself consists of two parts: The position as vector (XYZ) and the orientation as quaternion (XYZW).</Description>
         <DataType>
             <Structure>
                 <Element>
@@ -353,6 +355,8 @@
                                 <Basic>Real</Basic>
                             </DataType>
                             <Constraints>
+                                <MinimalInclusive>-0.855</MinimalInclusive>
+                                <MaximalInclusive>0.855</MaximalInclusive>
                                 <Unit>
                                     <Label>m</Label>
                                     <Factor>1.0</Factor>
@@ -376,6 +380,8 @@
                                 <Basic>Real</Basic>
                             </DataType>
                             <Constraints>
+                                <MinimalInclusive>-0.855</MinimalInclusive>
+                                <MaximalInclusive>0.855</MaximalInclusive>
                                 <Unit>
                                     <Label>m</Label>
                                     <Factor>1.0</Factor>
@@ -399,6 +405,8 @@
                                 <Basic>Real</Basic>
                             </DataType>
                             <Constraints>
+                                <MinimalInclusive>-0.360</MinimalInclusive>
+                                <MaximalInclusive>1.19</MaximalInclusive>
                                 <Unit>
                                     <Label>m</Label>
                                     <Factor>1.0</Factor>
@@ -417,7 +425,15 @@
                     <DisplayName>Orientation X</DisplayName>
                     <Description>The X value.</Description>
                     <DataType>
-                        <Basic>Real</Basic>
+                        <Constrained>
+                            <DataType>
+                                <Basic>Real</Basic>
+                            </DataType>
+                            <Constraints>
+                                <MinimalInclusive>-1.0</MinimalInclusive>
+                                <MaximalInclusive>1.0</MaximalInclusive>
+                            </Constraints>
+                        </Constrained>
                     </DataType>
                 </Element>
                 <Element>
@@ -425,7 +441,15 @@
                     <DisplayName>Orientation Y</DisplayName>
                     <Description>The Y value.</Description>
                     <DataType>
-                        <Basic>Real</Basic>
+                        <Constrained>
+                            <DataType>
+                                <Basic>Real</Basic>
+                            </DataType>
+                            <Constraints>
+                                <MinimalInclusive>-1.0</MinimalInclusive>
+                                <MaximalInclusive>1.0</MaximalInclusive>
+                            </Constraints>
+                        </Constrained>
                     </DataType>
                 </Element>
                 <Element>
@@ -433,7 +457,15 @@
                     <DisplayName>Orientation Z</DisplayName>
                     <Description>The Z value.</Description>
                     <DataType>
-                        <Basic>Real</Basic>
+                        <Constrained>
+                            <DataType>
+                                <Basic>Real</Basic>
+                            </DataType>
+                            <Constraints>
+                                <MinimalInclusive>-1.0</MinimalInclusive>
+                                <MaximalInclusive>1.0</MaximalInclusive>
+                            </Constraints>
+                        </Constrained>
                     </DataType>
                 </Element>
                 <Element>
@@ -441,7 +473,15 @@
                     <DisplayName>Orientation W</DisplayName>
                     <Description>The W value.</Description>
                     <DataType>
-                        <Basic>Real</Basic>
+                        <Constrained>
+                            <DataType>
+                                <Basic>Real</Basic>
+                            </DataType>
+                            <Constraints>
+                                <MinimalInclusive>-1.0</MinimalInclusive>
+                                <MaximalInclusive>1.0</MaximalInclusive>
+                            </Constraints>
+                        </Constrained>
                     </DataType>
                 </Element>
             </Structure>
