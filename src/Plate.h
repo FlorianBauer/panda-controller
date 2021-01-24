@@ -9,6 +9,15 @@
 
 class Plate {
 public:
+    // Field identifiers for JSON de-/serialization.
+    static constexpr char PLATE_TYPE[] = "type";
+    static constexpr char DIM_X[] = "dimX";
+    static constexpr char DIM_Y[] = "dimY";
+    static constexpr char DIM_Z[] = "dimZ";
+    static constexpr char GRIPPER_OFFSET_X[] = "gripperOffsetX";
+    static constexpr char GRIPPER_OFFSET_Y[] = "gripperOffsetY";
+    static constexpr char GRIPPER_OFFSET_Z[] = "gripperOffsetZ";
+
     Plate(const std::string& type, double lengthInM, double widthInM, double heightInM);
     Plate(const nlohmann::json& jsonStruct);
     Plate(const Plate& orig);
