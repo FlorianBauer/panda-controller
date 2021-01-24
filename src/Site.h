@@ -9,6 +9,24 @@
 
 class Site {
 public:
+    // Field identifiers for JSON de-/serialization.
+    static constexpr char SITE_ID[] = "id";
+    static constexpr char POSE[] = "pose";
+    static constexpr char POS_X[] = "posX";
+    static constexpr char POS_Y[] = "posY";
+    static constexpr char POS_Z[] = "posZ";
+    static constexpr char ORI_X[] = "oriX";
+    static constexpr char ORI_Y[] = "oriY";
+    static constexpr char ORI_Z[] = "oriZ";
+    static constexpr char ORI_W[] = "oriW";
+    static constexpr char APPROACH[] = "approach";
+    static constexpr char RETREAT[] = "retreat";
+    static constexpr char DESIRED_DIST[] = "desiredDist";
+    static constexpr char MIN_DIST[] = "minDist";
+    static constexpr char DIR_X[] = "dirX";
+    static constexpr char DIR_Y[] = "dirY";
+    static constexpr char DIR_Z[] = "dirZ";
+
     Site(const std::string& identifier, const geometry_msgs::Pose& pose);
     Site(const nlohmann::json& jsonStruct);
     Site(const Site& orig);

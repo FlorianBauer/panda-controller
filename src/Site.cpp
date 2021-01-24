@@ -12,24 +12,6 @@ static constexpr double FINGER_LENGTH = 0.20;
 /// Finger position relative to end-effector.
 static const tf2::Vector3 FINGER_REL_POS(0.0, 0.0, -FINGER_LENGTH);
 
-// Field identifiers for JSON de-/serialization.
-static constexpr char SITE_ID[] = "id";
-static constexpr char POSE[] = "pose";
-static constexpr char POS_X[] = "posX";
-static constexpr char POS_Y[] = "posY";
-static constexpr char POS_Z[] = "posZ";
-static constexpr char ORI_X[] = "oriX";
-static constexpr char ORI_Y[] = "oriY";
-static constexpr char ORI_Z[] = "oriZ";
-static constexpr char ORI_W[] = "oriW";
-static constexpr char APPROACH[] = "approach";
-static constexpr char RETREAT[] = "retreat";
-static constexpr char DESIRED_DIST[] = "desiredDist";
-static constexpr char MIN_DIST[] = "minDist";
-static constexpr char DIR_X[] = "dirX";
-static constexpr char DIR_Y[] = "dirY";
-static constexpr char DIR_Z[] = "dirZ";
-
 Site::Site(const std::string& identifier, const geometry_msgs::Pose& pose) {
     id = identifier;
     grasp.grasp_pose.header.frame_id = PANDA_LINK_BASE;

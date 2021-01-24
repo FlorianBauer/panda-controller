@@ -13,21 +13,11 @@
 #include <sila_cpp/common/logging.h>
 #include "FileManager.h"
 #include "SiteManager.pb.h"
+#include "Site.h"
 
 namespace fs = std::filesystem;
 using namespace sila2::de::fau::robot::sitemanager::v1;
 using json = nlohmann::json;
-
-// Field identifiers for JSON de-/serialization.
-static constexpr char SITE_ID[] = "id";
-static constexpr char POSE[] = "pose";
-static constexpr char POS_X[] = "posX";
-static constexpr char POS_Y[] = "posY";
-static constexpr char POS_Z[] = "posZ";
-static constexpr char ORI_X[] = "oriX";
-static constexpr char ORI_Y[] = "oriY";
-static constexpr char ORI_Z[] = "oriZ";
-static constexpr char ORI_W[] = "oriW";
 
 std::map<std::string, json> CSiteManagerImpl::loadJsonFilesToMap() {
     const fs::path appDir = FileManager::getAppDir();
@@ -49,7 +39,7 @@ std::map<std::string, json> CSiteManagerImpl::loadJsonFilesToMap() {
         }
         jsonStream.close();
 
-        const std::string& id = jsonStruct[SITE_ID].get<std::string>();
+        const std::string& id = jsonStruct[Site::SITE_ID].get<std::string>();
         sites[id] = jsonStruct;
     }
     return sites;
@@ -82,27 +72,27 @@ SetSite_Responses CSiteManagerImpl::SetSite(SetSiteWrapper* command) {
     const auto& pose = request.pose().pose();
     if (isSiteIdInList) {
         jsonStruct = iter->second;
-        jsonStruct[POSE] = {
-            {POS_X, pose.x().value()},
-            {POS_Y, pose.y().value()},
-            {POS_Z, pose.z().value()},
-            {ORI_X, pose.orix().value()},
-            {ORI_Y, pose.oriy().value()},
-            {ORI_Z, pose.oriz().value()},
-            {ORI_W, pose.oriw().value()},
+        jsonStruct[Site::POSE] = {
+            {Site::POS_X, pose.x().value()},
+            {Site::POS_Y, pose.y().value()},
+            {Site::POS_Z, pose.z().value()},
+            {Site::ORI_X, pose.orix().value()},
+            {Site::ORI_Y, pose.oriy().value()},
+            {Site::ORI_Z, pose.oriz().value()},
+            {Site::ORI_W, pose.oriw().value()},
         };
     } else {
         // Add a new ID to property list.
         m_SitesProperty.append(request.siteid().siteid());
-        jsonStruct[SITE_ID] = idToSet;
-        jsonStruct[POSE] = {
-            {POS_X, pose.x().value()},
-            {POS_Y, pose.y().value()},
-            {POS_Z, pose.z().value()},
-            {ORI_X, pose.orix().value()},
-            {ORI_Y, pose.oriy().value()},
-            {ORI_Z, pose.oriz().value()},
-            {ORI_W, pose.oriw().value()},
+        jsonStruct[Site::SITE_ID] = idToSet;
+        jsonStruct[Site::POSE] = {
+            {Site::POS_X, pose.x().value()},
+            {Site::POS_Y, pose.y().value()},
+            {Site::POS_Z, pose.z().value()},
+            {Site::ORI_X, pose.orix().value()},
+            {Site::ORI_Y, pose.oriy().value()},
+            {Site::ORI_Z, pose.oriz().value()},
+            {Site::ORI_W, pose.oriw().value()},
         };
         // Add entry to map.
         m_JsonSites[idToSet] = jsonStruct;
@@ -140,5 +130,5 @@ DeleteSite_Responses CSiteManagerImpl::DeleteSite(DeleteSiteWrapper* command) {
 }
 
 bool CSiteManagerImpl::hasSiteId(const std::string& siteId) const {
-        return (m_JsonSites.find(siteId) != m_JsonSites.cend());
+    return (m_JsonSites.find(siteId) != m_JsonSites.cend());
 }
