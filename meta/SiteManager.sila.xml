@@ -42,6 +42,33 @@
                 <DataTypeIdentifier>Pose</DataTypeIdentifier>
             </DataType>
         </Parameter>
+        <Parameter>
+            <Identifier>Approach</Identifier>
+            <DisplayName>Approach</DisplayName>
+            <Description>Defines a movement to approach an item on/inside the site (e.g. to pick-up from above).</Description>
+            <DataType>
+                <DataTypeIdentifier>RelativeMove</DataTypeIdentifier>
+            </DataType>
+        </Parameter>
+        <Parameter>
+            <Identifier>Retreat</Identifier>
+            <DisplayName>Retreat</DisplayName>
+            <Description>Defines a movement to retreat from an item on/inside the site (e.g. to move sideways after placing something). If no retreat is set, the reversed approach movement is used.</Description>
+            <DataType>
+                <Constrained>
+                    <DataType>
+                        <List>
+                            <DataType>
+                                <DataTypeIdentifier>RelativeMove</DataTypeIdentifier>
+                            </DataType>
+                        </List>
+                    </DataType>
+                    <Constraints>
+                        <MaximalElementCount>1</MaximalElementCount>
+                    </Constraints>
+                </Constrained>
+            </DataType>
+        </Parameter>
     </Command>
 
     <Command>
@@ -81,19 +108,21 @@
     <DataTypeDefinition>
         <Identifier>Pose</Identifier>
         <DisplayName>Pose</DisplayName>
-        <Description>The pose of the gripper to reach the site. The pose itself consists of two parts: The position as vector (XYZ) and the orientation as quaternion (XYZW).</Description>
+        <Description>The pose of the end-effector. The pose itself consists of two parts: The position as vector (XYZ) and the orientation as quaternion (XYZW).</Description>
         <DataType>
             <Structure>
                 <Element>
                     <Identifier>X</Identifier>
                     <DisplayName>X</DisplayName>
-                    <Description>The X position of the site.</Description>
+                    <Description>The X position of the Site.</Description>
                     <DataType>
                         <Constrained>
                             <DataType>
                                 <Basic>Real</Basic>
                             </DataType>
                             <Constraints>
+                                <MinimalInclusive>-0.855</MinimalInclusive>
+                                <MaximalInclusive>0.855</MaximalInclusive>
                                 <Unit>
                                     <Label>m</Label>
                                     <Factor>1.0</Factor>
@@ -110,13 +139,15 @@
                 <Element>
                     <Identifier>Y</Identifier>
                     <DisplayName>Y</DisplayName>
-                    <Description>The Y position of the site.</Description>
+                    <Description>The Y position of the Site.</Description>
                     <DataType>
                         <Constrained>
                             <DataType>
                                 <Basic>Real</Basic>
                             </DataType>
                             <Constraints>
+                                <MinimalInclusive>-0.855</MinimalInclusive>
+                                <MaximalInclusive>0.855</MaximalInclusive>
                                 <Unit>
                                     <Label>m</Label>
                                     <Factor>1.0</Factor>
@@ -140,6 +171,8 @@
                                 <Basic>Real</Basic>
                             </DataType>
                             <Constraints>
+                                <MinimalInclusive>-0.360</MinimalInclusive>
+                                <MaximalInclusive>1.19</MaximalInclusive>
                                 <Unit>
                                     <Label>m</Label>
                                     <Factor>1.0</Factor>
@@ -158,7 +191,15 @@
                     <DisplayName>Orientation X</DisplayName>
                     <Description>The X value.</Description>
                     <DataType>
-                        <Basic>Real</Basic>
+                        <Constrained>
+                            <DataType>
+                                <Basic>Real</Basic>
+                            </DataType>
+                            <Constraints>
+                                <MinimalInclusive>-1.0</MinimalInclusive>
+                                <MaximalInclusive>1.0</MaximalInclusive>
+                            </Constraints>
+                        </Constrained>
                     </DataType>
                 </Element>
                 <Element>
@@ -166,7 +207,15 @@
                     <DisplayName>Orientation Y</DisplayName>
                     <Description>The Y value.</Description>
                     <DataType>
-                        <Basic>Real</Basic>
+                        <Constrained>
+                            <DataType>
+                                <Basic>Real</Basic>
+                            </DataType>
+                            <Constraints>
+                                <MinimalInclusive>-1.0</MinimalInclusive>
+                                <MaximalInclusive>1.0</MaximalInclusive>
+                            </Constraints>
+                        </Constrained>
                     </DataType>
                 </Element>
                 <Element>
@@ -174,7 +223,15 @@
                     <DisplayName>Orientation Z</DisplayName>
                     <Description>The Z value.</Description>
                     <DataType>
-                        <Basic>Real</Basic>
+                        <Constrained>
+                            <DataType>
+                                <Basic>Real</Basic>
+                            </DataType>
+                            <Constraints>
+                                <MinimalInclusive>-1.0</MinimalInclusive>
+                                <MaximalInclusive>1.0</MaximalInclusive>
+                            </Constraints>
+                        </Constrained>
                     </DataType>
                 </Element>
                 <Element>
@@ -182,7 +239,15 @@
                     <DisplayName>Orientation W</DisplayName>
                     <Description>The W value.</Description>
                     <DataType>
-                        <Basic>Real</Basic>
+                        <Constrained>
+                            <DataType>
+                                <Basic>Real</Basic>
+                            </DataType>
+                            <Constraints>
+                                <MinimalInclusive>-1.0</MinimalInclusive>
+                                <MaximalInclusive>1.0</MaximalInclusive>
+                            </Constraints>
+                        </Constrained>
                     </DataType>
                 </Element>
             </Structure>
@@ -192,7 +257,7 @@
     <DataTypeDefinition>
         <Identifier>RelativeMove</Identifier>
         <DisplayName>Relative Move</DisplayName>
-        <Description>Move a relative distance to a given direction. This is used to define approach an retreat actions.</Description>
+        <Description>A relative move to the given direction without changing the orientation of the robot hand.</Description>
         <DataType>
             <Structure>
                 <Element>
@@ -244,9 +309,9 @@
                     </DataType>
                 </Element>
                 <Element>
-                    <Identifier>Distance</Identifier>
-                    <DisplayName>Distance</DisplayName>
-                    <Description>The distance do move.</Description>
+                    <Identifier>MinDist</Identifier>
+                    <DisplayName>Minimal Distance</DisplayName>
+                    <Description>The minimal distance to move.</Description>
                     <DataType>
                         <Constrained>
                             <DataType>
@@ -254,8 +319,31 @@
                             </DataType>
                             <Constraints>
                                 <Unit>
-                                    <Label>m</Label>
-                                    <Factor>1.0</Factor>
+                                    <Label>cm</Label>
+                                    <Factor>0.01</Factor>
+                                    <Offset>0</Offset>
+                                    <UnitComponent>
+                                        <SIUnit>Meter</SIUnit>
+                                        <Exponent>1</Exponent>
+                                    </UnitComponent>
+                                </Unit>
+                            </Constraints>
+                        </Constrained>
+                    </DataType>
+                </Element>
+                <Element>
+                    <Identifier>DesiredDist</Identifier>
+                    <DisplayName>Desired Distance</DisplayName>
+                    <Description>The desired distance to move.</Description>
+                    <DataType>
+                        <Constrained>
+                            <DataType>
+                                <Basic>Real</Basic>
+                            </DataType>
+                            <Constraints>
+                                <Unit>
+                                    <Label>cm</Label>
+                                    <Factor>0.01</Factor>
                                     <Offset>0</Offset>
                                     <UnitComponent>
                                         <SIUnit>Meter</SIUnit>
