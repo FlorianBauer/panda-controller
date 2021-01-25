@@ -3,6 +3,7 @@
  * put to. Therefore, every Site needs to define a pose from which the arm can access this location.
  */
 #include "Site.h"
+
 #include "ServiceDefs.h"
 
 using json = nlohmann::json;
@@ -47,8 +48,8 @@ Site::Site(const json& jsonStruct) {
     locationPose.orientation.z = jsonPose[ORI_Z].get<double>();
     locationPose.orientation.w = jsonPose[ORI_W].get<double>();
 
-    const json& jsonApproach = jsonStruct[APPROACH];
-    if (!jsonApproach.empty()) {
+    if (jsonStruct.find(APPROACH) != jsonStruct.cend()) {
+        const json& jsonApproach = jsonStruct[APPROACH];
         grasp.pre_grasp_approach.direction.header.frame_id = PANDA_LINK_BASE;
         grasp.pre_grasp_approach.desired_distance = jsonApproach[DESIRED_DIST].get<double>();
         grasp.pre_grasp_approach.min_distance = jsonApproach[MIN_DIST].get<double>();
@@ -58,8 +59,8 @@ Site::Site(const json& jsonStruct) {
         hasApproach = true;
     }
 
-    const json& jsonRetreat = jsonStruct[RETREAT];
-    if (!jsonRetreat.empty()) {
+    if (jsonStruct.find(RETREAT) != jsonStruct.cend()) {
+        const json& jsonRetreat = jsonStruct[RETREAT];
         grasp.post_place_retreat.direction.header.frame_id = PANDA_LINK_BASE;
         grasp.post_place_retreat.desired_distance = jsonRetreat[DESIRED_DIST].get<double>();
         grasp.post_place_retreat.min_distance = jsonRetreat[MIN_DIST].get<double>();
