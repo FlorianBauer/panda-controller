@@ -136,23 +136,24 @@ MoveToSite_Responses CRobotControllerImpl::MoveToSite(MoveToSiteWrapper* command
     const auto request = command->parameters();
     qDebug() << "Request contains:" << request;
 
-    if (!m_SiteManagerPtr->hasSiteId(request.siteid().siteid().value())) {
+    const std::string& siteId = request.siteid().siteid().value();
+    if (!m_SiteManagerPtr->hasSiteId(siteId)) {
         // Throw an validation exception if site is not available.
         throw SiLA2::CDefinedExecutionError{
             "SiteIdNotFound",
             "The given Site ID does not exist or could not be found."};
     }
 
-    // TODO: Write actual Command implementation logic...
-    const double NUM_STEPS = 10.0;
-    for (int i = 0; i <= NUM_STEPS; ++i) {
-        // do stuff...
-        command->setExecutionInfo(SiLA2::CReal{i / NUM_STEPS});
+    const Site site = m_SiteManagerPtr->getSite(siteId);
+    m_Arm.setPoseTarget(site.getPose(), PANDA_LINK_EEF);
+    const MoveItErrorCode err = m_Arm.move();
+    if (err != MoveItErrorCode::SUCCESS) {
+        throw SiLA2::CDefinedExecutionError{
+            "InvalidPose",
+            "The given pose is invalid, not within reach or would cause a collision."};
     }
 
-    auto Response = MoveToSite_Responses{};
-    // TODO: Fill the response fields
-    return Response;
+    return MoveToSite_Responses{};
 }
 
 MoveRelative_Responses CRobotControllerImpl::MoveRelative(MoveRelativeWrapper* command) {
