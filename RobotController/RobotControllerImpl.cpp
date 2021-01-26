@@ -242,6 +242,7 @@ FollowPath_Responses CRobotControllerImpl::FollowPath(FollowPathWrapper* command
         }
         command->setExecutionInfo(SiLA2::CReal{++progress / poseList.size()});
     }
+    command->executionFinished(SiLA2::CommandStatus::FINISHED_SUCCESSFULLY);
 
     return FollowPath_Responses{};
 }
@@ -293,6 +294,7 @@ FollowFrames_Responses CRobotControllerImpl::FollowFrames(FollowFramesWrapper* c
         }
         command->setExecutionInfo(SiLA2::CReal{++progress / frameList.size()});
     }
+    command->executionFinished(SiLA2::CommandStatus::FINISHED_SUCCESSFULLY);
 
     return FollowFrames_Responses{};
 }
