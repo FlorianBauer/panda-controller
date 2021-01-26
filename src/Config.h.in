@@ -2,9 +2,9 @@
 #define CONFIG_H
 
 // The build properties from CMake.
-#define VERSION_MAJOR @RobotService_VERSION_MAJOR@
-#define VERSION_MINOR @RobotService_VERSION_MINOR@
-#define VERSION_PATCH @RobotService_VERSION_PATCH@
+#define VERSION_MAJOR @PandaController_VERSION_MAJOR@
+#define VERSION_MINOR @PandaController_VERSION_MINOR@
+#define VERSION_PATCH @PandaController_VERSION_PATCH@
 #define EXECUTABLE_NAME "@ROBOT_SERVICE@"
 #define BUILD_TYPE "@CMAKE_BUILD_TYPE@"
 #define BUILD_TIMESTAMP "@BUILD_TIMESTAMP@"

@@ -1,13 +1,24 @@
 cmake_minimum_required(VERSION 3.13)
 
 project("panda_controller")
-set(ROBOT_SERVICE "RobotService")
+set(PANDA_CONTROLLER "PandaController")
 set(PROJECT_TEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/test")
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
+
+# Set C++17 as standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# General compiler flags
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+
+# Enable multi-threading
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
 
 # Set the local gRPC installation directory.
 # See https://gitlab.com/SiLA2/sila_cpp/-/blob/master/BUILDING.md#grpc
@@ -19,9 +30,9 @@ option(BUILD_TESTS "Build all unit tests." OFF)
 set(CMAKE_BUILD_TYPE "Release")
 
 # Version number
-set("${ROBOT_SERVICE}_VERSION_MAJOR" 0)
-set("${ROBOT_SERVICE}_VERSION_MINOR" 1)
-set("${ROBOT_SERVICE}_VERSION_PATCH" 0)
+set("${PANDA_CONTROLLER}_VERSION_MAJOR" 0)
+set("${PANDA_CONTROLLER}_VERSION_MINOR" 1)
+set("${PANDA_CONTROLLER}_VERSION_PATCH" 0)
 
 # Build-timestamp
 string(TIMESTAMP BUILD_TIMESTAMP UTC)
@@ -36,17 +47,6 @@ if(GIT_FOUND)
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
 endif()
-
-# Set C++17 as standard
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# General compiler flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-
-# Enable multi-threading
-set(THREADS_PREFER_PTHREAD_FLAG ON)
-find_package(Threads REQUIRED)
 
 # A header file to pass some of the CMake settings
 configure_file(
@@ -113,7 +113,6 @@ set(PROTOS
 
 protoc_generate_cpp(PROTO_SRCS IMPL_SRCS ${PROTOS})
 
-set(PANDA_CONTROLLER "PandaController")
 add_library(${PANDA_CONTROLLER}Features
     ${PROTO_SRCS}
     ${IMPL_SRCS}
