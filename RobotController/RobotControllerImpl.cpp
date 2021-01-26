@@ -20,6 +20,16 @@
 using namespace sila2::de::fau::robot::robotcontroller::v1;
 using moveit::planning_interface::MoveItErrorCode;
 
+static const SiLA2::CDefinedExecutionError ERROR_INVALID_FRAME{
+    "InvalidFrame",
+    "The given joint values are invalid or could not be set."};
+static const SiLA2::CDefinedExecutionError ERROR_INVALID_POSE{
+    "InvalidPose",
+    "The given pose is invalid, not within reach or would cause a collision."};
+static const SiLA2::CDefinedExecutionError ERROR_SITE_ID_NOT_FOUND{
+    "SiteIdNotFound",
+    "The given Site ID does not exist or could not be found."};
+
 CRobotControllerImpl::CRobotControllerImpl(SiLA2::CSiLAServer* parent, const std::shared_ptr<CSiteManagerImpl> siteManagerPtr)
 : CSiLAFeature{parent},
 m_SiteManagerPtr{siteManagerPtr},
@@ -124,9 +134,7 @@ MoveToPose_Responses CRobotControllerImpl::MoveToPose(MoveToPoseWrapper* command
     m_Arm.setPoseTarget(targetPose, PANDA_LINK_EEF);
     const MoveItErrorCode err = m_Arm.move();
     if (err != MoveItErrorCode::SUCCESS) {
-        throw SiLA2::CDefinedExecutionError{
-            "InvalidPose",
-            "The given pose is invalid, not within reach or would cause a collision."};
+        throw ERROR_INVALID_POSE;
     }
 
     return MoveToPose_Responses{};
@@ -138,19 +146,14 @@ MoveToSite_Responses CRobotControllerImpl::MoveToSite(MoveToSiteWrapper* command
 
     const std::string& siteId = request.siteid().siteid().value();
     if (!m_SiteManagerPtr->hasSiteId(siteId)) {
-        // Throw an validation exception if site is not available.
-        throw SiLA2::CDefinedExecutionError{
-            "SiteIdNotFound",
-            "The given Site ID does not exist or could not be found."};
+        throw ERROR_SITE_ID_NOT_FOUND;
     }
 
     const Site site = m_SiteManagerPtr->getSite(siteId);
     m_Arm.setPoseTarget(site.getPose(), PANDA_LINK_EEF);
     const MoveItErrorCode err = m_Arm.move();
     if (err != MoveItErrorCode::SUCCESS) {
-        throw SiLA2::CDefinedExecutionError{
-            "InvalidPose",
-            "The given pose is invalid, not within reach or would cause a collision."};
+        throw ERROR_INVALID_POSE;
     }
 
     return MoveToSite_Responses{};
@@ -236,9 +239,7 @@ FollowPath_Responses CRobotControllerImpl::FollowPath(FollowPathWrapper* command
         m_Arm.setPoseTarget(targetPose, PANDA_LINK_EEF);
         const MoveItErrorCode err = m_Arm.move();
         if (err != MoveItErrorCode::SUCCESS) {
-            throw SiLA2::CDefinedExecutionError{
-                "InvalidPose",
-                "The given pose is invalid, not within reach or would cause a collision."};
+            throw ERROR_INVALID_POSE;
         }
         command->setExecutionInfo(SiLA2::CReal{++progress / poseList.size()});
     }
@@ -265,9 +266,7 @@ SetToFrame_Responses CRobotControllerImpl::SetToFrame(SetToFrameWrapper* command
     m_Arm.setJointValueTarget(jointValues);
     const MoveItErrorCode err = m_Arm.move();
     if (err != MoveItErrorCode::SUCCESS) {
-        ROS_ERROR("Failed to call service SetToFrame");
-        // TODO: throw a defined SiLA execution exception
-        return {};
+        throw ERROR_INVALID_FRAME;
     }
 
     return SetToFrame_Responses{};
@@ -288,9 +287,7 @@ FollowFrames_Responses CRobotControllerImpl::FollowFrames(FollowFramesWrapper* c
         m_Arm.setJointValueTarget(jointValues);
         const MoveItErrorCode err = m_Arm.move();
         if (err != MoveItErrorCode::SUCCESS) {
-            ROS_ERROR("Failed to Set Frame");
-            // TODO: throw a defined SiLA execution exception
-            return {};
+            throw ERROR_INVALID_FRAME;
         }
         command->setExecutionInfo(SiLA2::CReal{++progress / frameList.size()});
     }
@@ -334,8 +331,7 @@ SetGripper_Responses CRobotControllerImpl::SetGripper(SetGripperWrapper* command
     m_Gripper.setJointValueTarget(std::vector<double>{halfWidthInM, halfWidthInM});
     const MoveItErrorCode err = m_Gripper.move();
     if (err != MoveItErrorCode::SUCCESS) {
-        // TODO: add error handling
-        return {};
+        throw SiLA2::CExecutionError("Could not set gripper.");
     }
 
     return SetGripper_Responses{};
@@ -345,8 +341,7 @@ CloseGripper_Responses CRobotControllerImpl::CloseGripper(CloseGripperWrapper* c
     m_Gripper.setJointValueTarget(std::vector<double>{0.0, 0.0});
     const MoveItErrorCode err = m_Gripper.move();
     if (err != MoveItErrorCode::SUCCESS) {
-        // TODO: add error handling
-        return {};
+        throw SiLA2::CExecutionError("Could not close gripper.");
     }
 
     return CloseGripper_Responses{};

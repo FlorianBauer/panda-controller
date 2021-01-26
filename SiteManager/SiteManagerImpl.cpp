@@ -19,6 +19,9 @@ using namespace sila2::de::fau::robot::sitemanager::v1;
 using json = nlohmann::json;
 
 constexpr double CM_TO_M = 0.01;
+static const SiLA2::CDefinedExecutionError ERROR_SITE_ID_NOT_FOUND{
+    "SiteIdNotFound",
+    "The given Site ID does not exist or could not be found."};
 
 std::map<std::string, json> CSiteManagerImpl::loadJsonFilesToMap() {
     const fs::path appDir = FileManager::getAppDir();
@@ -127,9 +130,7 @@ DeleteSite_Responses CSiteManagerImpl::DeleteSite(DeleteSiteWrapper* command) {
         const fs::path jsonFile = m_SitesDir / (idToDelete + JSON_FILE_EXT);
         fs::remove(jsonFile);
     } else {
-        throw SiLA2::CDefinedExecutionError{
-            "SiteIdNotFound",
-            "The given Site ID does not exist or could not be found."};
+        throw ERROR_SITE_ID_NOT_FOUND;
     }
 
     return DeleteSite_Responses{};
