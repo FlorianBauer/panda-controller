@@ -96,6 +96,15 @@ Site::Site(const Site& orig) {
 Site::~Site() {
 }
 
+/**
+ * Get the identifier of the site.
+ * 
+ * @return The ID string.
+ */
+const std::string& Site::getId() const {
+    return id;
+}
+
 geometry_msgs::PoseStamped Site::getPose() const {
     geometry_msgs::PoseStamped pose;
     pose.header.frame_id = PANDA_LINK_BASE;
