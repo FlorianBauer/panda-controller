@@ -236,12 +236,12 @@ FollowPath_Responses CRobotControllerImpl::FollowPath(FollowPathWrapper* command
         targetPose.orientation.z = pose.pose().oriz().value();
         targetPose.orientation.w = pose.pose().oriw().value();
 
+        command->setExecutionInfo(SiLA2::CReal{++progress / poseList.size()});
         m_Arm.setPoseTarget(targetPose, PANDA_LINK_EEF);
         const MoveItErrorCode err = m_Arm.move();
         if (err != MoveItErrorCode::SUCCESS) {
             throw ERROR_INVALID_POSE;
         }
-        command->setExecutionInfo(SiLA2::CReal{++progress / poseList.size()});
     }
     command->executionFinished(SiLA2::CommandStatus::FINISHED_SUCCESSFULLY);
 
@@ -284,12 +284,12 @@ FollowFrames_Responses CRobotControllerImpl::FollowFrames(FollowFramesWrapper* c
             jointValues[i] = frame.frame().at(i).value();
         }
 
+        command->setExecutionInfo(SiLA2::CReal{++progress / frameList.size()});
         m_Arm.setJointValueTarget(jointValues);
         const MoveItErrorCode err = m_Arm.move();
         if (err != MoveItErrorCode::SUCCESS) {
             throw ERROR_INVALID_FRAME;
         }
-        command->setExecutionInfo(SiLA2::CReal{++progress / frameList.size()});
     }
     command->executionFinished(SiLA2::CommandStatus::FINISHED_SUCCESSFULLY);
 
