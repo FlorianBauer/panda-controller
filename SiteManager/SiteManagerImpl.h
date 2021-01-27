@@ -28,6 +28,10 @@
  */
 class CSiteManagerImpl final : public SiLA2::CSiLAFeature<sila2::de::fau::robot::sitemanager::v1::SiteManager> {
     // Using declarations for the Feature's Commands and Properties
+    using GetSiteCommand = SiLA2::CUnobservableCommandManager<&CSiteManagerImpl::RequestGetSite>;
+    using GetSiteWrapper = SiLA2::CUnobservableCommandWrapper<
+            sila2::de::fau::robot::sitemanager::v1::GetSite_Parameters,
+            sila2::de::fau::robot::sitemanager::v1::GetSite_Responses>;
     using SetSiteCommand = SiLA2::CUnobservableCommandManager<&CSiteManagerImpl::RequestSetSite>;
     using SetSiteWrapper = SiLA2::CUnobservableCommandWrapper<
             sila2::de::fau::robot::sitemanager::v1::SetSite_Parameters,
@@ -46,6 +50,23 @@ public:
      * @param parent The SiLA server instance that contains this Feature
      */
     explicit CSiteManagerImpl(SiLA2::CSiLAServer* parent);
+
+    /**
+     * @brief GetSite Command
+     *
+     * @details Gets the site with the given ID.
+     *
+     * @param Command The current GetSite Command Execution Wrapper
+     * It contains the following Parameters:
+     * @li SiteId The site to get.
+     *
+     * @return GetSite_Responses The Command Response
+     * It contains the following fields:
+     * None
+     *
+     * @throw Validation Error if the given Parameter(s) are invalid
+     */
+    sila2::de::fau::robot::sitemanager::v1::GetSite_Responses GetSite(GetSiteWrapper* command);
 
     /**
      * @brief SetSite Command
@@ -73,7 +94,7 @@ public:
     /**
      * @brief DeleteSite Command
      *
-     * @details Removes a Site from the manager.
+     * @details Removes a site from the manager.
      *
      * @param Command The current DeleteSite Command Execution Wrapper
      * It contains the following Parameters:
@@ -91,13 +112,14 @@ public:
     Site getSite(const std::string& siteId) const;
 
 private:
+    GetSiteCommand m_GetSiteCommand;
     SetSiteCommand m_SetSiteCommand;
     DeleteSiteCommand m_DeleteSiteCommand;
     SitesProperty m_SitesProperty;
     std::map<std::string, nlohmann::json> m_JsonSites;
     const std::filesystem::path m_SitesDir;
 
-    static std::map<std::string, nlohmann::json> loadJsonFilesToMap();
+    static std::map<std::string, nlohmann::json> loadSiteFilesToMap();
 };
 
 #endif  // SITEMANAGERIMPL_H

@@ -10,7 +10,7 @@
     <Property>
         <Identifier>Sites</Identifier>
         <DisplayName>Sites</DisplayName>
-        <Description>Available Sites.</Description>
+        <Description>Shows all available site IDs.</Description>
         <Observable>No</Observable>
         <DataType>
             <List>
@@ -20,6 +20,76 @@
             </List>
         </DataType>
     </Property>
+
+    <Command>
+        <Identifier>GetSite</Identifier>
+        <DisplayName>Get Site</DisplayName>
+        <Description>Gets the site with the given ID.</Description>
+        <Observable>No</Observable>
+        <Parameter>
+            <Identifier>SiteId</Identifier>
+            <DisplayName>Site ID</DisplayName>
+            <Description>The site to get.</Description>
+            <DataType>
+                <DataTypeIdentifier>SiteId</DataTypeIdentifier>
+            </DataType>
+        </Parameter>
+        <Response>
+            <Identifier>Site</Identifier>
+            <DisplayName>Site</DisplayName>
+            <Description>The site and its values.</Description>
+            <DataType>
+                <!-- 
+                Since the sila2codegenerator v0.3.3-dev is not able to generate the 
+                corrensponding response, a string is temporarly used to show the results.
+                (2021-01-26, florian.bauer.dev@gmail.com) 
+                -->
+                <Basic>String</Basic>
+                <!--
+                <Structure>
+                    <Element>
+                        <Identifier>Pose</Identifier>
+                        <DisplayName>Pose</DisplayName>
+                        <Description>The pose to reach the site.</Description>
+                        <DataType>
+                            <DataTypeIdentifier>Pose</DataTypeIdentifier>
+                        </DataType>
+                    </Element>
+                    <Element>
+                        <Identifier>Approach</Identifier>
+                        <DisplayName>Approach</DisplayName>
+                        <Description>Defines a movement to approach an item on/inside the site (e.g. to pick-up from above).</Description>
+                        <DataType>
+                            <DataTypeIdentifier>RelativeMove</DataTypeIdentifier>
+                        </DataType>
+                    </Element>
+                    <Element>
+                        <Identifier>Retreat</Identifier>
+                        <DisplayName>Retreat</DisplayName>
+                        <Description>Defines a movement to retreat from an item on/inside the site (e.g. to move sideways after placing something). If no retreat is set, the reversed approach movement is used.</Description>
+                        <DataType>
+                            <Constrained>
+                                <DataType>
+                                    <List>
+                                        <DataType>
+                                            <DataTypeIdentifier>RelativeMove</DataTypeIdentifier>
+                                        </DataType>
+                                    </List>
+                                </DataType>
+                                <Constraints>
+                                    <MaximalElementCount>1</MaximalElementCount>
+                                </Constraints>
+                            </Constrained>
+                        </DataType>
+                    </Element>
+                </Structure>
+                -->
+            </DataType>
+        </Response>
+        <DefinedExecutionErrors>
+            <Identifier>SiteIdNotFound</Identifier>
+        </DefinedExecutionErrors>
+    </Command>
 
     <Command>
         <Identifier>SetSite</Identifier>
@@ -74,7 +144,7 @@
     <Command>
         <Identifier>DeleteSite</Identifier>
         <DisplayName>Delete Site</DisplayName>
-        <Description>Removes a Site from the manager.</Description>
+        <Description>Removes a site from the manager.</Description>
         <Observable>No</Observable>
         <Parameter>
             <Identifier>SiteId</Identifier>
@@ -114,7 +184,7 @@
                 <Element>
                     <Identifier>X</Identifier>
                     <DisplayName>X</DisplayName>
-                    <Description>The X position of the Site.</Description>
+                    <Description>The X position of the site.</Description>
                     <DataType>
                         <Constrained>
                             <DataType>
@@ -139,7 +209,7 @@
                 <Element>
                     <Identifier>Y</Identifier>
                     <DisplayName>Y</DisplayName>
-                    <Description>The Y position of the Site.</Description>
+                    <Description>The Y position of the site.</Description>
                     <DataType>
                         <Constrained>
                             <DataType>
