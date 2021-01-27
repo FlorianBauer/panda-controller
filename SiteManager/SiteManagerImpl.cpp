@@ -85,7 +85,7 @@ GetSite_Responses CSiteManagerImpl::GetSite(GetSiteWrapper* command) {
      */
     const Site site = getSite(siteId);
     auto response = GetSite_Responses{};
-    response.mutable_site()->set_value(site.toJson().dump(2));
+    response.mutable_site()->set_value(site.toJson().dump());
     return response;
 }
 
