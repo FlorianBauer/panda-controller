@@ -123,10 +123,8 @@ SetSite_Responses CSiteManagerImpl::SetSite(SetSiteWrapper* command) {
         {Site::DIR_Z, approachMove.z().value() * CM_TO_M},
     };
 
-    if (!isSiteIdInList) {
-        // Add entry to map.
-        m_JsonSites[idToSet] = jsonStruct;
-    }
+    // Add/update entry in map.
+    m_JsonSites[idToSet] = jsonStruct;
 
     // Write JSON data to file.
     const fs::path jsonFile = m_SitesDir / (idToSet + JSON_FILE_EXT);
