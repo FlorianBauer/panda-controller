@@ -11,6 +11,7 @@
 #include <map>
 #include <filesystem>
 #include <nlohmann/json.hpp>
+#include <string>
 #include <sila_cpp/server/SiLAFeature.h>
 #include <sila_cpp/data_types.h>
 #include <sila_cpp/server/command/UnobservableCommand.h>
