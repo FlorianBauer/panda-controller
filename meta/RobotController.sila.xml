@@ -59,7 +59,7 @@
         <Identifier>MoveToSite</Identifier>
         <DisplayName>Move To Site</DisplayName>
         <Description>Move to a given site without approaching.</Description>
-        <Observable>Yes</Observable>
+        <Observable>No</Observable>
         <Parameter>
             <Identifier>SiteId</Identifier>
             <DisplayName>Site ID</DisplayName>
@@ -179,9 +179,9 @@
     </Command>
 
     <Command>
-        <Identifier>CheckOccupied</Identifier>
-        <DisplayName>Check Occupied</DisplayName>
-        <Description>Check if the given site is occupied with a sample.</Description>
+        <Identifier>IsSiteOccupied</Identifier>
+        <DisplayName>Is Site Occupied</DisplayName>
+        <Description>Check if the given site is currently occupied with a sample.</Description>
         <Observable>No</Observable>
         <Parameter>
             <Identifier>SiteId</Identifier>
@@ -602,5 +602,11 @@
         <Identifier>InvalidPose</Identifier>
         <DisplayName>Invalid Pose</DisplayName>
         <Description>The given pose is invalid, not within reach or would cause a collision.</Description>
+    </DefinedExecutionError>
+
+    <DefinedExecutionError>
+        <Identifier>InvalidFrame</Identifier>
+        <DisplayName>Invalid Frame</DisplayName>
+        <Description>The given joint values are invalid or could not be set.</Description>
     </DefinedExecutionError>
 </Feature>
