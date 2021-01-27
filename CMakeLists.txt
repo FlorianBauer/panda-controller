@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.13)
 
 project("panda_controller")
 set(PANDA_CONTROLLER "PandaController")
+set(SILA_SERVER "PandaControlServer")
 set(PROJECT_TEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/test")
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -12,9 +13,6 @@ set(CMAKE_AUTORCC ON)
 # Set C++17 as standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# General compiler flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 
 # Enable multi-threading
 set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -27,7 +25,15 @@ list(APPEND CMAKE_PREFIX_PATH "${LOCAL_INSTALL_DIR}")
 
 # Enable tests with -DBUILD_TESTS=ON
 option(BUILD_TESTS "Build all unit tests." OFF)
-set(CMAKE_BUILD_TYPE "Release")
+
+# Enable debug build with -CMAKE_BUILD_TYPE=Debug
+#set(CMAKE_BUILD_TYPE "Debug")
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release")
+else()
+    # Enable more compiler warnings on Debug
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+endif()
 
 # Version number
 set("${PANDA_CONTROLLER}_VERSION_MAJOR" 0)
@@ -124,8 +130,6 @@ target_link_libraries(${PANDA_CONTROLLER}Features
     ${catkin_LIBRARIES}
 )
 
-# The SiLA Server takes the role of the ROS client node.
-set(SILA_SERVER "PandaControlServer")
 add_executable(${SILA_SERVER} "${CMAKE_CURRENT_SOURCE_DIR}/${SILA_SERVER}.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/Plate.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/Site.cpp"
