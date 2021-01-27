@@ -41,15 +41,14 @@ std::map<std::string, json> CSiteManagerImpl::loadSiteFilesToMap() {
         json jsonStruct;
         try {
             jsonStream >> jsonStruct;
+            const std::string& id = jsonStruct[Site::SITE_ID].get<std::string>();
+            sites[id] = jsonStruct;
         } catch (const std::exception& ex) {
-            std::cerr << "Could not load: " << file << "\n" << ex.what();
             jsonStream.close();
+            std::cerr << "Could not load: " << file << "\n" << ex.what() << "\n";
             continue;
         }
         jsonStream.close();
-
-        const std::string& id = jsonStruct[Site::SITE_ID].get<std::string>();
-        sites[id] = jsonStruct;
     }
     return sites;
 }
