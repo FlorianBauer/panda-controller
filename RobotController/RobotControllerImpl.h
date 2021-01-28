@@ -24,6 +24,16 @@
 #include "Site.h"
 #include "SiteManager/SiteManagerImpl.h"
 
+
+static const SiLA2::CDefinedExecutionError ERROR_INVALID_FRAME
+{
+    "InvalidFrame",
+    "The given joint values are invalid or could not be set."
+};
+static const SiLA2::CDefinedExecutionError ERROR_INVALID_POSE{
+    "InvalidPose",
+    "The given pose is invalid, not within reach or would cause a collision."};
+
 /**
  * @brief The CRobotControllerImpl class implements the RobotController feature
  *

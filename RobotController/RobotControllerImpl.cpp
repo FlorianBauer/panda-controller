@@ -20,15 +20,6 @@
 using namespace sila2::de::fau::robot::robotcontroller::v1;
 using moveit::planning_interface::MoveItErrorCode;
 
-static const SiLA2::CDefinedExecutionError ERROR_INVALID_FRAME{
-    "InvalidFrame",
-    "The given joint values are invalid or could not be set."};
-static const SiLA2::CDefinedExecutionError ERROR_INVALID_POSE{
-    "InvalidPose",
-    "The given pose is invalid, not within reach or would cause a collision."};
-static const SiLA2::CDefinedExecutionError ERROR_SITE_ID_NOT_FOUND{
-    "SiteIdNotFound",
-    "The given Site ID does not exist or could not be found."};
 
 CRobotControllerImpl::CRobotControllerImpl(SiLA2::CSiLAServer* parent, const std::shared_ptr<CSiteManagerImpl> siteManagerPtr)
 : CSiLAFeature{parent},

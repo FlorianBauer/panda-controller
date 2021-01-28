@@ -19,9 +19,6 @@ using namespace sila2::de::fau::robot::sitemanager::v1;
 using json = nlohmann::json;
 
 constexpr double CM_TO_M = 0.01;
-static const SiLA2::CDefinedExecutionError ERROR_SITE_ID_NOT_FOUND{
-    "SiteIdNotFound",
-    "The given Site ID does not exist or could not be found."};
 
 /**
  * Loads the JSON formatted site files from the `site` directory into a map.

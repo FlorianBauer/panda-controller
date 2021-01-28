@@ -21,6 +21,12 @@
 #include "Site.h"
 #include "SiteManager.grpc.pb.h"
 
+static const SiLA2::CDefinedExecutionError ERROR_SITE_ID_NOT_FOUND
+{
+    "SiteIdNotFound",
+    "The given Site ID does not exist or could not be found."
+};
+
 /**
  * @brief The CSiteManagerImpl class implements the SiteManager feature
  *
