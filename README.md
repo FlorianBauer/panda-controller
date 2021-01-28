@@ -31,8 +31,8 @@ omitted.
 
 TODO: add install instructions
 
-_Links for troubleshooting:_  
-[Ranka Emika Set-Up Guide](https://frankaemika.github.io/docs/installation_linux.html#setting-up-the-real-time-kernel)  
+_Additional links:_  
+[Franka Emika Set-Up Guide](https://frankaemika.github.io/docs/installation_linux.html#setting-up-the-real-time-kernel)  
 [RT Kernel Set-Up Guide](https://medium.com/@patdhlk/realtime-linux-e97628b51d5d)
 
 
@@ -69,7 +69,7 @@ make install
 popd
 ```
 
-_Links for troubleshooting:_  
+_Additional links:_  
 [sila_cpp Build Instructions](https://gitlab.com/SiLA2/sila_cpp/-/blob/master/BUILDING.md#grpc)  
 [gRPC Quickstart](https://grpc.io/docs/languages/cpp/quickstart/)
 
@@ -91,10 +91,10 @@ cmake --build .
 
 3. Install `sila_cpp`
 ```bash
-cmake --install .
+sudo cmake --install .
 ```
 
-_Links for troubleshooting:_  
+_Additional links:_  
 [sila_cpp Build Instructions](https://gitlab.com/SiLA2/sila_cpp/-/blob/master/BUILDING.md)
 
 
