@@ -7,7 +7,7 @@
 using json = nlohmann::json;
 
 /// ID counter
-static unsigned idCounter = 0;
+static unsigned instanceIdCounter = 0;
 
 /**
  * Constructor.
@@ -18,8 +18,8 @@ static unsigned idCounter = 0;
  * @param dimZ The height of the object in meter.
  */
 Plate::Plate(const std::string& typeName, double dimX, double dimY, double dimZ) {
-    type = typeName;
-    plateObject.id = typeName + std::to_string(++idCounter);
+    typeId = typeName;
+    plateObject.id = typeName + std::to_string(++instanceIdCounter);
     plateObject.header.frame_id = PANDA_LINK_BASE;
 
     plateObject.primitives.resize(1);
@@ -31,15 +31,13 @@ Plate::Plate(const std::string& typeName, double dimX, double dimY, double dimZ)
 }
 
 /**
- * Constructor for creation from a JSON struct. Parsed Opentrons labware files can be used as input.
- * The definitions therefore can be found here: 
- * https://github.com/Opentrons/opentrons/tree/master/shared-data/labware/definitions/2
+ * Constructor for creation from a JSON structure.
  * 
  * @param jsonStruct The JSON struct to read the data from.
  */
 Plate::Plate(const json& jsonStruct) {
-    type = jsonStruct[PLATE_TYPE].get<std::string>();
-    plateObject.id = type + std::to_string(++idCounter);
+    typeId = jsonStruct[PLATE_TYPE_ID].get<std::string>();
+    plateObject.id = typeId + std::to_string(++instanceIdCounter);
     plateObject.header.frame_id = PANDA_LINK_BASE;
 
     plateObject.primitives.resize(1);
@@ -48,6 +46,9 @@ Plate::Plate(const json& jsonStruct) {
     plateObject.primitives[0].dimensions[0] = jsonStruct[DIM_X].get<double>();
     plateObject.primitives[0].dimensions[1] = jsonStruct[DIM_Y].get<double>();
     plateObject.primitives[0].dimensions[2] = jsonStruct[DIM_Z].get<double>();
+    offX = jsonStruct[GRIPPER_OFFSET_X].get<double>();
+    offY = jsonStruct[GRIPPER_OFFSET_Y].get<double>();
+    offZ = jsonStruct[GRIPPER_OFFSET_Z].get<double>();
 }
 
 /**
@@ -82,7 +83,7 @@ void Plate::putAtSite(Site& site) {
  * 
  * @return The identifier as string.
  */
-const std::string& Plate::getId() const {
+const std::string& Plate::getObjectId() const {
     return plateObject.id;
 }
 
@@ -91,8 +92,8 @@ const std::string& Plate::getId() const {
  * 
  * @return The type as string.
  */
-const std::string& Plate::getType() const {
-    return type;
+const std::string& Plate::getTypeId() const {
+    return typeId;
 }
 
 /**
@@ -132,16 +133,18 @@ double Plate::getDimZ() const {
 }
 
 /**
- * Get the Plate data as JSON struct. The dimensions of the object are therefore converted from
- * meter into millimeter.
+ * Get the Plate data as JSON struct.
  * 
  * @return The JSON struct.
  */
 json Plate::toJson() const {
     json jsonStruct;
-    jsonStruct[PLATE_TYPE] = type;
+    jsonStruct[PLATE_TYPE_ID] = typeId;
     jsonStruct[DIM_X] = plateObject.primitives[0].dimensions[0];
     jsonStruct[DIM_Y] = plateObject.primitives[0].dimensions[1];
     jsonStruct[DIM_Z] = plateObject.primitives[0].dimensions[2];
+    jsonStruct[GRIPPER_OFFSET_X] = offX;
+    jsonStruct[GRIPPER_OFFSET_Y] = offY;
+    jsonStruct[GRIPPER_OFFSET_Z] = offZ;
     return jsonStruct;
 }

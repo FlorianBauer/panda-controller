@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Feature SiLA2Version="1.0" FeatureVersion="1.0" MaturityLevel="Draft" Originator="de.fau" Category="robot"
+         xmlns="http://www.sila-standard.org"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.sila-standard.org https://gitlab.com/SiLA2/sila_base/raw/master/schema/FeatureDefinition.xsd">
+    <Identifier>PlateTypeManager</Identifier>
+    <DisplayName>Plate Type Manager</DisplayName>
+    <Description>Manager to define and remove plate types, which are required by the robot gripper.</Description>
+
+    <Property>
+        <Identifier>PlateTypes</Identifier>
+        <DisplayName>Plate Types</DisplayName>
+        <Description>Shows all available type IDs.</Description>
+        <Observable>No</Observable>
+        <DataType>
+            <List>
+                <DataType>
+                    <Basic>String</Basic>
+                </DataType>
+            </List>
+        </DataType>
+    </Property>
+
+    <Command>
+        <Identifier>GetPlateType</Identifier>
+        <DisplayName>Get Plate Type</DisplayName>
+        <Description>Gets the plate type.</Description>
+        <Observable>No</Observable>
+        <Parameter>
+            <Identifier>PlateTypeId</Identifier>
+            <DisplayName>Plate Type ID</DisplayName>
+            <Description>The plate type to query.</Description>
+            <DataType>
+                <DataTypeIdentifier>PlateTypeId</DataTypeIdentifier>
+            </DataType>
+        </Parameter>
+        <Response>
+            <Identifier>PlateType</Identifier>
+            <DisplayName>Plate Type</DisplayName>
+            <Description>The plate type and its values.</Description>
+            <DataType>
+                <Basic>String</Basic>
+            </DataType>
+        </Response>
+        <DefinedExecutionErrors>
+            <Identifier>PlateTypeIdNotFound</Identifier>
+        </DefinedExecutionErrors>
+    </Command>
+
+    <Command>
+        <Identifier>SetPlateType</Identifier>
+        <DisplayName>Set Plate Type</DisplayName>
+        <Description>Defines a plate type.</Description>
+        <Observable>No</Observable>
+        <Parameter>
+            <Identifier>PlateTypeId</Identifier>
+            <DisplayName>Plate Type ID</DisplayName>
+            <Description>The plate type to query.</Description>
+            <DataType>
+                <DataTypeIdentifier>PlateTypeId</DataTypeIdentifier>
+            </DataType>
+        </Parameter>
+        <Parameter>
+            <Identifier>DimX</Identifier>
+            <DisplayName>X Dimension</DisplayName>
+            <Description>The X dimension of the plate.</Description>
+            <DataType>
+                <Constrained>
+                    <DataType>
+                        <Basic>Real</Basic>
+                    </DataType>
+                    <Constraints>
+                        <MinimalInclusive>0.0</MinimalInclusive>
+                        <Unit>
+                            <Label>cm</Label>
+                            <Factor>0.01</Factor>
+                            <Offset>0</Offset>
+                            <UnitComponent>
+                                <SIUnit>Meter</SIUnit>
+                                <Exponent>1</Exponent>
+                            </UnitComponent>
+                        </Unit>
+                    </Constraints>
+                </Constrained>
+            </DataType>
+        </Parameter>
+        <Parameter>
+            <Identifier>DimY</Identifier>
+            <DisplayName>Y Dimension</DisplayName>
+            <Description>The Y dimension of the plate.</Description>
+            <DataType>
+                <Constrained>
+                    <DataType>
+                        <Basic>Real</Basic>
+                    </DataType>
+                    <Constraints>
+                        <MinimalInclusive>0.0</MinimalInclusive>
+                        <Unit>
+                            <Label>cm</Label>
+                            <Factor>0.01</Factor>
+                            <Offset>0</Offset>
+                            <UnitComponent>
+                                <SIUnit>Meter</SIUnit>
+                                <Exponent>1</Exponent>
+                            </UnitComponent>
+                        </Unit>
+                    </Constraints>
+                </Constrained>
+            </DataType>
+        </Parameter>
+        <Parameter>
+            <Identifier>DimZ</Identifier>
+            <DisplayName>Z Dimension</DisplayName>
+            <Description>The Z dimension or height of the plate.</Description>
+            <DataType>
+                <Constrained>
+                    <DataType>
+                        <Basic>Real</Basic>
+                    </DataType>
+                    <Constraints>
+                        <MinimalInclusive>0.0</MinimalInclusive>
+                        <Unit>
+                            <Label>cm</Label>
+                            <Factor>0.01</Factor>
+                            <Offset>0</Offset>
+                            <UnitComponent>
+                                <SIUnit>Meter</SIUnit>
+                                <Exponent>1</Exponent>
+                            </UnitComponent>
+                        </Unit>
+                    </Constraints>
+                </Constrained>
+            </DataType>
+        </Parameter>
+        <Parameter>
+            <Identifier>OffX</Identifier>
+            <DisplayName>X Offset</DisplayName>
+            <Description>The X offset for grabbing the plate.</Description>
+            <DataType>
+                <Constrained>
+                    <DataType>
+                        <Basic>Real</Basic>
+                    </DataType>
+                    <Constraints>
+                        <Unit>
+                            <Label>cm</Label>
+                            <Factor>0.01</Factor>
+                            <Offset>0</Offset>
+                            <UnitComponent>
+                                <SIUnit>Meter</SIUnit>
+                                <Exponent>1</Exponent>
+                            </UnitComponent>
+                        </Unit>
+                    </Constraints>
+                </Constrained>
+            </DataType>
+        </Parameter>
+        <Parameter>
+            <Identifier>OffY</Identifier>
+            <DisplayName>Y Offset</DisplayName>
+            <Description>The Y offset for grabbing the plate.</Description>
+            <DataType>
+                <Constrained>
+                    <DataType>
+                        <Basic>Real</Basic>
+                    </DataType>
+                    <Constraints>
+                        <Unit>
+                            <Label>cm</Label>
+                            <Factor>0.01</Factor>
+                            <Offset>0</Offset>
+                            <UnitComponent>
+                                <SIUnit>Meter</SIUnit>
+                                <Exponent>1</Exponent>
+                            </UnitComponent>
+                        </Unit>
+                    </Constraints>
+                </Constrained>
+            </DataType>
+        </Parameter>
+        <Parameter>
+            <Identifier>OffZ</Identifier>
+            <DisplayName>Z Offset</DisplayName>
+            <Description>The Z offset for grabbing the plate.</Description>
+            <DataType>
+                <Constrained>
+                    <DataType>
+                        <Basic>Real</Basic>
+                    </DataType>
+                    <Constraints>
+                        <Unit>
+                            <Label>cm</Label>
+                            <Factor>0.01</Factor>
+                            <Offset>0</Offset>
+                            <UnitComponent>
+                                <SIUnit>Meter</SIUnit>
+                                <Exponent>1</Exponent>
+                            </UnitComponent>
+                        </Unit>
+                    </Constraints>
+                </Constrained>
+            </DataType>
+        </Parameter>
+    </Command>
+
+    <Command>
+        <Identifier>DeletePlateType</Identifier>
+        <DisplayName>Delete Plate Type</DisplayName>
+        <Description>Removes a plate from the manager.</Description>
+        <Observable>No</Observable>
+        <Parameter>
+            <Identifier>PlateTypeId</Identifier>
+            <DisplayName>Plate type ID</DisplayName>
+            <Description>The plate type to delete.</Description>
+            <DataType>
+                <DataTypeIdentifier>PlateTypeId</DataTypeIdentifier>
+            </DataType>
+        </Parameter>
+        <DefinedExecutionErrors>
+            <Identifier>PlateTypeIdNotFound</Identifier>
+        </DefinedExecutionErrors>
+    </Command>
+
+    <DataTypeDefinition>
+        <Identifier>PlateTypeId</Identifier>
+        <DisplayName>Plate Type ID</DisplayName>
+        <Description>The string identifier of the plate type.</Description>
+        <DataType>
+            <Constrained>
+                <DataType>
+                    <Basic>String</Basic>
+                </DataType>
+                <Constraints>
+                    <MaximalLength>255</MaximalLength>
+                    <Pattern>[a-zA-Z0-9_'-]+</Pattern>
+                </Constraints>
+            </Constrained>
+        </DataType>
+    </DataTypeDefinition>
+
+    <DefinedExecutionError>
+        <Identifier>PlateTypeIdNotFound</Identifier>
+        <DisplayName>Plate Type ID not found</DisplayName>
+        <Description>The given plate type ID could not be found or does not exist.</Description>
+    </DefinedExecutionError>
+</Feature>

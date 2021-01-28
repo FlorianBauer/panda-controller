@@ -8,7 +8,7 @@
 
 static constexpr char APP_DIR[] = ".sila/panda_controller";
 static constexpr char SITES_DIR[] = "sites";
-static constexpr char PLATE_TYPES_DIR[] = "plate_types";
+static constexpr char LABWARE_DIR[] = "labware";
 static constexpr char SCENE_OBJECTS_DIR[] = "scene_objects";
 static constexpr char COLLISION_OBJECTS_DIR[] = "collision_objects";
 static constexpr char JSON_FILE_EXT[] = ".json";

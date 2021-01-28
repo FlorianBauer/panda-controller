@@ -114,6 +114,7 @@ endif()
 
 set(PROTOS
     "${CMAKE_CURRENT_SOURCE_DIR}/meta/SiteManager.proto"
+    "${CMAKE_CURRENT_SOURCE_DIR}/meta/PlateTypeManager.proto"
     "${CMAKE_CURRENT_SOURCE_DIR}/meta/RobotController.proto"
 )
 

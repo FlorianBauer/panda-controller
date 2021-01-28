@@ -10,8 +10,9 @@
     "SiLAService"
   ],
   "SiLA_feature_list": [
-	"SiteManager",
-	"RobotController"
+    "SiteManager",
+    "PlateTypeManager",
+    "RobotController"
   ],
   "communication_port": "50054",
   "IP_address": "127.0.0.1",

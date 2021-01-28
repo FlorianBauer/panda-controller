@@ -23,6 +23,7 @@
 #include "ServiceDefs.h"
 #include "Site.h"
 #include "SiteManager/SiteManagerImpl.h"
+#include "PlateTypeManager/PlateTypeManagerImpl.h"
 
 
 static const SiLA2::CDefinedExecutionError ERROR_INVALID_FRAME
@@ -128,7 +129,9 @@ public:
      *
      * @param parent The SiLA server instance that contains this Feature
      */
-    explicit CRobotControllerImpl(SiLA2::CSiLAServer* parent, const std::shared_ptr<CSiteManagerImpl> siteManagerPtr);
+    explicit CRobotControllerImpl(SiLA2::CSiLAServer* parent,
+            const std::shared_ptr<CSiteManagerImpl> siteManagerPtr,
+            const std::shared_ptr<CPlateTypeManagerImpl> plateTypeManagerPtr);
 
     /**
      * @brief GetCurrentFrame Command
@@ -376,6 +379,7 @@ public:
 
 private:
     const std::shared_ptr<CSiteManagerImpl> m_SiteManagerPtr;
+    const std::shared_ptr<CPlateTypeManagerImpl> m_PlateTypeManagerPtr;
     GetCurrentFrameCommand m_GetCurrentFrameCommand;
     GetCurrentPoseCommand m_GetCurrentPoseCommand;
     MoveToPoseCommand m_MoveToPoseCommand;

@@ -21,9 +21,12 @@ using namespace sila2::de::fau::robot::robotcontroller::v1;
 using moveit::planning_interface::MoveItErrorCode;
 
 
-CRobotControllerImpl::CRobotControllerImpl(SiLA2::CSiLAServer* parent, const std::shared_ptr<CSiteManagerImpl> siteManagerPtr)
+CRobotControllerImpl::CRobotControllerImpl(SiLA2::CSiLAServer* parent,
+        const std::shared_ptr<CSiteManagerImpl> siteManagerPtr,
+        const std::shared_ptr<CPlateTypeManagerImpl> plateTypeManagerPtr)
 : CSiLAFeature{parent},
 m_SiteManagerPtr{siteManagerPtr},
+m_PlateTypeManagerPtr{plateTypeManagerPtr},
 m_GetCurrentFrameCommand{this, "GetCurrentFrame"},
 m_GetCurrentPoseCommand{this, "GetCurrentPose"},
 m_MoveToPoseCommand{this, "MoveToPose"},
