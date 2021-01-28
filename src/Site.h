@@ -36,7 +36,7 @@ public:
     geometry_msgs::PoseStamped getPose() const;
     moveit_msgs::GripperTranslation getApproach() const;
     moveit_msgs::GripperTranslation getRetreat() const;
-    moveit_msgs::Grasp& getGrasp();
+    moveit_msgs::Grasp getGrasp() const;
     moveit_msgs::PlaceLocation getPlaceLocation() const;
     nlohmann::json toJson() const;
     void setApproach(const moveit_msgs::GripperTranslation& approach);

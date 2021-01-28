@@ -154,8 +154,8 @@ moveit_msgs::GripperTranslation Site::getRetreat() const {
     return retreat;
 }
 
-moveit_msgs::Grasp& Site::getGrasp() {
-    return grasp;
+moveit_msgs::Grasp Site::getGrasp() const {
+    return moveit_msgs::Grasp(grasp);
 }
 
 moveit_msgs::PlaceLocation Site::getPlaceLocation() const {
