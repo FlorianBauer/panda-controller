@@ -165,15 +165,24 @@
             </DataType>
         </Parameter>
         <Parameter>
-            <Identifier>PlateType</Identifier>
-            <DisplayName>Plate Type</DisplayName>
-            <Description>The plate type to grab.</Description>
+            <Identifier>PlateTypeId</Identifier>
+            <DisplayName>Plate Type ID</DisplayName>
+            <Description>The ID for the plate type to grab.</Description>
             <DataType>
-                <Basic>String</Basic>
+                <Constrained>
+                    <DataType>
+                        <Basic>String</Basic>
+                    </DataType>
+                    <Constraints>
+                        <MaximalLength>255</MaximalLength>
+                        <Pattern>[a-zA-Z0-9_'-]+</Pattern>
+                    </Constraints>
+                </Constrained>
             </DataType>
         </Parameter>
         <DefinedExecutionErrors>
             <Identifier>SiteNotFound</Identifier>
+            <Identifier>PlateTypeIdNotFound</Identifier>
             <Identifier>InvalidPose</Identifier>
         </DefinedExecutionErrors>
     </Command>
@@ -596,6 +605,12 @@
         <Identifier>SiteIdNotFound</Identifier>
         <DisplayName>Site ID not found</DisplayName>
         <Description>The given Site ID does not exist or could not be found.</Description>
+    </DefinedExecutionError>
+
+    <DefinedExecutionError>
+        <Identifier>PlateTypeIdNotFound</Identifier>
+        <DisplayName>Plate Type ID not found</DisplayName>
+        <Description>The given plate type ID could not be found or does not exist.</Description>
     </DefinedExecutionError>
 
     <DefinedExecutionError>
