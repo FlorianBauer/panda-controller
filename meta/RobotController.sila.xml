@@ -138,15 +138,24 @@
             </DataType>
         </Parameter>
         <Parameter>
-            <Identifier>PlateType</Identifier>
-            <DisplayName>Plate Type</DisplayName>
-            <Description>The plate type to grab.</Description>
+            <Identifier>PlateTypeId</Identifier>
+            <DisplayName>Plate Type ID</DisplayName>
+            <Description>The ID for the plate type to grab.</Description>
             <DataType>
-                <Basic>String</Basic>
+                <Constrained>
+                    <DataType>
+                        <Basic>String</Basic>
+                    </DataType>
+                    <Constraints>
+                        <MaximalLength>255</MaximalLength>
+                        <Pattern>[a-zA-Z0-9_'-]+</Pattern>
+                    </Constraints>
+                </Constrained>
             </DataType>
         </Parameter>
         <DefinedExecutionErrors>
             <Identifier>SiteIdNotFound</Identifier>
+            <Identifier>PlateTypeIdNotFound</Identifier>
             <Identifier>InvalidPose</Identifier>
         </DefinedExecutionErrors>
     </Command>
@@ -164,25 +173,8 @@
                 <DataTypeIdentifier>SiteId</DataTypeIdentifier>
             </DataType>
         </Parameter>
-        <Parameter>
-            <Identifier>PlateTypeId</Identifier>
-            <DisplayName>Plate Type ID</DisplayName>
-            <Description>The ID for the plate type to grab.</Description>
-            <DataType>
-                <Constrained>
-                    <DataType>
-                        <Basic>String</Basic>
-                    </DataType>
-                    <Constraints>
-                        <MaximalLength>255</MaximalLength>
-                        <Pattern>[a-zA-Z0-9_'-]+</Pattern>
-                    </Constraints>
-                </Constrained>
-            </DataType>
-        </Parameter>
         <DefinedExecutionErrors>
             <Identifier>SiteNotFound</Identifier>
-            <Identifier>PlateTypeIdNotFound</Identifier>
             <Identifier>InvalidPose</Identifier>
         </DefinedExecutionErrors>
     </Command>
