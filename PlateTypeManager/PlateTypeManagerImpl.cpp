@@ -157,7 +157,12 @@ bool CPlateTypeManagerImpl::hasPlateTypeId(const std::string& plateTypeId) const
     return (m_JsonLabwares.find(plateTypeId) != m_JsonLabwares.cend());
 }
 
-Plate CPlateTypeManagerImpl::getPlate(const std::string& plateTypeId) const {
+Plate CPlateTypeManagerImpl::createPlate(const std::string& plateTypeId) const {
     const std::map<std::string, json>::const_iterator iter = m_JsonLabwares.find(plateTypeId);
     return Plate{iter->second};
+}
+
+std::shared_ptr<Plate> CPlateTypeManagerImpl::createSharedPlate(const std::string& plateTypeId) const {
+    const std::map<std::string, json>::const_iterator iter = m_JsonLabwares.find(plateTypeId);
+    return std::make_shared<Plate>(iter->second);
 }

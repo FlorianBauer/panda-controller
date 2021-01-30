@@ -116,7 +116,8 @@ public:
     sila2::de::fau::robot::platetypemanager::v1::DeletePlateType_Responses DeletePlateType(DeletePlateTypeWrapper* command);
 
     bool hasPlateTypeId(const std::string& plateTypeId) const;
-    Plate getPlate(const std::string& plateTypeId) const;
+    Plate createPlate(const std::string& plateTypeId) const;
+    std::shared_ptr<Plate> createSharedPlate(const std::string& plateTypeId) const;
 
 private:
     GetPlateTypeCommand m_GetPlateTypeCommand;
