@@ -398,6 +398,8 @@ private:
     moveit::planning_interface::MoveGroupInterface m_Arm{PANDA_ARM};
     moveit::planning_interface::MoveGroupInterface m_Gripper{PANDA_HAND};
     moveit::planning_interface::PlanningSceneInterface m_PlanningScene;
+    bool m_IsOnTransport = false;
+    std::shared_ptr<Plate> m_TransportedPlatePtr;
 
     void openGripper(trajectory_msgs::JointTrajectory& posture, double width);
     void closeGripper(trajectory_msgs::JointTrajectory& posture);

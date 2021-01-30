@@ -186,41 +186,61 @@ PickPlate_Responses CRobotControllerImpl::PickPlate(PickPlateWrapper* command) {
         throw ERROR_SITE_ID_NOT_FOUND;
     }
 
-    const std::string& plateTypeId = request.platetype().value();
+    const std::string& plateTypeId = request.platetypeid().value();
     if (!m_PlateTypeManagerPtr->hasPlateTypeId(plateTypeId)) {
         throw ERROR_PLATE_TYPE_ID_NOT_FOUND;
     }
 
+    if (m_IsOnTransport) {
+        throw SiLA2::CExecutionError("Gripper is already holding a plate.");
+    }
+
     Site site = m_SiteManagerPtr->getSite(siteId);
+    m_TransportedPlatePtr = m_PlateTypeManagerPtr->createSharedPlate(plateTypeId);
+    m_TransportedPlatePtr->putAtSite(site);
+    m_PlanningScene.applyCollisionObject(m_TransportedPlatePtr->getCollisonObject());
     moveit_msgs::Grasp grasp = site.getGrasp();
-
-    Plate plate = m_PlateTypeManagerPtr->getPlate(plateTypeId);
-    plate.putAtSite(site);
-    m_PlanningScene.applyCollisionObject(plate.getCollisonObject());
-
-    openGripper(grasp.pre_grasp_posture, plate.getDimY());
+    openGripper(grasp.pre_grasp_posture, m_TransportedPlatePtr->getDimY());
     closeGripper(grasp.grasp_posture);
     command->setExecutionInfo(SiLA2::CReal{0.5});
-    const MoveItErrorCode err = m_Arm.pick(plate.getObjectId(), grasp);
+    const MoveItErrorCode err = m_Arm.pick(m_TransportedPlatePtr->getObjectId(), grasp);
     if (err != MoveItErrorCode::SUCCESS) {
         throw SiLA2::CExecutionError("Could not pick plate.");
     }
-
+    m_IsOnTransport = true;
+    site.setOccupied(false);
     command->executionFinished(SiLA2::CommandStatus::FINISHED_SUCCESSFULLY);
 
     return PickPlate_Responses{};
 }
 
 PlacePlate_Responses CRobotControllerImpl::PlacePlate(PlacePlateWrapper* command) {
-    const auto Request = command->parameters();
-    qDebug() << "Request contains:" << Request;
-    // TODO: Validate request parameters...
+    const auto request = command->parameters();
+    qDebug() << "Request contains:" << request;
+    const std::string& siteId = request.siteid().siteid().value();
+    if (!m_SiteManagerPtr->hasSiteId(siteId)) {
+        throw ERROR_SITE_ID_NOT_FOUND;
+    }
 
-    // TODO: Write actual Command implementation logic...
+    if (!m_IsOnTransport) {
+        throw SiLA2::CExecutionError("Nothing to place.");
+    }
 
-    auto Response = PlacePlate_Responses{};
-    // TODO: Fill the response fields
-    return Response;
+    Site site = m_SiteManagerPtr->getSite(siteId);
+    moveit_msgs::Grasp grasp = site.getGrasp();
+    openGripper(grasp.pre_grasp_posture, m_TransportedPlatePtr->getDimY());
+    command->setExecutionInfo(SiLA2::CReal{0.5});
+    const MoveItErrorCode err = m_Arm.place(m_TransportedPlatePtr->getObjectId(), {
+        site.getPlaceLocation()
+    });
+    if (err != MoveItErrorCode::SUCCESS) {
+        throw SiLA2::CExecutionError("Could not place plate.");
+    }
+    m_TransportedPlatePtr->putAtSite(site);
+    m_IsOnTransport = false;
+    command->executionFinished(SiLA2::CommandStatus::FINISHED_SUCCESSFULLY);
+
+    return PlacePlate_Responses{};
 }
 
 IsSiteOccupied_Responses CRobotControllerImpl::IsSiteOccupied(IsSiteOccupiedWrapper* command) {
