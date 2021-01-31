@@ -81,7 +81,8 @@ _Additional links:_
 clone --recurse-submodules https://gitlab.com/SiLA2/sila_cpp.git
 ```
 
-2. Build `sila_cpp`
+2. Build `sila_cpp`. Ensure the `LOCAL_INSTALL_DIR` environment variable is still set. (Set with 
+`export LOCAL_INSTALL_DIR=$HOME/.local`)
 ```bash
 cd path/to/sila_cpp
 mkdir build && cd build
