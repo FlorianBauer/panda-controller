@@ -119,12 +119,12 @@ public:
     Site getSite(const std::string& siteId) const;
 
 private:
+    static const std::filesystem::path m_SitesDir;
     GetSiteCommand m_GetSiteCommand;
     SetSiteCommand m_SetSiteCommand;
     DeleteSiteCommand m_DeleteSiteCommand;
     SitesProperty m_SitesProperty;
     std::map<std::string, nlohmann::json> m_JsonSites;
-    const std::filesystem::path m_SitesDir;
 
     static std::map<std::string, nlohmann::json> loadSiteFilesToMap();
 };

@@ -19,6 +19,7 @@ using namespace sila2::de::fau::robot::sitemanager::v1;
 using json = nlohmann::json;
 
 constexpr double CM_TO_M = 0.01;
+const std::filesystem::path CSiteManagerImpl::m_SitesDir{FileManager::getAppDir() / SITES_DIR};
 
 /**
  * Loads the JSON formatted site files from the `site` directory into a map.
@@ -56,8 +57,7 @@ m_GetSiteCommand{this, "GetSite"},
 m_SetSiteCommand{this, "SetSite"},
 m_DeleteSiteCommand{this, "DeleteSite"},
 m_SitesProperty{this, "Sites"},
-m_JsonSites(loadSiteFilesToMap()),
-m_SitesDir(FileManager::getAppDir() / SITES_DIR) {
+m_JsonSites(loadSiteFilesToMap()) {
 
     std::vector<SiLA2::CString> siteIds;
     for (auto const& elem : m_JsonSites) {

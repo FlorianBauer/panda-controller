@@ -18,6 +18,7 @@ using namespace sila2::de::fau::robot::platetypemanager::v1;
 using json = nlohmann::json;
 
 constexpr double CM_TO_M = 0.01;
+const fs::path CPlateTypeManagerImpl::m_LabwareDir{FileManager::getAppDir() / LABWARE_DIR};
 
 /**
  * Loads the JSON formatted labware files from the `labware` directory into a map.
@@ -54,11 +55,8 @@ CPlateTypeManagerImpl::CPlateTypeManagerImpl(SiLA2::CSiLAServer* parent)
 m_GetPlateTypeCommand{this, "GetPlateType"},
 m_SetPlateTypeCommand{this, "SetPlateType"},
 m_DeletePlateTypeCommand{this, "DeletePlateType"},
-m_PlateTypesProperty{this, "PlateTypes"}
-
-,
-m_JsonLabwares(loadLabwareFilesToMap()),
-m_LabwareDir(FileManager::getAppDir() / LABWARE_DIR) {
+m_PlateTypesProperty{this, "PlateTypes"},
+m_JsonLabwares(loadLabwareFilesToMap()) {
 
     std::vector<SiLA2::CString> plateTypes;
     for (auto const& elem : m_JsonLabwares) {

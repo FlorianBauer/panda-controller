@@ -120,12 +120,12 @@ public:
     std::shared_ptr<Plate> createSharedPlate(const std::string& plateTypeId) const;
 
 private:
+    static const std::filesystem::path m_LabwareDir;
     GetPlateTypeCommand m_GetPlateTypeCommand;
     SetPlateTypeCommand m_SetPlateTypeCommand;
     DeletePlateTypeCommand m_DeletePlateTypeCommand;
     PlateTypesProperty m_PlateTypesProperty;
     std::map<std::string, nlohmann::json> m_JsonLabwares;
-    const std::filesystem::path m_LabwareDir;
 
     static std::map<std::string, nlohmann::json> loadLabwareFilesToMap();
 };
