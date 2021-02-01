@@ -29,8 +29,9 @@ public:
 
     Site(const std::string& identifier, const geometry_msgs::Pose& pose);
     Site(const nlohmann::json& jsonStruct);
-    Site(const Site& orig);
-    virtual ~Site();
+    Site(const Site& orig) = default;
+    Site(Site&& orig) = default;
+    virtual ~Site() = default;
 
     const std::string& getId() const;
     geometry_msgs::PoseStamped getPose() const;

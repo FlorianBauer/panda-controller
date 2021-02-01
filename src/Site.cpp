@@ -90,12 +90,6 @@ Site::Site(const json& jsonStruct) {
     grasp.grasp_posture.joint_names[1] = PANDA_FINGER_2;
 }
 
-Site::Site(const Site& orig) {
-}
-
-Site::~Site() {
-}
-
 /**
  * Get the identifier of the site.
  * 

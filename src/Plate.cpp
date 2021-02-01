@@ -52,18 +52,6 @@ Plate::Plate(const json& jsonStruct) {
 }
 
 /**
- * Copy-Constructor.
- */
-Plate::Plate(const Plate& orig) {
-}
-
-/**
- * Destructor.
- */
-Plate::~Plate() {
-}
-
-/**
  * Sets the position of this plate to the corresponding `Site`. The `Site` is then marked as 
  * occupied.
  * 

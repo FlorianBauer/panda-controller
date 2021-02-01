@@ -20,8 +20,8 @@ public:
 
     Plate(const std::string& typeId, double lengthInM, double widthInM, double heightInM);
     Plate(const nlohmann::json& jsonStruct);
-    Plate(const Plate& orig);
-    virtual ~Plate();
+    Plate(const Plate& orig) = default;
+    virtual ~Plate() = default;
 
     void putAtSite(Site& site);
     const std::string& getObjectId() const;
