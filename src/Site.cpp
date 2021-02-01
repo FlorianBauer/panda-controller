@@ -30,11 +30,11 @@ Site::Site(const std::string& identifier, const geometry_msgs::Pose& pose) {
 
     grasp.pre_grasp_posture.joint_names.resize(2);
     grasp.pre_grasp_posture.joint_names[0] = PANDA_FINGER_1;
-    grasp.pre_grasp_posture.joint_names[1] = PANDA_FINGER_1;
+    grasp.pre_grasp_posture.joint_names[1] = PANDA_FINGER_2;
 
     grasp.grasp_posture.joint_names.resize(2);
     grasp.grasp_posture.joint_names[0] = PANDA_FINGER_1;
-    grasp.grasp_posture.joint_names[1] = PANDA_FINGER_1;
+    grasp.grasp_posture.joint_names[1] = PANDA_FINGER_2;
 }
 
 Site::Site(const json& jsonStruct) {
@@ -83,11 +83,11 @@ Site::Site(const json& jsonStruct) {
 
     grasp.pre_grasp_posture.joint_names.resize(2);
     grasp.pre_grasp_posture.joint_names[0] = PANDA_FINGER_1;
-    grasp.pre_grasp_posture.joint_names[1] = PANDA_FINGER_1;
+    grasp.pre_grasp_posture.joint_names[1] = PANDA_FINGER_2;
 
     grasp.grasp_posture.joint_names.resize(2);
     grasp.grasp_posture.joint_names[0] = PANDA_FINGER_1;
-    grasp.grasp_posture.joint_names[1] = PANDA_FINGER_1;
+    grasp.grasp_posture.joint_names[1] = PANDA_FINGER_2;
 }
 
 Site::Site(const Site& orig) {
