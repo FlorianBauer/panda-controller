@@ -3,6 +3,7 @@
 
 #include <string>
 #include <ros/ros.h>
+#include <geometry_msgs/Pose.h>
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <nlohmann/json.hpp>
 #include "Site.h"
@@ -27,6 +28,8 @@ public:
     const std::string& getObjectId() const;
     const std::string& getTypeId() const;
     moveit_msgs::CollisionObject& getCollisonObject();
+    void setPosition(const geometry_msgs::Pose::_position_type& position);
+    void setOrientation(const geometry_msgs::Pose::_orientation_type& orientation);
     double getDimX() const;
     double getDimY() const;
     double getDimZ() const;

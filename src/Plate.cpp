@@ -21,6 +21,7 @@ Plate::Plate(const std::string& typeName, double dimX, double dimY, double dimZ)
     typeId = typeName;
     plateObject.id = typeName + "_" + std::to_string(++instanceIdCounter);
     plateObject.header.frame_id = PANDA_LINK_BASE;
+    plateObject.primitive_poses.resize(1);
 
     plateObject.primitives.resize(1);
     plateObject.primitives[0].type = shape_msgs::SolidPrimitive::BOX;
@@ -39,6 +40,7 @@ Plate::Plate(const json& jsonStruct) {
     typeId = jsonStruct[PLATE_TYPE_ID].get<std::string>();
     plateObject.id = typeId + "_" + std::to_string(++instanceIdCounter);
     plateObject.header.frame_id = PANDA_LINK_BASE;
+    plateObject.primitive_poses.resize(1);
 
     plateObject.primitives.resize(1);
     plateObject.primitives[0].type = shape_msgs::SolidPrimitive::BOX;
@@ -91,6 +93,24 @@ const std::string& Plate::getTypeId() const {
  */
 moveit_msgs::CollisionObject& Plate::getCollisonObject() {
     return plateObject;
+}
+
+/**
+ * Set the position of the `CollisionObject`.
+ * 
+ * @param position The new position of the `CollisionObject`.
+ */
+void Plate::setPosition(const geometry_msgs::Pose::_position_type& position) {
+    plateObject.primitive_poses[0].position = position;
+}
+
+/**
+ * Set the orientation of the `CollisionObject`.
+ * 
+ * @param orientation The new orientation of the `CollisionObject`.
+ */
+void Plate::setOrientation(const geometry_msgs::Pose::_orientation_type& orientation) {
+    plateObject.primitive_poses[0].orientation = orientation;
 }
 
 /**
