@@ -19,7 +19,7 @@ static unsigned instanceIdCounter = 0;
  */
 Plate::Plate(const std::string& typeName, double dimX, double dimY, double dimZ) {
     typeId = typeName;
-    plateObject.id = typeName + std::to_string(++instanceIdCounter);
+    plateObject.id = typeName + "_" + std::to_string(++instanceIdCounter);
     plateObject.header.frame_id = PANDA_LINK_BASE;
 
     plateObject.primitives.resize(1);
@@ -37,7 +37,7 @@ Plate::Plate(const std::string& typeName, double dimX, double dimY, double dimZ)
  */
 Plate::Plate(const json& jsonStruct) {
     typeId = jsonStruct[PLATE_TYPE_ID].get<std::string>();
-    plateObject.id = typeId + std::to_string(++instanceIdCounter);
+    plateObject.id = typeId + "_" + std::to_string(++instanceIdCounter);
     plateObject.header.frame_id = PANDA_LINK_BASE;
 
     plateObject.primitives.resize(1);
