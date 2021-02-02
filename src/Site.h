@@ -27,13 +27,14 @@ public:
     static constexpr char DIR_Y[] = "dirY";
     static constexpr char DIR_Z[] = "dirZ";
 
-    Site(const std::string& identifier, const geometry_msgs::Pose& pose);
+    Site(const std::string& identifier);
     Site(const nlohmann::json& jsonStruct);
     Site(const Site& orig) = default;
     Site(Site&& orig) = default;
     virtual ~Site() = default;
 
     const std::string& getId() const;
+    void setPose(const geometry_msgs::Pose& pose);
     geometry_msgs::PoseStamped getPose() const;
     moveit_msgs::GripperTranslation getApproach() const;
     moveit_msgs::GripperTranslation getRetreat() const;
