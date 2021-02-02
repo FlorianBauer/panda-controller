@@ -229,6 +229,7 @@ void Site::putPlate(std::shared_ptr<Plate> platePtr) {
 }
 
 void Site::removePlate() {
+    platePtr.reset();
     isSiteOccupied = false;
 }
 
