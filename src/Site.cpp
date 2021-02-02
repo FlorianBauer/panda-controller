@@ -218,5 +218,20 @@ bool Site::isOccupied() const {
 }
 
 void Site::setOccupied(bool isInUse) {
-    isInUse = isInUse;
+    isSiteOccupied = isInUse;
+}
+
+void Site::putPlate(std::shared_ptr<Plate> platePtr) {
+    this->platePtr = platePtr;
+    this->platePtr->setPosition(locationPose.position);
+    // this->platePtr->setOrientation(locationPose.orientation);
+    isSiteOccupied = true;
+}
+
+void Site::removePlate() {
+    isSiteOccupied = false;
+}
+
+std::shared_ptr<Plate> Site::getPlate() const {
+    return platePtr;
 }

@@ -1,11 +1,13 @@
 #ifndef SITE_H
 #define SITE_H
 
+#include <memory>
 #include <string>
 #include <ros/ros.h>
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <nlohmann/json.hpp>
+#include "Plate.h"
 
 class Site {
 public:
@@ -36,15 +38,19 @@ public:
     const std::string& getId() const;
     void setPose(const geometry_msgs::Pose& pose);
     geometry_msgs::PoseStamped getPose() const;
+    void setApproach(const moveit_msgs::GripperTranslation& approach);
     moveit_msgs::GripperTranslation getApproach() const;
+    void setRetreat(const moveit_msgs::GripperTranslation& retreat);
     moveit_msgs::GripperTranslation getRetreat() const;
     moveit_msgs::Grasp getGrasp() const;
     moveit_msgs::PlaceLocation getPlaceLocation() const;
     nlohmann::json toJson() const;
-    void setApproach(const moveit_msgs::GripperTranslation& approach);
-    void setRetreat(const moveit_msgs::GripperTranslation& retreat);
+
     bool isOccupied() const;
     void setOccupied(bool isInUse);
+    void putPlate(std::shared_ptr<Plate> platePtr);
+    void removePlate();
+    std::shared_ptr<Plate> getPlate() const;
 
 private:
     std::string id;
@@ -54,6 +60,7 @@ private:
     bool hasApproach = false;
     bool hasRetreat = false;
     bool isSiteOccupied = false;
+    std::shared_ptr<Plate> platePtr;
 };
 
 #endif /* SITE_H */
