@@ -6,7 +6,6 @@
 #include <geometry_msgs/Pose.h>
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <nlohmann/json.hpp>
-#include "Site.h"
 
 class Plate {
 public:
@@ -24,7 +23,6 @@ public:
     Plate(const Plate& orig) = default;
     virtual ~Plate() = default;
 
-    void putAtSite(Site& site);
     const std::string& getObjectId() const;
     const std::string& getTypeId() const;
     moveit_msgs::CollisionObject& getCollisonObject();

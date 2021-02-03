@@ -53,21 +53,21 @@ public:
     : SiLA2::CSiLAServer{ServerInfo, Address}
     {
         qDebug() << "Registering features...";
-        registerFeature(siteManagerPtr.get(), SiLA2::CFeatureID{SiteManager::service_full_name()},
-        CSiteManagerImpl::featureDefinition());
         registerFeature(plateTypeManagerPtr.get(), SiLA2::CFeatureID{PlateTypeManager::service_full_name()},
         CPlateTypeManagerImpl::featureDefinition());
+        registerFeature(siteManagerPtr.get(), SiLA2::CFeatureID{SiteManager::service_full_name()},
+        CSiteManagerImpl::featureDefinition());
         registerFeature(robotControllePtr.get(), SiLA2::CFeatureID{RobotController::service_full_name()},
         CRobotControllerImpl::featureDefinition());
     }
 
 private:
+       const std::shared_ptr<CPlateTypeManagerImpl> plateTypeManagerPtr{new CPlateTypeManagerImpl
+        {this}};
     const std::shared_ptr<CSiteManagerImpl> siteManagerPtr{new CSiteManagerImpl
-        {this}};
-    const std::shared_ptr<CPlateTypeManagerImpl> plateTypeManagerPtr{new CPlateTypeManagerImpl
-        {this}};
+        {this, plateTypeManagerPtr}};
     const std::shared_ptr<CRobotControllerImpl> robotControllePtr{new CRobotControllerImpl
-        {this, siteManagerPtr, plateTypeManagerPtr}};
+        {this, siteManagerPtr}};
 };
 
 /**

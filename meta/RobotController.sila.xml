@@ -120,7 +120,6 @@
         </Parameter>
         <DefinedExecutionErrors>
             <Identifier>SiteIdNotFound</Identifier>
-            <Identifier>LostPlate</Identifier>
         </DefinedExecutionErrors>
     </Command>
 
@@ -137,25 +136,9 @@
                 <DataTypeIdentifier>SiteId</DataTypeIdentifier>
             </DataType>
         </Parameter>
-        <Parameter>
-            <Identifier>PlateTypeId</Identifier>
-            <DisplayName>Plate Type ID</DisplayName>
-            <Description>The ID for the plate type to grab.</Description>
-            <DataType>
-                <Constrained>
-                    <DataType>
-                        <Basic>String</Basic>
-                    </DataType>
-                    <Constraints>
-                        <MaximalLength>255</MaximalLength>
-                        <Pattern>[a-zA-Z0-9_'-]+</Pattern>
-                    </Constraints>
-                </Constrained>
-            </DataType>
-        </Parameter>
         <DefinedExecutionErrors>
             <Identifier>SiteIdNotFound</Identifier>
-            <Identifier>PlateTypeIdNotFound</Identifier>
+            <Identifier>SiteIsEmpty</Identifier>
             <Identifier>InvalidPose</Identifier>
         </DefinedExecutionErrors>
     </Command>
@@ -163,7 +146,7 @@
     <Command>
         <Identifier>PlacePlate</Identifier>
         <DisplayName>Place Plate</DisplayName>
-        <Description>Place a plate on a given site.</Description>
+        <Description>Places the currently grabbed plate on a given site.</Description>
         <Observable>Yes</Observable>
         <Parameter>
             <Identifier>SiteId</Identifier>
@@ -174,34 +157,9 @@
             </DataType>
         </Parameter>
         <DefinedExecutionErrors>
-            <Identifier>SiteNotFound</Identifier>
-            <Identifier>InvalidPose</Identifier>
-        </DefinedExecutionErrors>
-    </Command>
-
-    <Command>
-        <Identifier>IsSiteOccupied</Identifier>
-        <DisplayName>Is Site Occupied</DisplayName>
-        <Description>Check if the given site is currently occupied with a sample.</Description>
-        <Observable>No</Observable>
-        <Parameter>
-            <Identifier>SiteId</Identifier>
-            <DisplayName>Site ID</DisplayName>
-            <Description>The Site to check.</Description>
-            <DataType>
-                <DataTypeIdentifier>SiteId</DataTypeIdentifier>
-            </DataType>
-        </Parameter>
-        <Response>
-            <Identifier>IsOccupied</Identifier>
-            <DisplayName>Is Occupied</DisplayName>
-            <Description>Boolean describing if site is occupied or not.</Description>
-            <DataType>
-                <Basic>Boolean</Basic>
-            </DataType>
-        </Response>
-        <DefinedExecutionErrors>
             <Identifier>SiteIdNotFound</Identifier>
+            <Identifier>SiteAlreadyOccupied</Identifier>
+            <Identifier>InvalidPose</Identifier>
         </DefinedExecutionErrors>
     </Command>
 
@@ -597,6 +555,18 @@
         <Identifier>SiteIdNotFound</Identifier>
         <DisplayName>Site ID not found</DisplayName>
         <Description>The given Site ID does not exist or could not be found.</Description>
+    </DefinedExecutionError>
+
+    <DefinedExecutionError>
+        <Identifier>SiteAlreadyOccupied</Identifier>
+        <DisplayName>Site already occupied</DisplayName>
+        <Description>The given site is already occupied by another item.</Description>
+    </DefinedExecutionError>
+
+    <DefinedExecutionError>
+        <Identifier>SiteIsEmpty</Identifier>
+        <DisplayName>Site is empty</DisplayName>
+        <Description>Can not remove a item from a empty site.</Description>
     </DefinedExecutionError>
 
     <DefinedExecutionError>

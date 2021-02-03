@@ -54,21 +54,6 @@ Plate::Plate(const json& jsonStruct) {
 }
 
 /**
- * Sets the position of this plate to the corresponding `Site`. The `Site` is then marked as 
- * occupied.
- * 
- * @param site The `Site` to place this plate at.
- */
-void Plate::putAtSite(Site& site) {
-    site.setOccupied(true);
-    plateObject.primitive_poses.resize(1);
-    const geometry_msgs::PoseStamped& pose = site.getPose();
-    // The orientation is just meant for the gripper, so we ignore it and use just the position.
-    plateObject.primitive_poses[0].position = pose.pose.position;
-    plateObject.operation = moveit_msgs::CollisionObject::ADD;
-}
-
-/**
  * Get the unique identifier of this object.
  * 
  * @return The identifier as string.

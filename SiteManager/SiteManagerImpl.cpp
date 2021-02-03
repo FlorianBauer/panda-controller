@@ -22,25 +22,20 @@ constexpr double CM_TO_M = 0.01;
 const std::filesystem::path CSiteManagerImpl::m_SitesDir{FileManager::getAppDir() / SITES_DIR};
 
 /**
- * Loads the JSON formatted site files from the `site` directory into a map.
+ *  Loads the JSON formatted site files from the `site` directory into a map.
  * 
- * @return A map where the site ID is the key and the json struct the value.
+ * @param[out] sites The map where the loaded sites get put in.
  */
-std::map<std::string, json> CSiteManagerImpl::loadSiteFilesToMap() {
-    const fs::path appDir = FileManager::getAppDir();
-    const fs::path sitesDir = appDir / SITES_DIR;
-    FileManager::checkAndCreateDir(sitesDir);
-
-    std::map<std::string, json> sites;
-    const std::vector<fs::path> sitesFiles = FileManager::collectJsonFilesFromDir(sitesDir);
-    for (const auto& file : sitesFiles) {
+void CSiteManagerImpl::loadSiteFilesIntoMap(std::map<std::string, Site>& sites) {
+    const std::vector<fs::path> siteFiles = FileManager::collectJsonFilesFromDir(m_SitesDir);
+    for (const auto& file : siteFiles) {
         // read a JSON file
         std::ifstream jsonStream(file);
         json jsonStruct;
         try {
             jsonStream >> jsonStruct;
             const std::string& id = jsonStruct[Site::SITE_ID].get<std::string>();
-            sites[id] = jsonStruct;
+            sites.insert({id, Site(jsonStruct)});
         } catch (const std::exception& ex) {
             jsonStream.close();
             std::cerr << "Could not load: " << file << "\n" << ex.what() << "\n";
@@ -48,19 +43,24 @@ std::map<std::string, json> CSiteManagerImpl::loadSiteFilesToMap() {
         }
         jsonStream.close();
     }
-    return sites;
 }
 
-CSiteManagerImpl::CSiteManagerImpl(SiLA2::CSiLAServer* parent)
+CSiteManagerImpl::CSiteManagerImpl(SiLA2::CSiLAServer* parent,
+        const std::shared_ptr<CPlateTypeManagerImpl> plateTypeManagerPtr)
 : CSiLAFeature{parent},
+m_PlateTypeManagerPtr{plateTypeManagerPtr},
 m_GetSiteCommand{this, "GetSite"},
 m_SetSiteCommand{this, "SetSite"},
 m_DeleteSiteCommand{this, "DeleteSite"},
-m_SitesProperty{this, "Sites"},
-m_JsonSites(loadSiteFilesToMap()) {
-
+m_IsSiteOccupiedCommand{this, "IsSiteOccupied"},
+m_PutPlateOnSiteCommand{this, "PutPlateToSite"},
+m_RemovePlateFromSiteCommand{this, "RemovePlateFromSite"},
+m_SitesProperty{this, "Sites"}
+{
+    FileManager::checkAndCreateDir(m_SitesDir);
+    loadSiteFilesIntoMap(m_Sites);
     std::vector<SiLA2::CString> siteIds;
-    for (auto const& elem : m_JsonSites) {
+    for (auto const& elem : this->m_Sites) {
         // collect IDs
         siteIds.push_back(SiLA2::CString(elem.first));
     }
@@ -68,6 +68,9 @@ m_JsonSites(loadSiteFilesToMap()) {
     m_GetSiteCommand.setExecutor(this, &CSiteManagerImpl::GetSite);
     m_SetSiteCommand.setExecutor(this, &CSiteManagerImpl::SetSite);
     m_DeleteSiteCommand.setExecutor(this, &CSiteManagerImpl::DeleteSite);
+    m_IsSiteOccupiedCommand.setExecutor(this, &CSiteManagerImpl::IsSiteOccupied);
+    m_PutPlateOnSiteCommand.setExecutor(this, &CSiteManagerImpl::PutPlateOnSite);
+    m_RemovePlateFromSiteCommand.setExecutor(this, &CSiteManagerImpl::RemovePlateFromSite);
 }
 
 GetSite_Responses CSiteManagerImpl::GetSite(GetSiteWrapper* command) {
@@ -80,7 +83,7 @@ GetSite_Responses CSiteManagerImpl::GetSite(GetSiteWrapper* command) {
     /* TODO: This is just a temporary hack where all values gat dumped into a string just to be 
      * able to show them to the user. (2021-01-27, florian.bauer.dev@gmail.com) 
      */
-    const Site site = getSite(siteId);
+    const Site& site = getSite(siteId);
     auto response = GetSite_Responses{};
     response.mutable_site()->set_value(site.toJson().dump());
     return response;
@@ -89,43 +92,50 @@ GetSite_Responses CSiteManagerImpl::GetSite(GetSiteWrapper* command) {
 SetSite_Responses CSiteManagerImpl::SetSite(SetSiteWrapper* command) {
     const auto request = command->parameters();
     const std::string& idToSet = request.siteid().siteid().value();
-    const auto iter = m_JsonSites.find(idToSet);
-    json jsonStruct;
-    const bool isSiteIdInList = (iter != m_JsonSites.cend());
+    const auto iter = m_Sites.find(idToSet);
+    const bool isSiteIdInList = (iter != m_Sites.cend());
     if (!isSiteIdInList) {
         // Add a new ID to property list.
         m_SitesProperty.append(request.siteid().siteid());
-        jsonStruct[Site::SITE_ID] = idToSet;
-    } else {
-        jsonStruct = iter->second;
     }
 
+    Site site = (!isSiteIdInList) ? Site(idToSet) : iter->second;
     const auto& pose = request.pose().pose();
-    jsonStruct[Site::POSE] = {
-        {Site::POS_X, pose.x().value()},
-        {Site::POS_Y, pose.y().value()},
-        {Site::POS_Z, pose.z().value()},
-        {Site::ORI_X, pose.orix().value()},
-        {Site::ORI_Y, pose.oriy().value()},
-        {Site::ORI_Z, pose.oriz().value()},
-        {Site::ORI_W, pose.oriw().value()},
-    };
+    geometry_msgs::Pose rosPose;
+    rosPose.position.x = pose.x().value();
+    rosPose.position.y = pose.y().value();
+    rosPose.position.z = pose.z().value();
+    rosPose.orientation.x = pose.orix().value();
+    rosPose.orientation.y = pose.oriy().value();
+    rosPose.orientation.z = pose.oriz().value();
+    rosPose.orientation.w = pose.oriw().value();
+    site.setPose(rosPose);
 
     const auto& approachMove = request.approach().relativemove();
-    jsonStruct[Site::APPROACH] = {
-        {Site::DESIRED_DIST, approachMove.desireddist().value() * CM_TO_M},
-        {Site::MIN_DIST, approachMove.mindist().value() * CM_TO_M},
-        {Site::DIR_X, approachMove.x().value() * CM_TO_M},
-        {Site::DIR_Y, approachMove.y().value() * CM_TO_M},
-        {Site::DIR_Z, approachMove.z().value() * CM_TO_M},
-    };
+    moveit_msgs::GripperTranslation approach;
+    approach.desired_distance = approachMove.desireddist().value() * CM_TO_M;
+    approach.min_distance = approachMove.mindist().value() * CM_TO_M;
+    approach.direction.vector.x = approachMove.x().value() * CM_TO_M;
+    approach.direction.vector.y = approachMove.y().value() * CM_TO_M;
+    approach.direction.vector.z = approachMove.z().value() * CM_TO_M;
+    site.setApproach(approach);
+
+    if (!request.retreat().empty()) {
+        const auto& retreatMove = request.retreat().at(0).relativemove();
+        moveit_msgs::GripperTranslation retreat;
+        retreat.desired_distance = retreatMove.desireddist().value() * CM_TO_M;
+        retreat.min_distance = retreatMove.mindist().value() * CM_TO_M;
+        retreat.direction.vector.x = retreatMove.x().value() * CM_TO_M;
+        retreat.direction.vector.y = retreatMove.y().value() * CM_TO_M;
+        retreat.direction.vector.z = retreatMove.z().value() * CM_TO_M;
+        site.setRetreat(retreat);
+    }
 
     // Add/update entry in map.
-    m_JsonSites[idToSet] = jsonStruct;
-
+    m_Sites.insert({idToSet, site});
     // Write JSON data to file.
     const fs::path jsonFile = m_SitesDir / (idToSet + JSON_FILE_EXT);
-    FileManager::saveJsonToFile(jsonStruct, jsonFile);
+    FileManager::saveJsonToFile(site.toJson(), jsonFile);
 
     return SetSite_Responses{};
 }
@@ -133,12 +143,12 @@ SetSite_Responses CSiteManagerImpl::SetSite(SetSiteWrapper* command) {
 DeleteSite_Responses CSiteManagerImpl::DeleteSite(DeleteSiteWrapper* command) {
     const auto request = command->parameters();
     const std::string& idToDelete = request.siteid().siteid().value();
-    const auto iter = m_JsonSites.find(idToDelete);
-    const bool isSiteIdInList = (iter != m_JsonSites.cend());
+    const auto iter = m_Sites.find(idToDelete);
+    const bool isSiteIdInList = (iter != m_Sites.cend());
     if (isSiteIdInList) {
-        m_JsonSites.erase(iter);
+        m_Sites.erase(iter);
         std::vector<SiLA2::CString> siteIds;
-        for (auto const& elem : m_JsonSites) {
+        for (auto const& elem : m_Sites) {
             // collect IDs
             siteIds.push_back(SiLA2::CString(elem.first));
         }
@@ -152,6 +162,68 @@ DeleteSite_Responses CSiteManagerImpl::DeleteSite(DeleteSiteWrapper* command) {
     return DeleteSite_Responses{};
 }
 
+IsSiteOccupied_Responses CSiteManagerImpl::IsSiteOccupied(IsSiteOccupiedWrapper* command) {
+    const auto request = command->parameters();
+    qDebug() << "Request contains:" << request;
+    const std::string& id = request.siteid().siteid().value();
+
+    if (!hasSiteId(id)) {
+        throw ERROR_SITE_ID_NOT_FOUND;
+    }
+
+    const Site& site = getSite(id);
+    auto response = IsSiteOccupied_Responses{};
+    response.mutable_isoccupied()->set_value(site.isOccupied());
+    return response;
+}
+
+PutPlateOnSite_Responses CSiteManagerImpl::PutPlateOnSite(PutPlateOnSiteWrapper* command) {
+    const auto request = command->parameters();
+    qDebug() << "Request contains:" << request;
+    const std::string& plateTypeId = request.platetypeid().platetypeid().value();
+    if (!m_PlateTypeManagerPtr->hasPlateTypeId(plateTypeId)) {
+        throw ERROR_PLATE_TYPE_ID_NOT_FOUND;
+    }
+
+    const std::string& siteId = request.siteid().siteid().value();
+    if (!hasSiteId(siteId)) {
+        throw ERROR_SITE_ID_NOT_FOUND;
+    }
+
+    Site& site = getSite(siteId);
+    if (site.isOccupied()) {
+        throw ERROR_ALREADY_OCCUPIED;
+    }
+
+    auto plate = m_PlateTypeManagerPtr->createSharedPlate(plateTypeId);
+    site.putPlate(plate);
+    m_PlanningScene.applyCollisionObject(plate->getCollisonObject());
+    site.setOccupied(true);
+
+    return PutPlateOnSite_Responses{};
+}
+
+RemovePlateFromSite_Responses CSiteManagerImpl::RemovePlateFromSite(RemovePlateFromSiteWrapper* command) {
+    const auto request = command->parameters();
+    qDebug() << "Request contains:" << request;
+
+    const std::string& siteId = request.siteid().siteid().value();
+    if (!hasSiteId(siteId)) {
+        throw ERROR_SITE_ID_NOT_FOUND;
+    }
+
+    Site& site = getSite(siteId);
+    if (!site.isOccupied()) {
+        throw ERROR_SITE_IS_EMPTY;
+    }
+
+    m_PlanningScene.removeCollisionObjects({site.getPlate()->getObjectId()});
+    site.removePlate();
+    site.setOccupied(false);
+
+    return RemovePlateFromSite_Responses{};
+}
+
 /**
  * Checks if the given site ID is available.
  * 
@@ -159,7 +231,7 @@ DeleteSite_Responses CSiteManagerImpl::DeleteSite(DeleteSiteWrapper* command) {
  * @return true if the site ID is known, otherwise false.
  */
 bool CSiteManagerImpl::hasSiteId(const std::string& siteId) const {
-    return (m_JsonSites.find(siteId) != m_JsonSites.cend());
+    return (m_Sites.find(siteId) != m_Sites.cend());
 }
 
 /**
@@ -168,7 +240,7 @@ bool CSiteManagerImpl::hasSiteId(const std::string& siteId) const {
  * @param siteId The site ID for the site to get.
  * @return The site object for further usage.
  */
-Site CSiteManagerImpl::getSite(const std::string& siteId) const {
-    const std::map<std::string, nlohmann::json>::const_iterator iter = m_JsonSites.find(siteId);
-    return Site{iter->second};
+Site& CSiteManagerImpl::getSite(const std::string& siteId) {
+    const std::map<std::string, Site>::iterator iter = m_Sites.find(siteId);
+    return iter->second;
 }

@@ -8,8 +8,9 @@
 #ifndef SITEMANAGERIMPL_H
 #define SITEMANAGERIMPL_H
 
-#include <map>
 #include <filesystem>
+#include <map>
+#include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <nlohmann/json.hpp>
 #include <string>
 #include <sila_cpp/server/SiLAFeature.h>
@@ -20,12 +21,21 @@
 #include "Pose.h"
 #include "Site.h"
 #include "SiteManager.grpc.pb.h"
+#include "PlateTypeManager/PlateTypeManagerImpl.h"
 
 static const SiLA2::CDefinedExecutionError ERROR_SITE_ID_NOT_FOUND
 {
     "SiteIdNotFound",
     "The given Site ID does not exist or could not be found."
 };
+static const SiLA2::CDefinedExecutionError ERROR_ALREADY_OCCUPIED
+{
+    "SiteAlreadyOccupied",
+    "The given site is already occupied by another item."};
+static const SiLA2::CDefinedExecutionError ERROR_SITE_IS_EMPTY
+{
+    "SiteIsEmpty",
+    "Can not remove a item from a empty site."};
 
 /**
  * @brief The CSiteManagerImpl class implements the SiteManager feature
@@ -47,6 +57,21 @@ class CSiteManagerImpl final : public SiLA2::CSiLAFeature<sila2::de::fau::robot:
     using DeleteSiteWrapper = SiLA2::CUnobservableCommandWrapper<
             sila2::de::fau::robot::sitemanager::v1::DeleteSite_Parameters,
             sila2::de::fau::robot::sitemanager::v1::DeleteSite_Responses>;
+    using IsSiteOccupiedCommand =
+            SiLA2::CUnobservableCommandManager<&CSiteManagerImpl::RequestIsSiteOccupied>;
+    using IsSiteOccupiedWrapper = SiLA2::CUnobservableCommandWrapper<
+            sila2::de::fau::robot::sitemanager::v1::IsSiteOccupied_Parameters,
+            sila2::de::fau::robot::sitemanager::v1::IsSiteOccupied_Responses>;
+    using PutPlateOnSiteCommand =
+            SiLA2::CUnobservableCommandManager<&CSiteManagerImpl::RequestPutPlateOnSite>;
+    using PutPlateOnSiteWrapper = SiLA2::CUnobservableCommandWrapper<
+            sila2::de::fau::robot::sitemanager::v1::PutPlateOnSite_Parameters,
+            sila2::de::fau::robot::sitemanager::v1::PutPlateOnSite_Responses>;
+    using RemovePlateFromSiteCommand =
+            SiLA2::CUnobservableCommandManager<&CSiteManagerImpl::RequestRemovePlateFromSite>;
+    using RemovePlateFromSiteWrapper = SiLA2::CUnobservableCommandWrapper<
+            sila2::de::fau::robot::sitemanager::v1::RemovePlateFromSite_Parameters,
+            sila2::de::fau::robot::sitemanager::v1::RemovePlateFromSite_Responses>;
     using SitesProperty = SiLA2::CUnobservablePropertyWrapper<
             std::vector<SiLA2::CString>, &CSiteManagerImpl::RequestGet_Sites>;
 
@@ -56,7 +81,8 @@ public:
      *
      * @param parent The SiLA server instance that contains this Feature
      */
-    explicit CSiteManagerImpl(SiLA2::CSiLAServer* parent);
+    explicit CSiteManagerImpl(SiLA2::CSiLAServer* parent,
+            const std::shared_ptr<CPlateTypeManagerImpl> plateTypeManagerPtr);
 
     /**
      * @brief GetSite Command
@@ -115,18 +141,76 @@ public:
      */
     sila2::de::fau::robot::sitemanager::v1::DeleteSite_Responses DeleteSite(DeleteSiteWrapper* command);
 
+    /**
+     * @brief IsSiteOccupied Command
+     *
+     * @details Check if the given site is currently occupied with a sample.
+     *
+     * @param Command The current IsSiteOccupied Command Execution Wrapper
+     * It contains the following Parameters:
+     * @li SiteId The Site to check.
+     *
+     * @return IsSiteOccupied_Responses The Command Response
+     * It contains the following fields:
+     * @li IsOccupied Boolean describing if site is occupied or not.
+     *
+     * @throw Validation Error if the given Parameter(s) are invalid
+     */
+    sila2::de::fau::robot::sitemanager::v1::IsSiteOccupied_Responses IsSiteOccupied(IsSiteOccupiedWrapper* command);
+
+    /**
+     * @brief PutPlateOnSite Command
+     *
+     * @details Puts a plate instance form the given pate type on the site.
+     *
+     * @param Command The current PutPlateToSite Command Execution Wrapper
+     * It contains the following Parameters:
+     * @li PlateTypeId The ID of the plate type.
+     * @li SiteId The ID of the site.
+     *
+     * @return PutPlateToSite_Responses The Command Response
+     * It contains the following fields:
+     * None
+     *
+     * @throw Validation Error if the given Parameter(s) are invalid
+     */
+    sila2::de::fau::robot::sitemanager::v1::PutPlateOnSite_Responses PutPlateOnSite(PutPlateOnSiteWrapper* command);
+
+    /**
+     * @brief RemovePlateFromSite Command
+     *
+     * @details Removes plate instance form the given pate type to the site.
+     *
+     * @param Command The current RemovePlateFromSite Command Execution Wrapper
+     * It contains the following Parameters:
+     * @li SiteId The ID of the site.
+     *
+     * @return RemovePlateFromSite_Responses The Command Response
+     * It contains the following fields:
+     * None
+     *
+     * @throw Validation Error if the given Parameter(s) are invalid
+     */
+    sila2::de::fau::robot::sitemanager::v1::RemovePlateFromSite_Responses RemovePlateFromSite(RemovePlateFromSiteWrapper* command);
+
     bool hasSiteId(const std::string& siteId) const;
-    Site getSite(const std::string& siteId) const;
+    Site& getSite(const std::string& siteId);
+    Site& getMutSite(const std::string& siteId);
 
 private:
     static const std::filesystem::path m_SitesDir;
+    const std::shared_ptr<CPlateTypeManagerImpl> m_PlateTypeManagerPtr;
     GetSiteCommand m_GetSiteCommand;
     SetSiteCommand m_SetSiteCommand;
     DeleteSiteCommand m_DeleteSiteCommand;
+    IsSiteOccupiedCommand m_IsSiteOccupiedCommand;
+    PutPlateOnSiteCommand m_PutPlateOnSiteCommand;
+    RemovePlateFromSiteCommand m_RemovePlateFromSiteCommand;
     SitesProperty m_SitesProperty;
-    std::map<std::string, nlohmann::json> m_JsonSites;
+    std::map<std::string, Site> m_Sites;
+    moveit::planning_interface::PlanningSceneInterface m_PlanningScene;
 
-    static std::map<std::string, nlohmann::json> loadSiteFilesToMap();
+    static void loadSiteFilesIntoMap(std::map<std::string, Site>& sites);
 };
 
 #endif  // SITEMANAGERIMPL_H

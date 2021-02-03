@@ -10,20 +10,19 @@
 
 #include <memory>
 #include <ros/ros.h>
-#include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <sila_cpp/server/SiLAFeature.h>
 #include <sila_cpp/data_types.h>
 #include <sila_cpp/server/command/UnobservableCommand.h>
 #include <sila_cpp/server/command/ObservableCommand.h>
 #include <sila_cpp/server/property/UnobservableProperty.h>
+#include "Plate.h"
 #include "Pose.h"
 #include "RelativeMove.h"
 #include "RobotController.grpc.pb.h"
 #include "ServiceDefs.h"
 #include "Site.h"
 #include "SiteManager/SiteManagerImpl.h"
-#include "PlateTypeManager/PlateTypeManagerImpl.h"
 
 
 static const SiLA2::CDefinedExecutionError ERROR_INVALID_FRAME
@@ -88,11 +87,6 @@ class CRobotControllerImpl final : public SiLA2::CSiLAFeature<sila2::de::fau::ro
     using PlacePlateWrapper = SiLA2::CObservableCommandWrapper<
             sila2::de::fau::robot::robotcontroller::v1::PlacePlate_Parameters,
             sila2::de::fau::robot::robotcontroller::v1::PlacePlate_Responses>;
-    using IsSiteOccupiedCommand =
-            SiLA2::CUnobservableCommandManager<&CRobotControllerImpl::RequestIsSiteOccupied>;
-    using IsSiteOccupiedWrapper = SiLA2::CUnobservableCommandWrapper<
-            sila2::de::fau::robot::robotcontroller::v1::IsSiteOccupied_Parameters,
-            sila2::de::fau::robot::robotcontroller::v1::IsSiteOccupied_Responses>;
     using FollowPathCommand = SiLA2::CObservableCommandManager<
             &CRobotControllerImpl::RequestFollowPath,
             &CRobotControllerImpl::RequestFollowPath_Info,
@@ -130,8 +124,7 @@ public:
      * @param parent The SiLA server instance that contains this Feature
      */
     explicit CRobotControllerImpl(SiLA2::CSiLAServer* parent,
-            const std::shared_ptr<CSiteManagerImpl> siteManagerPtr,
-            const std::shared_ptr<CPlateTypeManagerImpl> plateTypeManagerPtr);
+            const std::shared_ptr<CSiteManagerImpl> siteManagerPtr);
 
     /**
      * @brief GetCurrentFrame Command
@@ -275,23 +268,6 @@ public:
     sila2::de::fau::robot::robotcontroller::v1::PlacePlate_Responses PlacePlate(PlacePlateWrapper* command);
 
     /**
-     * @brief IsSiteOccupied Command
-     *
-     * @details Check if the given site is currently occupied with a sample.
-     *
-     * @param Command The current IsSiteOccupied Command Execution Wrapper
-     * It contains the following Parameters:
-     * @li SiteId The Site to check.
-     *
-     * @return IsSiteOccupied_Responses The Command Response
-     * It contains the following fields:
-     * @li IsOccupied Boolean describing if site is occupied or not.
-     *
-     * @throw Validation Error if the given Parameter(s) are invalid
-     */
-    sila2::de::fau::robot::robotcontroller::v1::IsSiteOccupied_Responses IsSiteOccupied(IsSiteOccupiedWrapper* command);
-
-    /**
      * @brief FollowPath Command
      *
      * @details Follows a path of poses.
@@ -379,7 +355,6 @@ public:
 
 private:
     const std::shared_ptr<CSiteManagerImpl> m_SiteManagerPtr;
-    const std::shared_ptr<CPlateTypeManagerImpl> m_PlateTypeManagerPtr;
     GetCurrentFrameCommand m_GetCurrentFrameCommand;
     GetCurrentPoseCommand m_GetCurrentPoseCommand;
     MoveToPoseCommand m_MoveToPoseCommand;
@@ -388,7 +363,6 @@ private:
     TransportPlateCommand m_TransportPlateCommand;
     PickPlateCommand m_PickPlateCommand;
     PlacePlateCommand m_PlacePlateCommand;
-    IsSiteOccupiedCommand m_IsSiteOccupiedCommand;
     FollowPathCommand m_FollowPathCommand;
     SetToFrameCommand m_SetToFrameCommand;
     FollowFramesCommand m_FollowFramesCommand;
@@ -397,9 +371,8 @@ private:
     ros::NodeHandle m_RosNode;
     moveit::planning_interface::MoveGroupInterface m_Arm{PANDA_ARM};
     moveit::planning_interface::MoveGroupInterface m_Gripper{PANDA_HAND};
-    moveit::planning_interface::PlanningSceneInterface m_PlanningScene;
     bool m_IsOnTransport = false;
-    std::shared_ptr<Plate> m_TransportedPlatePtr;
+    std::shared_ptr<Plate> m_PlatePtr;
 
     void openGripper(trajectory_msgs::JointTrajectory& posture, double width);
     void closeGripper(trajectory_msgs::JointTrajectory& posture);
