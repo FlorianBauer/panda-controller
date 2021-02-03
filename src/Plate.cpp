@@ -2,6 +2,8 @@
  * Class for Plates describing the transportable object and its dimensions and offsets for gripping.
  */
 #include "Plate.h"
+
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include "ServiceDefs.h"
 
 using json = nlohmann::json;
@@ -22,6 +24,8 @@ Plate::Plate(const std::string& typeName, double dimX, double dimY, double dimZ)
     plateObject.id = typeName + "_" + std::to_string(++instanceIdCounter);
     plateObject.header.frame_id = PANDA_LINK_BASE;
     plateObject.primitive_poses.resize(1);
+    tf2::Quaternion orientation;
+    plateObject.primitive_poses[0].orientation = tf2::toMsg(orientation);
 
     plateObject.primitives.resize(1);
     plateObject.primitives[0].type = shape_msgs::SolidPrimitive::BOX;
@@ -41,6 +45,8 @@ Plate::Plate(const json& jsonStruct) {
     plateObject.id = typeId + "_" + std::to_string(++instanceIdCounter);
     plateObject.header.frame_id = PANDA_LINK_BASE;
     plateObject.primitive_poses.resize(1);
+    tf2::Quaternion orientation;
+    plateObject.primitive_poses[0].orientation = tf2::toMsg(orientation);
 
     plateObject.primitives.resize(1);
     plateObject.primitives[0].type = shape_msgs::SolidPrimitive::BOX;
