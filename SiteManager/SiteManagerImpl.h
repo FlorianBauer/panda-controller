@@ -195,7 +195,6 @@ public:
 
     bool hasSiteId(const std::string& siteId) const;
     Site& getSite(const std::string& siteId);
-    Site& getMutSite(const std::string& siteId);
 
 private:
     static const std::filesystem::path m_SitesDir;
