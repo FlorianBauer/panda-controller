@@ -187,15 +187,14 @@ PickPlate_Responses CRobotControllerImpl::PickPlate(PickPlateWrapper* command) {
     }
 
     Site& site = m_SiteManagerPtr->getSite(siteId);
-    moveit_msgs::Grasp grasp = site.getGrasp();
     m_PlatePtr = site.getPlate();
-
+    moveit_msgs::Grasp grasp = site.getGrasp();
     openGripper(grasp.pre_grasp_posture, m_PlatePtr->getDimY());
     closeGripper(grasp.grasp_posture);
     command->setExecutionInfo(SiLA2::CReal{0.5});
     const MoveItErrorCode err = m_Arm.pick(m_PlatePtr->getObjectId(), grasp);
     if (err != MoveItErrorCode::SUCCESS) {
-        throw SiLA2::CExecutionError("Could not pick plate.");
+        throw SiLA2::CExecutionError("Could not pick plate. (error " + std::to_string(err.val) + ")");
     }
     m_IsOnTransport = true;
     site.removePlate();
@@ -224,7 +223,7 @@ PlacePlate_Responses CRobotControllerImpl::PlacePlate(PlacePlateWrapper* command
         site.getPlaceLocation()
     });
     if (err != MoveItErrorCode::SUCCESS) {
-        throw SiLA2::CExecutionError("Could not place plate.");
+        throw SiLA2::CExecutionError("Could not place plate. (error " + std::to_string(err.val) + ")");
     }
     site.putPlate(m_PlatePtr);
     m_PlatePtr.reset();
@@ -345,7 +344,7 @@ SetGripper_Responses CRobotControllerImpl::SetGripper(SetGripperWrapper* command
     m_Gripper.setJointValueTarget(std::vector<double>{halfWidthInM, halfWidthInM});
     const MoveItErrorCode err = m_Gripper.move();
     if (err != MoveItErrorCode::SUCCESS) {
-        throw SiLA2::CExecutionError("Could not set gripper.");
+        throw SiLA2::CExecutionError("Could not set gripper. (error " + std::to_string(err.val) + ")");
     }
 
     return SetGripper_Responses{};
@@ -355,7 +354,7 @@ CloseGripper_Responses CRobotControllerImpl::CloseGripper(CloseGripperWrapper* c
     m_Gripper.setJointValueTarget(std::vector<double>{0.0, 0.0});
     const MoveItErrorCode err = m_Gripper.move();
     if (err != MoveItErrorCode::SUCCESS) {
-        throw SiLA2::CExecutionError("Could not close gripper.");
+        throw SiLA2::CExecutionError("Could not close gripper. (error " + std::to_string(err.val) + ")");
     }
 
     return CloseGripper_Responses{};
