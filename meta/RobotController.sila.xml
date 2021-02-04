@@ -111,15 +111,17 @@
             </DataType>
         </Parameter>
         <Parameter>
-            <Identifier>PlateType</Identifier>
-            <DisplayName>Plate Type</DisplayName>
-            <Description>The plate type to grab.</Description>
+            <Identifier>IsLiquidTransport</Identifier>
+            <DisplayName>Is Liquid Transport</DisplayName>
+            <Description>Determines whether the movement is constrained to avoid spilling of liquids during transport.</Description>
             <DataType>
-                <Basic>String</Basic>
+                <Basic>Boolean</Basic>
             </DataType>
         </Parameter>
         <DefinedExecutionErrors>
             <Identifier>SiteIdNotFound</Identifier>
+            <Identifier>SiteIsEmpty</Identifier>
+            <Identifier>SiteAlreadyOccupied</Identifier>
         </DefinedExecutionErrors>
     </Command>
 

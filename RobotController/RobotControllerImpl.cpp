@@ -160,18 +160,72 @@ MoveRelative_Responses CRobotControllerImpl::MoveRelative(MoveRelativeWrapper* c
 TransportPlate_Responses CRobotControllerImpl::TransportPlate(TransportPlateWrapper* command) {
     const auto request = command->parameters();
     qDebug() << "Request contains:" << request;
-    // TODO: Validate request parameters...
 
-    // TODO: Write actual Command implementation logic...
-    const double NUM_STEPS = 10.0;
-    for (int i = 0; i <= NUM_STEPS; ++i) {
-        // do stuff...
-        command->setExecutionInfo(SiLA2::CReal{i / NUM_STEPS});
+    if (m_IsOnTransport) {
+        throw SiLA2::CExecutionError("Gripper is already holding a plate.");
     }
 
-    auto Response = TransportPlate_Responses{};
-    // TODO: Fill the response fields
-    return Response;
+    const std::string& originId = request.originsiteid().siteid().value();
+    if (!m_SiteManagerPtr->hasSiteId(originId)) {
+        throw ERROR_SITE_ID_NOT_FOUND;
+    }
+
+    const std::string& destinationId = request.destinationsiteid().siteid().value();
+    if (!m_SiteManagerPtr->hasSiteId(destinationId)) {
+        throw ERROR_SITE_ID_NOT_FOUND;
+    }
+
+    Site& srcSite = m_SiteManagerPtr->getSite(originId);
+    m_PlatePtr = srcSite.getPlate();
+    moveit_msgs::Grasp pickGrasp = srcSite.getGrasp();
+    openGripper(pickGrasp.pre_grasp_posture, m_PlatePtr->getDimY());
+    closeGripper(pickGrasp.grasp_posture);
+    command->setExecutionInfo(SiLA2::CReal{0.4});
+    MoveItErrorCode err = m_Arm.pick(m_PlatePtr->getObjectId(), pickGrasp);
+    if (err != MoveItErrorCode::SUCCESS) {
+        throw SiLA2::CExecutionError("Could not pick plate. (error " + std::to_string(err.val) + ")");
+    }
+    m_IsOnTransport = true;
+    srcSite.removePlate();
+
+    const bool isConstrained = request.isliquidtransport().value();
+    if (isConstrained) {
+        // set-up constraint for liquids
+        moveit_msgs::OrientationConstraint oriCon;
+        oriCon.header.frame_id = PANDA_LINK_BASE;
+        oriCon.link_name = PANDA_LINK_EEF;
+        oriCon.orientation = m_Arm.getCurrentPose(PANDA_LINK_EEF).pose.orientation;
+        // restrain X and Y axis to max. +-36° tilt(360° / 10)
+        oriCon.absolute_x_axis_tolerance = 2.0 * M_PI / 10.0;
+        oriCon.absolute_y_axis_tolerance = 2.0 * M_PI / 10.0;
+        // Z axis has full freedom
+        oriCon.absolute_z_axis_tolerance = 2.0 * M_PI;
+        oriCon.weight = 1.0;
+        moveit_msgs::Constraints liquidTransportConstraint;
+        liquidTransportConstraint.orientation_constraints.push_back(oriCon);
+        m_Arm.setPathConstraints(liquidTransportConstraint);
+    }
+
+    Site& dstSite = m_SiteManagerPtr->getSite(destinationId);
+    moveit_msgs::Grasp placeGrasp = dstSite.getGrasp();
+    openGripper(placeGrasp.pre_grasp_posture, m_PlatePtr->getDimY());
+    command->setExecutionInfo(SiLA2::CReal{0.6});
+    err = m_Arm.place(m_PlatePtr->getObjectId(), {
+        dstSite.getPlaceLocation()
+    });
+    if (err != MoveItErrorCode::SUCCESS) {
+        throw SiLA2::CExecutionError("Could not place plate. (error " + std::to_string(err.val) + ")");
+    }
+    dstSite.putPlate(m_PlatePtr);
+    m_PlatePtr.reset();
+    m_IsOnTransport = false;
+
+    if (isConstrained) {
+        m_Arm.clearPathConstraints();
+    }
+
+    command->executionFinished(SiLA2::CommandStatus::FINISHED_SUCCESSFULLY);
+    return TransportPlate_Responses{};
 }
 
 PickPlate_Responses CRobotControllerImpl::PickPlate(PickPlateWrapper* command) {
