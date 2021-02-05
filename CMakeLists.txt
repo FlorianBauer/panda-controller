@@ -32,7 +32,7 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 else()
     # Enable more compiler warnings on Debug
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+    add_compile_options(-Wall -Wextra)
 endif()
 
 # Version number
