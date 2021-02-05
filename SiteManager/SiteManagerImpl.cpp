@@ -12,6 +12,7 @@
 #include <fstream>
 #include <sila_cpp/common/logging.h>
 #include "FileManager.h"
+#include "ServiceDefs.h"
 #include "SiteManager.pb.h"
 
 namespace fs = std::filesystem;
@@ -19,7 +20,8 @@ using namespace sila2::de::fau::robot::sitemanager::v1;
 using json = nlohmann::json;
 
 constexpr double CM_TO_M = 0.01;
-const std::filesystem::path CSiteManagerImpl::m_SitesDir{FileManager::getAppDir() / SITES_DIR};
+const fs::path CSiteManagerImpl::m_SitesDir{FileManager::getAppDir() / SITES_DIR};
+const fs::path CSiteManagerImpl::m_ColObjDir{FileManager::getAppDir() / COLLISION_OBJECTS_DIR};
 
 /**
  *  Loads the JSON formatted site files from the `site` directory into a map.
@@ -45,6 +47,76 @@ void CSiteManagerImpl::loadSiteFilesIntoMap(std::map<std::string, Site>& sites) 
     }
 }
 
+/**
+ * Loads the JSON formatted collision object files from the `collision_objects` directory into the
+ * planning scene. The files have to be created manually and must be placed in the mentioned 
+ * directory.
+ * 
+ * Example of an collision object file named `wall.json`.
+ * ```
+ * {
+ *     "id": "wall",
+ *     "posX": 0.79,
+ *     "posY": -0.715,
+ *     "posZ": 0.55,
+ *     "rotP": 0.0,
+ *     "rotR": 0.0,
+ *     "rotY": 0.0,
+ *     "dimX": 1.0,
+ *     "dimY": 0.39,
+ *     "dimZ": 2.5
+ * }
+ * ```
+ * 
+ * @param planningScene The planning scene to load the objects into.
+ */
+void CSiteManagerImpl::loadCollisionObjectsIntoScene(moveit::planning_interface::PlanningSceneInterface& planningScene) {
+    const std::vector<fs::path> colFiles = FileManager::collectJsonFilesFromDir(m_ColObjDir);
+    if (colFiles.empty()) {
+        return;
+    }
+
+    std::vector<moveit_msgs::CollisionObject> colObjs;
+    colObjs.resize(colFiles.size());
+
+    for (const auto& file : colFiles) {
+        // read a JSON file
+        std::ifstream jsonStream(file);
+        json jsonStruct;
+        try {
+            jsonStream >> jsonStruct;
+        } catch (const std::exception& ex) {
+            std::cerr << "Could not load: " << file << "\n" << ex.what() << "\n";
+            jsonStream.close();
+            continue;
+        }
+        jsonStream.close();
+        std::cout << "Loaded: " << jsonStruct["id"] << " from " << file << "\n";
+
+        moveit_msgs::CollisionObject colBox;
+        colBox.id = jsonStruct["id"].get<std::string>();
+        colBox.header.frame_id = PANDA_LINK_BASE;
+        colBox.primitives.resize(1);
+        colBox.primitives[0].type = shape_msgs::SolidPrimitive::BOX;
+        colBox.primitive_poses.resize(1);
+        colBox.primitive_poses[0].position.x = jsonStruct["posX"];
+        colBox.primitive_poses[0].position.y = jsonStruct["posY"];
+        colBox.primitive_poses[0].position.z = jsonStruct["posZ"];
+
+        tf2::Quaternion orientation;
+        orientation.setRPY(jsonStruct["rotR"], jsonStruct["rotP"], jsonStruct["rotY"]);
+        colBox.primitive_poses[0].orientation = tf2::toMsg(orientation);
+
+        colBox.primitives[0].dimensions.resize(3);
+        colBox.primitives[0].dimensions[0] = jsonStruct["dimX"]; // length;
+        colBox.primitives[0].dimensions[1] = jsonStruct["dimY"]; // width
+        colBox.primitives[0].dimensions[2] = jsonStruct["dimZ"]; // hight
+        colBox.operation = moveit_msgs::CollisionObject::ADD;
+        colObjs.push_back(colBox);
+    }
+    planningScene.applyCollisionObjects(colObjs);
+}
+
 CSiteManagerImpl::CSiteManagerImpl(SiLA2::CSiLAServer* parent,
         const std::shared_ptr<CPlateTypeManagerImpl> plateTypeManagerPtr)
 : CSiLAFeature{parent},
@@ -57,6 +129,9 @@ m_PutPlateOnSiteCommand{this, "PutPlateToSite"},
 m_RemovePlateFromSiteCommand{this, "RemovePlateFromSite"},
 m_SitesProperty{this, "Sites"}
 {
+    FileManager::checkAndCreateDir(m_ColObjDir);
+    loadCollisionObjectsIntoScene(m_PlanningScene);
+
     FileManager::checkAndCreateDir(m_SitesDir);
     loadSiteFilesIntoMap(m_Sites);
     std::vector<SiLA2::CString> siteIds;

@@ -198,6 +198,7 @@ public:
 
 private:
     static const std::filesystem::path m_SitesDir;
+    static const std::filesystem::path m_ColObjDir;
     const std::shared_ptr<CPlateTypeManagerImpl> m_PlateTypeManagerPtr;
     GetSiteCommand m_GetSiteCommand;
     SetSiteCommand m_SetSiteCommand;
@@ -210,6 +211,7 @@ private:
     moveit::planning_interface::PlanningSceneInterface m_PlanningScene;
 
     static void loadSiteFilesIntoMap(std::map<std::string, Site>& sites);
+    static void loadCollisionObjectsIntoScene(moveit::planning_interface::PlanningSceneInterface& planningScene);
 };
 
 #endif  // SITEMANAGERIMPL_H
