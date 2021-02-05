@@ -21,9 +21,9 @@ public:
     static bool saveJsonToFile(const nlohmann::json& jsonStruct, const std::filesystem::path & filePath);
     static nlohmann::json loadJsonFromFile(const std::filesystem::path & filePath);
 
-    FileManager();
-    FileManager(const FileManager & orig);
-    virtual ~FileManager();
+    FileManager() = delete;
+    FileManager(const FileManager & orig) = delete;
+    virtual ~FileManager() = delete;
 
 private:
 

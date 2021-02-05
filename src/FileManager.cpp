@@ -59,16 +59,6 @@ std::vector<fs::path> FileManager::collectJsonFilesFromDir(const fs::path& dirPa
     return files;
 }
 
-FileManager::FileManager() {
-
-}
-
-FileManager::FileManager(const FileManager& orig) {
-}
-
-FileManager::~FileManager() {
-}
-
 /**
  * Writes the given JSON struct into the given file path. Already existing files get overwritten.
  * 
