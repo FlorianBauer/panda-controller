@@ -29,7 +29,6 @@ m_GetCurrentFrameCommand{this, "GetCurrentFrame"},
 m_GetCurrentPoseCommand{this, "GetCurrentPose"},
 m_MoveToPoseCommand{this, "MoveToPose"},
 m_MoveToSiteCommand{this, "MoveToSite"},
-m_MoveRelativeCommand{this, "MoveRelative"},
 m_TransportPlateCommand{this, "TransportPlate"},
 m_PickPlateCommand{this, "PickPlate"},
 m_PlacePlateCommand{this, "PlacePlate"},
@@ -44,7 +43,6 @@ m_CloseGripperCommand{this, "CloseGripper"}
     m_GetCurrentPoseCommand.setExecutor(this, &CRobotControllerImpl::GetCurrentPose);
     m_MoveToPoseCommand.setExecutor(this, &CRobotControllerImpl::MoveToPose);
     m_MoveToSiteCommand.setExecutor(this, &CRobotControllerImpl::MoveToSite);
-    m_MoveRelativeCommand.setExecutor(this, &CRobotControllerImpl::MoveRelative);
     m_TransportPlateCommand.setExecutor(this, &CRobotControllerImpl::TransportPlate);
     m_PickPlateCommand.setExecutor(this, &CRobotControllerImpl::PickPlate);
     m_PlacePlateCommand.setExecutor(this, &CRobotControllerImpl::PlacePlate);
@@ -147,14 +145,6 @@ MoveToSite_Responses CRobotControllerImpl::MoveToSite(MoveToSiteWrapper* command
     }
 
     return MoveToSite_Responses{};
-}
-
-MoveRelative_Responses CRobotControllerImpl::MoveRelative(MoveRelativeWrapper* command) {
-    const auto request = command->parameters();
-    qDebug() << "Request contains:" << request;
-    // TODO: Validate request parameters...
-
-    return MoveRelative_Responses{};
 }
 
 TransportPlate_Responses CRobotControllerImpl::TransportPlate(TransportPlateWrapper* command) {

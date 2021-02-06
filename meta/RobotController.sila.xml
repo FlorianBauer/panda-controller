@@ -75,21 +75,6 @@
     </Command>
 
     <Command>
-        <Identifier>MoveRelative</Identifier>
-        <DisplayName>Move Relative</DisplayName>
-        <Description>Move in the given direction without changing the current orientation of the robot hand.</Description>
-        <Observable>No</Observable>
-        <Parameter>
-            <Identifier>RelativeMove</Identifier>
-            <DisplayName>Relative Move</DisplayName>
-            <Description>The position changing move operation.</Description>
-            <DataType>
-                <DataTypeIdentifier>RelativeMove</DataTypeIdentifier>
-            </DataType>
-        </Parameter>
-    </Command>
-
-    <Command>
         <Identifier>TransportPlate</Identifier>
         <DisplayName>Transport Plate</DisplayName>
         <Description>Transports a plate between the two given sites.</Description>
@@ -441,110 +426,6 @@
                             <Constraints>
                                 <MinimalInclusive>-1.0</MinimalInclusive>
                                 <MaximalInclusive>1.0</MaximalInclusive>
-                            </Constraints>
-                        </Constrained>
-                    </DataType>
-                </Element>
-            </Structure>
-        </DataType>
-    </DataTypeDefinition>
-
-    <DataTypeDefinition>
-        <Identifier>RelativeMove</Identifier>
-        <DisplayName>Relative Move</DisplayName>
-        <Description>A relative move to the given direction without changing the orientation of the robot hand.</Description>
-        <DataType>
-            <Structure>
-                <Element>
-                    <Identifier>X</Identifier>
-                    <DisplayName>X</DisplayName>
-                    <Description>The X direction.</Description>
-                    <DataType>
-                        <Constrained>
-                            <DataType>
-                                <Basic>Real</Basic>
-                            </DataType>
-                            <Constraints>
-                                <MinimalInclusive>-1.0</MinimalInclusive>
-                                <MaximalInclusive>1.0</MaximalInclusive>
-                            </Constraints>
-                        </Constrained>
-                    </DataType>
-                </Element>
-                <Element>
-                    <Identifier>Y</Identifier>
-                    <DisplayName>Y</DisplayName>
-                    <Description>The Y direction.</Description>
-                    <DataType>
-                        <Constrained>
-                            <DataType>
-                                <Basic>Real</Basic>
-                            </DataType>
-                            <Constraints>
-                                <MinimalInclusive>-1.0</MinimalInclusive>
-                                <MaximalInclusive>1.0</MaximalInclusive>
-                            </Constraints>
-                        </Constrained>
-                    </DataType>
-                </Element>
-                <Element>
-                    <Identifier>Z</Identifier>
-                    <DisplayName>Z</DisplayName>
-                    <Description>The Z direction.</Description>
-                    <DataType>
-                        <Constrained>
-                            <DataType>
-                                <Basic>Real</Basic>
-                            </DataType>
-                            <Constraints>
-                                <MinimalInclusive>-1.0</MinimalInclusive>
-                                <MaximalInclusive>1.0</MaximalInclusive>
-                            </Constraints>
-                        </Constrained>
-                    </DataType>
-                </Element>
-                <Element>
-                    <Identifier>MinDist</Identifier>
-                    <DisplayName>Minimal Distance</DisplayName>
-                    <Description>The minimal distance to move.</Description>
-                    <DataType>
-                        <Constrained>
-                            <DataType>
-                                <Basic>Real</Basic>
-                            </DataType>
-                            <Constraints>
-                                <Unit>
-                                    <Label>cm</Label>
-                                    <Factor>0.01</Factor>
-                                    <Offset>0</Offset>
-                                    <UnitComponent>
-                                        <SIUnit>Meter</SIUnit>
-                                        <Exponent>1</Exponent>
-                                    </UnitComponent>
-                                </Unit>
-                            </Constraints>
-                        </Constrained>
-                    </DataType>
-                </Element>
-                <Element>
-                    <Identifier>DesiredDist</Identifier>
-                    <DisplayName>Desired Distance</DisplayName>
-                    <Description>The desired distance to move.</Description>
-                    <DataType>
-                        <Constrained>
-                            <DataType>
-                                <Basic>Real</Basic>
-                            </DataType>
-                            <Constraints>
-                                <Unit>
-                                    <Label>cm</Label>
-                                    <Factor>0.01</Factor>
-                                    <Offset>0</Offset>
-                                    <UnitComponent>
-                                        <SIUnit>Meter</SIUnit>
-                                        <Exponent>1</Exponent>
-                                    </UnitComponent>
-                                </Unit>
                             </Constraints>
                         </Constrained>
                     </DataType>

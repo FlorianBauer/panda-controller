@@ -18,7 +18,6 @@
 #include <sila_cpp/server/property/UnobservableProperty.h>
 #include "Plate.h"
 #include "Pose.h"
-#include "RelativeMove.h"
 #include "RobotController.grpc.pb.h"
 #include "ServiceDefs.h"
 #include "Site.h"
@@ -61,11 +60,6 @@ class CRobotControllerImpl final : public SiLA2::CSiLAFeature<sila2::de::fau::ro
     using MoveToSiteWrapper = SiLA2::CUnobservableCommandWrapper<
             sila2::de::fau::robot::robotcontroller::v1::MoveToSite_Parameters,
             sila2::de::fau::robot::robotcontroller::v1::MoveToSite_Responses>;
-    using MoveRelativeCommand =
-            SiLA2::CUnobservableCommandManager<&CRobotControllerImpl::RequestMoveRelative>;
-    using MoveRelativeWrapper = SiLA2::CUnobservableCommandWrapper<
-            sila2::de::fau::robot::robotcontroller::v1::MoveRelative_Parameters,
-            sila2::de::fau::robot::robotcontroller::v1::MoveRelative_Responses>;
     using TransportPlateCommand = SiLA2::CObservableCommandManager<
             &CRobotControllerImpl::RequestTransportPlate,
             &CRobotControllerImpl::RequestTransportPlate_Info,
@@ -193,24 +187,6 @@ public:
      * @throw Validation Error if the given Parameter(s) are invalid
      */
     sila2::de::fau::robot::robotcontroller::v1::MoveToSite_Responses MoveToSite(MoveToSiteWrapper* command);
-
-    /**
-     * @brief MoveRelative Command
-     *
-     * @details Move in the given direction without changing the current orientation of the
-     * robot hand.
-     *
-     * @param Command The current MoveRelative Command Execution Wrapper
-     * It contains the following Parameters:
-     * @li RelativeMove The position changing move operation.
-     *
-     * @return MoveRelative_Responses The Command Response
-     * It contains the following fields:
-     * None
-     *
-     * @throw Validation Error if the given Parameter(s) are invalid
-     */
-    sila2::de::fau::robot::robotcontroller::v1::MoveRelative_Responses MoveRelative(MoveRelativeWrapper* command);
 
     /**
      * @brief TransportPlate Command
@@ -359,7 +335,6 @@ private:
     GetCurrentPoseCommand m_GetCurrentPoseCommand;
     MoveToPoseCommand m_MoveToPoseCommand;
     MoveToSiteCommand m_MoveToSiteCommand;
-    MoveRelativeCommand m_MoveRelativeCommand;
     TransportPlateCommand m_TransportPlateCommand;
     PickPlateCommand m_PickPlateCommand;
     PlacePlateCommand m_PlacePlateCommand;
