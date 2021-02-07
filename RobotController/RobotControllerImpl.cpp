@@ -36,7 +36,11 @@ m_FollowPathCommand{this, "FollowPath"},
 m_SetToFrameCommand{this, "SetToFrame"},
 m_FollowFramesCommand{this, "FollowFrames"},
 m_SetGripperCommand{this, "SetGripper"},
-m_CloseGripperCommand{this, "CloseGripper"}
+m_CloseGripperCommand{this, "CloseGripper"},
+m_SetGripperEffortCommand{this, "SetGripperEffort"},
+m_GetGripperEffortCommand{this, "GetGripperEffort"},
+m_SetArmEffortCommand{this, "SetArmEffort"},
+m_GetArmEffortCommand{this, "GetArmEffort"}
 {
     m_Arm.setGoalOrientationTolerance(0.05);
     m_GetCurrentFrameCommand.setExecutor(this, &CRobotControllerImpl::GetCurrentFrame);
@@ -51,6 +55,10 @@ m_CloseGripperCommand{this, "CloseGripper"}
     m_FollowFramesCommand.setExecutor(this, &CRobotControllerImpl::FollowFrames);
     m_SetGripperCommand.setExecutor(this, &CRobotControllerImpl::SetGripper);
     m_CloseGripperCommand.setExecutor(this, &CRobotControllerImpl::CloseGripper);
+    m_SetGripperEffortCommand.setExecutor(this, &CRobotControllerImpl::SetGripperEffort);
+    m_GetGripperEffortCommand.setExecutor(this, &CRobotControllerImpl::GetGripperEffort);
+    m_SetArmEffortCommand.setExecutor(this, &CRobotControllerImpl::SetArmEffort);
+    m_GetArmEffortCommand.setExecutor(this, &CRobotControllerImpl::GetArmEffort);
 }
 
 /**
@@ -402,4 +410,53 @@ CloseGripper_Responses CRobotControllerImpl::CloseGripper(CloseGripperWrapper* c
     }
 
     return CloseGripper_Responses{};
+}
+
+SetGripperEffort_Responses CRobotControllerImpl::SetGripperEffort(SetGripperEffortWrapper* command) {
+    const auto request = command->parameters();
+    qDebug() << "Request contains:" << request;
+
+    const double effortVal = request.effort().value();
+    const moveit::core::RobotStatePtr state = m_Arm.getCurrentState();
+    state->setVariableEffort(PANDA_FINGER_1, effortVal);
+    state->setVariableEffort(PANDA_FINGER_2, effortVal);
+
+    return SetGripperEffort_Responses{};
+}
+
+GetGripperEffort_Responses CRobotControllerImpl::GetGripperEffort(GetGripperEffortWrapper* command) {
+    const moveit::core::RobotStatePtr state = m_Arm.getCurrentState();
+    const double effortVal = state->getVariableEffort(PANDA_FINGER_1);
+    auto response = GetGripperEffort_Responses{};
+    response.mutable_effort()->set_value(effortVal);
+    return response;
+}
+
+SetArmEffort_Responses CRobotControllerImpl::SetArmEffort(SetArmEffortWrapper* command) {
+    const auto request = command->parameters();
+    qDebug() << "Request contains:" << request;
+
+    const moveit::core::RobotStatePtr state = m_Arm.getCurrentState();
+    state->setVariableEffort("panda_joint1", request.effort(0).value());
+    state->setVariableEffort("panda_joint2", request.effort(1).value());
+    state->setVariableEffort("panda_joint3", request.effort(2).value());
+    state->setVariableEffort("panda_joint4", request.effort(3).value());
+    state->setVariableEffort("panda_joint5", request.effort(4).value());
+    state->setVariableEffort("panda_joint6", request.effort(5).value());
+    state->setVariableEffort("panda_joint7", request.effort(6).value());
+
+    return SetArmEffort_Responses{};
+}
+
+GetArmEffort_Responses CRobotControllerImpl::GetArmEffort(GetArmEffortWrapper* command) {
+    const moveit::core::RobotStatePtr state = m_Arm.getCurrentState();
+    auto response = GetArmEffort_Responses{};
+    response.add_effort()->set_value(state->getVariableEffort("panda_joint1"));
+    response.add_effort()->set_value(state->getVariableEffort("panda_joint2"));
+    response.add_effort()->set_value(state->getVariableEffort("panda_joint3"));
+    response.add_effort()->set_value(state->getVariableEffort("panda_joint4"));
+    response.add_effort()->set_value(state->getVariableEffort("panda_joint5"));
+    response.add_effort()->set_value(state->getVariableEffort("panda_joint6"));
+    response.add_effort()->set_value(state->getVariableEffort("panda_joint7"));
+    return response;
 }

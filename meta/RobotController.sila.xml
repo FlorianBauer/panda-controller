@@ -249,6 +249,88 @@
         <Observable>No</Observable>
     </Command>
 
+    <Command>
+        <Identifier>SetGripperEffort</Identifier>
+        <DisplayName>Set Gripper Effort</DisplayName>
+        <Description>Set the force used by the robot fingers.</Description>
+        <Observable>No</Observable>
+        <Parameter>
+            <Identifier>Effort</Identifier>
+            <DisplayName>Effort</DisplayName>
+            <Description>The force value to set.</Description>
+            <DataType>
+                <Basic>Real</Basic>
+            </DataType>
+        </Parameter>
+    </Command>
+
+    <Command>
+        <Identifier>GetGripperEffort</Identifier>
+        <DisplayName>Get Gripper Effort</DisplayName>
+        <Description>Get the force used by the robot fingers.</Description>
+        <Observable>No</Observable>
+        <Response>
+            <Identifier>Effort</Identifier>
+            <DisplayName>Effort</DisplayName>
+            <Description>The force value to get.</Description>
+            <DataType>
+                <Basic>Real</Basic>
+            </DataType>
+        </Response>
+    </Command>
+
+    <Command>
+        <Identifier>SetArmEffort</Identifier>
+        <DisplayName>Set Arm Effort</DisplayName>
+        <Description>Set the forces used by the robot links.</Description>
+        <Observable>No</Observable>
+        <Parameter>
+            <Identifier>Effort</Identifier>
+            <DisplayName>Effort</DisplayName>
+            <Description>The force values to set.</Description>
+            <DataType>
+                <Constrained>
+                    <DataType>
+                        <List>
+                            <DataType>
+                                <Basic>Real</Basic>
+                            </DataType>
+                        </List>
+                    </DataType>
+                    <Constraints>
+                        <ElementCount>7</ElementCount>
+                    </Constraints>
+                </Constrained>
+            </DataType>
+        </Parameter>
+    </Command>
+
+    <Command>
+        <Identifier>GetArmEffort</Identifier>
+        <DisplayName>Get Arm Effort</DisplayName>
+        <Description>Get the forces used by the robot links.</Description>
+        <Observable>No</Observable>
+        <Response>
+            <Identifier>Effort</Identifier>
+            <DisplayName>Effort</DisplayName>
+            <Description>The force values to get.</Description>
+            <DataType>
+                <Constrained>
+                    <DataType>
+                        <List>
+                            <DataType>
+                                <Basic>Real</Basic>
+                            </DataType>
+                        </List>
+                    </DataType>
+                    <Constraints>
+                        <ElementCount>7</ElementCount>
+                    </Constraints>
+                </Constrained>
+            </DataType>
+        </Response>
+    </Command>
+
     <DataTypeDefinition>
         <Identifier>Frame</Identifier>
         <DisplayName>Frame</DisplayName>

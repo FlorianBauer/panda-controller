@@ -110,6 +110,26 @@ class CRobotControllerImpl final : public SiLA2::CSiLAFeature<sila2::de::fau::ro
     using CloseGripperWrapper = SiLA2::CUnobservableCommandWrapper<
             sila2::de::fau::robot::robotcontroller::v1::CloseGripper_Parameters,
             sila2::de::fau::robot::robotcontroller::v1::CloseGripper_Responses>;
+    using SetGripperEffortCommand =
+            SiLA2::CUnobservableCommandManager<&CRobotControllerImpl::RequestSetGripperEffort>;
+    using SetGripperEffortWrapper = SiLA2::CUnobservableCommandWrapper<
+            sila2::de::fau::robot::robotcontroller::v1::SetGripperEffort_Parameters,
+            sila2::de::fau::robot::robotcontroller::v1::SetGripperEffort_Responses>;
+    using GetGripperEffortCommand =
+            SiLA2::CUnobservableCommandManager<&CRobotControllerImpl::RequestGetGripperEffort>;
+    using GetGripperEffortWrapper = SiLA2::CUnobservableCommandWrapper<
+            sila2::de::fau::robot::robotcontroller::v1::GetGripperEffort_Parameters,
+            sila2::de::fau::robot::robotcontroller::v1::GetGripperEffort_Responses>;
+    using SetArmEffortCommand =
+            SiLA2::CUnobservableCommandManager<&CRobotControllerImpl::RequestSetArmEffort>;
+    using SetArmEffortWrapper = SiLA2::CUnobservableCommandWrapper<
+            sila2::de::fau::robot::robotcontroller::v1::SetArmEffort_Parameters,
+            sila2::de::fau::robot::robotcontroller::v1::SetArmEffort_Responses>;
+    using GetArmEffortCommand =
+            SiLA2::CUnobservableCommandManager<&CRobotControllerImpl::RequestGetArmEffort>;
+    using GetArmEffortWrapper = SiLA2::CUnobservableCommandWrapper<
+            sila2::de::fau::robot::robotcontroller::v1::GetArmEffort_Parameters,
+            sila2::de::fau::robot::robotcontroller::v1::GetArmEffort_Responses>;
 
 public:
     /**
@@ -329,6 +349,74 @@ public:
      */
     sila2::de::fau::robot::robotcontroller::v1::CloseGripper_Responses CloseGripper(CloseGripperWrapper* command);
 
+    /**
+     * @brief SetGripperEffort Command
+     *
+     * @details Set the force used by the robot fingers.
+     *
+     * @param Command The current SetGripperEffort Command Execution Wrapper
+     * It contains the following Parameters:
+     * @li Effort The force value to set.
+     *
+     * @return SetGripperEffort_Responses The Command Response
+     * It contains the following fields:
+     * None
+     *
+     * @throw Validation Error if the given Parameter(s) are invalid
+     */
+    sila2::de::fau::robot::robotcontroller::v1::SetGripperEffort_Responses SetGripperEffort(SetGripperEffortWrapper* command);
+
+    /**
+     * @brief GetGripperEffort Command
+     *
+     * @details Get the force used by the robot fingers.
+     *
+     * @param Command The current GetGripperEffort Command Execution Wrapper
+     * It contains the following Parameters:
+     * None
+     *
+     * @return GetGripperEffort_Responses The Command Response
+     * It contains the following fields:
+     * @li Effort The force value to get.
+     *
+     * @throw Validation Error if the given Parameter(s) are invalid
+     */
+    sila2::de::fau::robot::robotcontroller::v1::GetGripperEffort_Responses GetGripperEffort(GetGripperEffortWrapper* command);
+
+    /**
+     * @brief SetArmEffort Command
+     *
+     * @details Set the forces used by the robot links.
+     *
+     * @param Command The current SetArmEffort Command Execution Wrapper
+     * It contains the following Parameters:
+     * @li Effort The force values to set.
+     *
+     * @return SetArmEffort_Responses The Command Response
+     * It contains the following fields:
+     * None
+     *
+     * @throw Validation Error if the given Parameter(s) are invalid
+     */
+    sila2::de::fau::robot::robotcontroller::v1::SetArmEffort_Responses SetArmEffort(SetArmEffortWrapper* command);
+
+    /**
+     * @brief GetArmEffort Command
+     *
+     * @details Get the forces used by the robot links.
+     *
+     * @param Command The current GetArmEffort Command Execution Wrapper
+     * It contains the following Parameters:
+     * None
+     *
+     * @return GetArmEffort_Responses The Command Response
+     * It contains the following fields:
+     * @li Effort The force values to get.
+     *
+     * @throw Validation Error if the given Parameter(s) are invalid
+     */
+    sila2::de::fau::robot::robotcontroller::v1::GetArmEffort_Responses GetArmEffort(GetArmEffortWrapper* command);
+
 private:
     const std::shared_ptr<CSiteManagerImpl> m_SiteManagerPtr;
     GetCurrentFrameCommand m_GetCurrentFrameCommand;
@@ -343,6 +431,10 @@ private:
     FollowFramesCommand m_FollowFramesCommand;
     SetGripperCommand m_SetGripperCommand;
     CloseGripperCommand m_CloseGripperCommand;
+    SetGripperEffortCommand m_SetGripperEffortCommand;
+    GetGripperEffortCommand m_GetGripperEffortCommand;
+    SetArmEffortCommand m_SetArmEffortCommand;
+    GetArmEffortCommand m_GetArmEffortCommand;
     ros::NodeHandle m_RosNode;
     moveit::planning_interface::MoveGroupInterface m_Arm{PANDA_ARM};
     moveit::planning_interface::MoveGroupInterface m_Gripper{PANDA_HAND};
