@@ -15,7 +15,11 @@ sudo apt install -y build-essential autoconf libtool pkg-config cmake
 ```
 
 2. Install [ROS](https://wiki.ros.org/) from the [Install Site](https://wiki.ros.org/ROS/Installation).
-It is recommended to install `ROS Noetic` and the `ros-<distro>-desktop-full` package.
+It is recommended to install `ROS Noetic` and the `ros-<distro>-desktop-full` package. Also install
+the following packages afterwards.
+```
+sudo apt install ros-noetic-moveit ros-noetic-franka-control
+```
 
 3. Install the following packages required for SiLA.
 ```
@@ -87,6 +91,7 @@ git clone --recurse-submodules https://gitlab.com/SiLA2/sila_cpp.git
 cd path/to/sila_cpp
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$LOCAL_INSTALL_DIR
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$LOCAL_INSTALL_DIR/lib"
 cmake --build .
 ```
 
@@ -103,26 +108,32 @@ _Additional links:_
 
 1. Create a Catkin workspace.
 ```bash
-mkdir -p ~/catkin_ws/src/
+mkdir -p catkin_ws/src/
+cd catkin_ws/src/
 ```
 
 2. If the recommended simulation mode should be available as well, the MoveIt-config shall also be built.  
-    2.1 Change into the workspace `src`-dir: `cd ~/catkin_ws/src/`  
-    2.2 Add the `panda_moveit_config` from https://github.com/ros-planning/panda_moveit_config  
-        `git clone https://github.com/ros-planning/panda_moveit_config.git -b melodic-devel`
-
-3. Build the project.
+Add the `panda_moveit_config` from https://github.com/ros-planning/panda_moveit_config  
 ```bash
-cd ~/catkin_ws/
+git clone https://github.com/ros-planning/panda_moveit_config.git -b melodic-devel
+```
+
+3. Clone this project.
+```bash
+git clone --recurse-submodules https://github.com/FlorianBauer/panda-controller.git
+```
+
+4. Build everything.
+```bash
+cd ..
 source /opt/ros/noetic/setup.bash
 catkin_make
 ```
 
-4. Copy the Feature Definition Language files into the directory of the generated binary.
+5. Copy the Feature Definition Language (FDL) files into the directory of the generated binary.
 ```bash
 mkdir -p ./build/panda-controller/bin/meta
-cp ./src/panda-controller/meta/SiteManager.sila.xml ./build/panda-controller/bin/meta/SiteManager.sila.xml
-cp ./src/panda-controller/meta/RobotController.sila.xml ./build/panda-controller/bin/meta/RobotController.sila.xml
+cp ./src/panda-controller/meta/*.sila.xml ./build/panda-controller/bin/meta/
 ```
 
 
@@ -130,15 +141,22 @@ cp ./src/panda-controller/meta/RobotController.sila.xml ./build/panda-controller
 
 1. Start a terminal, source the workspace and launch [MoveIt](https://ros-planning.github.io/moveit_tutorials/).
 ```bash
+cd path/to/catkin_ws
 source devel/setup.bash
 roslaunch panda_moveit_config demo.launch
 ```
 
 2. After RViz has launched, open a new terminal and start the actual SiLA Server.
 ```bash
+cd path/to/catkin_ws
 source devel/setup.bash
 ./build/panda-controller/bin/PandaControlServer
 ```
+
+3. Now you can send commands and control to the robot via SiLA. Therefore, generic SiLA clients can 
+be bound here:
+* [sila-orchestrator](https://github.com/FlorianBauer/sila-orchestrator)
+* [SiLA Browser](https://unitelabs.ch/technology/plug-and-play/sila-browser)
 
 _Troubleshooting:_
 * If a `lib*.so: cannot open shared object file: No such file or directory` error is shown on 
