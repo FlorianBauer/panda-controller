@@ -155,7 +155,7 @@ source devel/setup.bash
 ```
 
 3. Now you can send commands and control to the robot via SiLA. Therefore, generic SiLA clients can 
-be bound here:
+be found here:
 * [sila-orchestrator](https://github.com/FlorianBauer/sila-orchestrator)
 * [SiLA Browser](https://unitelabs.ch/technology/plug-and-play/sila-browser)
 
