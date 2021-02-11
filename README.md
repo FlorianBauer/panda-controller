@@ -42,9 +42,10 @@ _Additional links:_
 
 ### Build and Install gRPC
 
-1. Set the environment variable.
+1. Set the environment variables.
 ```bash
 export LOCAL_INSTALL_DIR=$HOME/.local
+export PATH="$PATH:$LOCAL_INSTALL_DIR/bin"
 ```
 
 2. Create the install directory.
