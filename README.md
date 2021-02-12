@@ -91,14 +91,19 @@ git clone --recurse-submodules https://gitlab.com/SiLA2/sila_cpp.git
 ```bash
 cd path/to/sila_cpp
 mkdir build && cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$LOCAL_INSTALL_DIR
+cmake -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_PREFIX_PATH=$LOCAL_INSTALL_DIR \
+      -DCMAKE_INSTALL_PREFIX=$LOCAL_INSTALL_DIR \
+      ..
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$LOCAL_INSTALL_DIR/lib"
 cmake --build .
 ```
 
 3. Install `sila_cpp`
 ```bash
-sudo cmake --install .
+cmake --install .
+echo "$LOCAL_INSTALL_DIR/lib" | sudo tee /etc/ld.so.conf.d/sila_cpp.conf
+sudo ldconfig
 ```
 
 _Additional links:_  
