@@ -176,7 +176,7 @@ launch file for the actual Franka Control Interface (FCI)).
 
 _Various Notes:_
 To omit sourcing the workspace every time in a new terminal, the setup can be amended into 
-`.bashrc` with `echo 'source ~/catkin_ws/devel/setup.bash' >> ~/.bashrc`
+`.bashrc` with `echo 'source path/to/catkin_ws/devel/setup.bash' >> ~/.bashrc`
 
 To check the proper set up of the workspace `echo $ROS_PACKAGE_PATH` should return something like
 ```
