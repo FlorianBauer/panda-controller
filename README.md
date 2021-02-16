@@ -159,7 +159,7 @@ source devel/setup.bash
 ./build/panda-controller/bin/PandaControlServer
 ```
 
-3. Now you can send commands and control to the robot via SiLA. Therefore, generic SiLA clients can 
+3. Now you can send commands and control the robot via SiLA. Therefore, generic SiLA clients can 
 be found here:
 * [sila-orchestrator](https://github.com/FlorianBauer/sila-orchestrator)
 * [SiLA Browser](https://unitelabs.ch/technology/plug-and-play/sila-browser)
@@ -167,7 +167,13 @@ be found here:
 _Troubleshooting:_
 * If a `lib*.so: cannot open shared object file: No such file or directory` error is shown on 
 start-up of the SiLA server, check the environment was sourced correctly (e.g. with `env`) and is 
-not executed as root-user.
+not executed as root-user. Also, if the `sila_cpp` installation with `ldconfig` failed or was 
+omitted, it might be necessary to set the following environment variable before server start-up.
+```bash
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/.local/lib"
+```
+* On `opt/ros/noetic/lib/lib*.so: undefined reference to *` after an `catkin_build`, check if all 
+ROS packages are up-to-date with `sudo apt update` and `sudo apt dist-upgrade`.
 * If a `WARNING: Could not open FDL file` appears, check if the corresponding Feature Definition 
 Language files are actually available in the `./build/panda-controller/bin/meta/`-directory.
 * On an `[registerPublisher] Failed to contact master at [localhost:11311].  Retrying...` error, 
