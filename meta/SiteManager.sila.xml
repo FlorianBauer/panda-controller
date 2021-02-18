@@ -188,7 +188,7 @@
     <Command>
         <Identifier>PutPlateOnSite</Identifier>
         <DisplayName>Put Plate On Site</DisplayName>
-        <Description>Puts a plate instance form the given pate type on the site.</Description>
+        <Description>Puts a plate instance form the given plate type on the site.</Description>
         <Observable>No</Observable>
         <Parameter>
             <Identifier>PlateTypeId</Identifier>
@@ -401,7 +401,7 @@
     <DataTypeDefinition>
         <Identifier>RelativeMove</Identifier>
         <DisplayName>Relative Move</DisplayName>
-        <Description>A relative move to the given direction without changing the orientation of the robot hand.</Description>
+        <Description>A relative move to the given direction without changing the orientation of the end-effector.</Description>
         <DataType>
             <Structure>
                 <Element>
@@ -534,7 +534,7 @@
     <DefinedExecutionError>
         <Identifier>SiteIsEmpty</Identifier>
         <DisplayName>Site is empty</DisplayName>
-        <Description>Can not remove a item from a empty site.</Description>
+        <Description>Can not remove a item from an empty site.</Description>
     </DefinedExecutionError>
 
     <DefinedExecutionError>

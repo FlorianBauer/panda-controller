@@ -35,7 +35,7 @@ static const SiLA2::CDefinedExecutionError ERROR_ALREADY_OCCUPIED
 static const SiLA2::CDefinedExecutionError ERROR_SITE_IS_EMPTY
 {
     "SiteIsEmpty",
-    "Can not remove a item from a empty site."};
+    "Can not remove a item from an empty site."};
 
 /**
  * @brief The CSiteManagerImpl class implements the SiteManager feature
