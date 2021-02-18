@@ -9,9 +9,9 @@
 using json = nlohmann::json;
 
 /// The length of the robot finger in m.
-static constexpr double FINGER_LENGTH = 0.20;
-/// Finger position relative to end-effector.
-static const tf2::Vector3 FINGER_REL_POS(0.0, 0.0, -FINGER_LENGTH);
+static double fingerLengthInM = DEFAULT_FINGER_LENGHT_IN_M;
+/// Finger tip position relative to end-effector.
+static tf2::Vector3 fingerRelPos(0.0, 0.0, -(fingerLengthInM + DIST_EEF_TO_PALM_IN_M));
 
 Site::Site(const std::string& identifier) {
     id = identifier;
@@ -59,15 +59,7 @@ Site::Site(const json& jsonStruct) {
     }
 
     grasp.grasp_pose.header.frame_id = PANDA_LINK_BASE;
-
-    // Transform position a bit back to grab target with the actual fingers.
-    tf2::Transform trans;
-    tf2::fromMsg(locationPose, trans);
-    tf2::Vector3 transFinger = trans * FINGER_REL_POS;
     grasp.grasp_pose.pose = locationPose;
-    grasp.grasp_pose.pose.position.x = transFinger.getX();
-    grasp.grasp_pose.pose.position.y = transFinger.getY();
-    grasp.grasp_pose.pose.position.z = transFinger.getZ();
 
     grasp.pre_grasp_posture.joint_names.resize(2);
     grasp.pre_grasp_posture.joint_names[0] = PANDA_FINGER_1;
@@ -76,6 +68,11 @@ Site::Site(const json& jsonStruct) {
     grasp.grasp_posture.joint_names.resize(2);
     grasp.grasp_posture.joint_names[0] = PANDA_FINGER_1;
     grasp.grasp_posture.joint_names[1] = PANDA_FINGER_2;
+}
+
+void Site::setFingerLength(double lengthInM) {
+    fingerLengthInM = (lengthInM > 0.0) ? lengthInM : 0.0;
+    fingerRelPos = tf2::Vector3(0.0, 0.0, -(fingerLengthInM + DIST_EEF_TO_PALM_IN_M));
 }
 
 /**
@@ -89,22 +86,22 @@ const std::string& Site::getId() const {
 
 void Site::setPose(const geometry_msgs::Pose& pose) {
     locationPose = pose;
-
-    // Transform position a bit back to grab target with the actual fingers.
-    tf2::Transform trans;
-    tf2::fromMsg(locationPose, trans);
-    tf2::Vector3 transFinger = trans * FINGER_REL_POS;
-
     grasp.grasp_pose.pose = locationPose;
-    grasp.grasp_pose.pose.position.x = transFinger.getX();
-    grasp.grasp_pose.pose.position.y = transFinger.getY();
-    grasp.grasp_pose.pose.position.z = transFinger.getZ();
 }
 
 geometry_msgs::PoseStamped Site::getPose() const {
     geometry_msgs::PoseStamped pose;
     pose.header.frame_id = PANDA_LINK_BASE;
     pose.pose = locationPose;
+
+    // Transform position a bit back to grab target with the actual finger tips.
+    tf2::Transform trans;
+    tf2::fromMsg(locationPose, trans);
+    tf2::Vector3 transFinger = trans * fingerRelPos;
+    pose.pose.position.x = transFinger.getX();
+    pose.pose.position.y = transFinger.getY();
+    pose.pose.position.z = transFinger.getZ();
+
     return pose;
 }
 
@@ -151,7 +148,17 @@ moveit_msgs::GripperTranslation Site::getRetreat() const {
 }
 
 moveit_msgs::Grasp Site::getGrasp() const {
-    return moveit_msgs::Grasp(grasp);
+    // Transform position a bit back to grab target with the actual finger tips.
+    tf2::Transform trans;
+    tf2::fromMsg(locationPose, trans);
+    tf2::Vector3 transFinger = trans * fingerRelPos;
+
+    moveit_msgs::Grasp gr = moveit_msgs::Grasp(grasp);
+    gr.grasp_pose.pose.position.x = transFinger.getX();
+    gr.grasp_pose.pose.position.y = transFinger.getY();
+    gr.grasp_pose.pose.position.z = transFinger.getZ();
+
+    return gr;
 }
 
 moveit_msgs::PlaceLocation Site::getPlaceLocation() const {

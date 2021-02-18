@@ -9,6 +9,11 @@
 #include <nlohmann/json.hpp>
 #include "Plate.h"
 
+/// Distance between EEF and gripper palm is 0.058 m + 0.002 m extra padding.
+static constexpr double DIST_EEF_TO_PALM_IN_M = 0.06;
+/// Default finger length in m.
+static constexpr double DEFAULT_FINGER_LENGHT_IN_M = 0.11;
+
 class Site {
 public:
     // Field identifiers for JSON de-/serialization.
@@ -35,6 +40,7 @@ public:
     Site(Site&& orig) = default;
     virtual ~Site() = default;
 
+    static void setFingerLength(double lengthInM);
     const std::string& getId() const;
     void setPose(const geometry_msgs::Pose& pose);
     geometry_msgs::PoseStamped getPose() const;
