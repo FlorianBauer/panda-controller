@@ -190,9 +190,9 @@ SetSite_Responses CSiteManagerImpl::SetSite(SetSiteWrapper* command) {
     moveit_msgs::GripperTranslation approach;
     approach.desired_distance = approachMove.desireddist().value() * CM_TO_M;
     approach.min_distance = approachMove.mindist().value() * CM_TO_M;
-    approach.direction.vector.x = approachMove.x().value() * CM_TO_M;
-    approach.direction.vector.y = approachMove.y().value() * CM_TO_M;
-    approach.direction.vector.z = approachMove.z().value() * CM_TO_M;
+    approach.direction.vector.x = approachMove.x().value();
+    approach.direction.vector.y = approachMove.y().value();
+    approach.direction.vector.z = approachMove.z().value();
     site.setApproach(approach);
 
     if (!request.retreat().empty()) {
@@ -200,9 +200,9 @@ SetSite_Responses CSiteManagerImpl::SetSite(SetSiteWrapper* command) {
         moveit_msgs::GripperTranslation retreat;
         retreat.desired_distance = retreatMove.desireddist().value() * CM_TO_M;
         retreat.min_distance = retreatMove.mindist().value() * CM_TO_M;
-        retreat.direction.vector.x = retreatMove.x().value() * CM_TO_M;
-        retreat.direction.vector.y = retreatMove.y().value() * CM_TO_M;
-        retreat.direction.vector.z = retreatMove.z().value() * CM_TO_M;
+        retreat.direction.vector.x = retreatMove.x().value();
+        retreat.direction.vector.y = retreatMove.y().value();
+        retreat.direction.vector.z = retreatMove.z().value();
         site.setRetreat(retreat);
     }
 
