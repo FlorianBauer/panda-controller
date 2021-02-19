@@ -20,6 +20,7 @@
 using namespace sila2::de::fau::robot::robotcontroller::v1;
 using moveit::planning_interface::MoveItErrorCode;
 
+constexpr double CM_TO_M = 0.01;
 
 CRobotControllerImpl::CRobotControllerImpl(SiLA2::CSiLAServer* parent,
         const std::shared_ptr<CSiteManagerImpl> siteManagerPtr)
@@ -392,7 +393,7 @@ SetGripper_Responses CRobotControllerImpl::SetGripper(SetGripperWrapper* command
     const auto& request = command->parameters();
     qDebug() << "Request contains:" << request;
 
-    const double halfWidthInM = request.width().value() / 2.0 / 100.0;
+    const double halfWidthInM = request.width().value() / 2.0 * CM_TO_M;
     m_Gripper.setJointValueTarget(std::vector<double>{halfWidthInM, halfWidthInM});
     const MoveItErrorCode err = m_Gripper.move();
     if (err != MoveItErrorCode::SUCCESS) {
