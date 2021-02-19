@@ -290,6 +290,9 @@ FollowPath_Responses CRobotControllerImpl::FollowPath(FollowPathWrapper* command
     const auto request = command->parameters();
     qDebug() << "Request contains:" << request;
 
+    /* Could also be implemented as cartesian path. 
+     * See http://docs.ros.org/en/melodic/api/moveit_tutorials/html/doc/move_group_interface/move_group_interface_tutorial.html#cartesian-paths
+     */
     double progress = 0.0;
     const auto& poseList = request.poselist();
     geometry_msgs::Pose targetPose;
