@@ -20,6 +20,7 @@ using namespace sila2::de::fau::robot::sitemanager::v1;
 using json = nlohmann::json;
 
 constexpr double CM_TO_M = 0.01;
+constexpr double M_TO_CM = 100.0;
 const fs::path CSiteManagerImpl::m_SitesDir{FileManager::getAppDir() / SITES_DIR};
 const fs::path CSiteManagerImpl::m_ColObjDir{FileManager::getAppDir() / COLLISION_OBJECTS_DIR};
 
@@ -127,7 +128,9 @@ m_DeleteSiteCommand{this, "DeleteSite"},
 m_IsSiteOccupiedCommand{this, "IsSiteOccupied"},
 m_PutPlateOnSiteCommand{this, "PutPlateToSite"},
 m_RemovePlateFromSiteCommand{this, "RemovePlateFromSite"},
-m_SitesProperty{this, "Sites"}
+m_SetFingerLengthCommand{this, "SetFingerLength"},
+m_SitesProperty{this, "Sites"},
+m_FingerLengthProperty{this, DEFAULT_FINGER_LENGHT_IN_M * M_TO_CM , "FingerLength"}
 {
     FileManager::checkAndCreateDir(m_ColObjDir);
     loadCollisionObjectsIntoScene(m_PlanningScene);
@@ -146,6 +149,7 @@ m_SitesProperty{this, "Sites"}
     m_IsSiteOccupiedCommand.setExecutor(this, &CSiteManagerImpl::IsSiteOccupied);
     m_PutPlateOnSiteCommand.setExecutor(this, &CSiteManagerImpl::PutPlateOnSite);
     m_RemovePlateFromSiteCommand.setExecutor(this, &CSiteManagerImpl::RemovePlateFromSite);
+    m_SetFingerLengthCommand.setExecutor(this, &CSiteManagerImpl::SetFingerLength);
 }
 
 GetSite_Responses CSiteManagerImpl::GetSite(GetSiteWrapper* command) {
@@ -297,6 +301,21 @@ RemovePlateFromSite_Responses CSiteManagerImpl::RemovePlateFromSite(RemovePlateF
     site.setOccupied(false);
 
     return RemovePlateFromSite_Responses{};
+}
+
+SetFingerLength_Responses CSiteManagerImpl::SetFingerLength(SetFingerLengthWrapper* command) {
+    const auto request = command->parameters();
+    qDebug() << "Request contains:" << request;
+
+    double lengthInCm = request.fingerlength().value();
+    if (lengthInCm < 0.0) {
+        throw SiLA2::CValidationError{"Negative Value", "Negative values are not allowed."};
+    }
+
+    Site::setFingerLength(lengthInCm * CM_TO_M);
+    m_FingerLengthProperty.setValue(lengthInCm);
+
+    return SetFingerLength_Responses{};
 }
 
 /**

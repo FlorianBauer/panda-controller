@@ -13,8 +13,10 @@
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <nlohmann/json.hpp>
 #include <string>
-#include <sila_cpp/server/SiLAFeature.h>
 #include <sila_cpp/data_types.h>
+#include <sila_cpp/framework/error_handling/ExecutionError.h>
+#include <sila_cpp/framework/error_handling/ValidationError.h>
+#include <sila_cpp/server/SiLAFeature.h>
 #include <sila_cpp/server/command/UnobservableCommand.h>
 #include <sila_cpp/server/property/UnobservableProperty.h>
 #include "RelativeMove.h"
@@ -72,8 +74,15 @@ class CSiteManagerImpl final : public SiLA2::CSiLAFeature<sila2::de::fau::robot:
     using RemovePlateFromSiteWrapper = SiLA2::CUnobservableCommandWrapper<
             sila2::de::fau::robot::sitemanager::v1::RemovePlateFromSite_Parameters,
             sila2::de::fau::robot::sitemanager::v1::RemovePlateFromSite_Responses>;
+    using SetFingerLengthCommand =
+            SiLA2::CUnobservableCommandManager<&CSiteManagerImpl::RequestSetFingerLength>;
+    using SetFingerLengthWrapper = SiLA2::CUnobservableCommandWrapper<
+            sila2::de::fau::robot::sitemanager::v1::SetFingerLength_Parameters,
+            sila2::de::fau::robot::sitemanager::v1::SetFingerLength_Responses>;
     using SitesProperty = SiLA2::CUnobservablePropertyWrapper<
             std::vector<SiLA2::CString>, &CSiteManagerImpl::RequestGet_Sites>;
+    using FingerLengthProperty = SiLA2::CUnobservablePropertyWrapper<
+            SiLA2::CReal, &CSiteManagerImpl::RequestGet_FingerLength>;
 
 public:
     /**
@@ -193,6 +202,23 @@ public:
      */
     sila2::de::fau::robot::sitemanager::v1::RemovePlateFromSite_Responses RemovePlateFromSite(RemovePlateFromSiteWrapper* command);
 
+    /**
+     * @brief SetFingerLength Command
+     *
+     * @details Defines the finger length of the gripper used to access the sites.
+     *
+     * @param Command The current SetFingerLength Command Execution Wrapper
+     * It contains the following Parameters:
+     * @li FingerLength The finger length of the gripper.
+     *
+     * @return SetFingerLength_Responses The Command Response
+     * It contains the following fields:
+     * None
+     *
+     * @throw Validation Error if the given Parameter(s) are invalid
+     */
+    sila2::de::fau::robot::sitemanager::v1::SetFingerLength_Responses SetFingerLength(SetFingerLengthWrapper* command);
+
     bool hasSiteId(const std::string& siteId) const;
     Site& getSite(const std::string& siteId);
 
@@ -206,7 +232,9 @@ private:
     IsSiteOccupiedCommand m_IsSiteOccupiedCommand;
     PutPlateOnSiteCommand m_PutPlateOnSiteCommand;
     RemovePlateFromSiteCommand m_RemovePlateFromSiteCommand;
+    SetFingerLengthCommand m_SetFingerLengthCommand;
     SitesProperty m_SitesProperty;
+    FingerLengthProperty m_FingerLengthProperty;
     std::map<std::string, Site> m_Sites;
     moveit::planning_interface::PlanningSceneInterface m_PlanningScene;
 

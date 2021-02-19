@@ -20,6 +20,32 @@
             </List>
         </DataType>
     </Property>
+    
+    <Property>
+        <Identifier>FingerLength</Identifier>
+        <DisplayName>Finger Length</DisplayName>
+        <Description>The finger length of the gripper.</Description>
+        <Observable>No</Observable>
+        <DataType>
+            <Constrained>
+                <DataType>
+                    <Basic>Real</Basic>
+                </DataType>
+                <Constraints>
+                    <MinimalInclusive>0.0</MinimalInclusive>
+                    <Unit>
+                        <Label>cm</Label>
+                        <Factor>0.01</Factor>
+                        <Offset>0</Offset>
+                        <UnitComponent>
+                            <SIUnit>Meter</SIUnit>
+                            <Exponent>1</Exponent>
+                        </UnitComponent>
+                    </Unit>
+                </Constraints>
+            </Constrained>
+        </DataType>
+    </Property>
 
     <Command>
         <Identifier>GetSite</Identifier>
@@ -230,6 +256,37 @@
             <Identifier>SiteIdNotFound</Identifier>
             <Identifier>SiteIsEmpty</Identifier>
         </DefinedExecutionErrors>
+    </Command>
+
+    <Command>
+        <Identifier>SetFingerLength</Identifier>
+        <DisplayName>Set Finger Length</DisplayName>
+        <Description>Defines the finger length of the gripper used to access the sites.</Description>
+        <Observable>No</Observable>
+        <Parameter>
+            <Identifier>FingerLength</Identifier>
+            <DisplayName>Finger Length</DisplayName>
+            <Description>The finger length of the gripper.</Description>
+            <DataType>
+                <Constrained>
+                    <DataType>
+                        <Basic>Real</Basic>
+                    </DataType>
+                    <Constraints>
+                        <MinimalInclusive>0.0</MinimalInclusive>
+                        <Unit>
+                            <Label>cm</Label>
+                            <Factor>0.01</Factor>
+                            <Offset>0</Offset>
+                            <UnitComponent>
+                                <SIUnit>Meter</SIUnit>
+                                <Exponent>1</Exponent>
+                            </UnitComponent>
+                        </Unit>
+                    </Constraints>
+                </Constrained>
+            </DataType>
+        </Parameter>
     </Command>
 
     <DataTypeDefinition>
