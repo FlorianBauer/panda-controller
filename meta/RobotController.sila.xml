@@ -75,6 +75,85 @@
     </Command>
 
     <Command>
+        <Identifier>MoveRelative</Identifier>
+        <DisplayName>Move Relative</DisplayName>
+        <Description>Move in the given direction without changing the current orientation of the end-effector.</Description>
+        <Observable>No</Observable>
+        <Parameter>
+            <Identifier>X</Identifier>
+            <DisplayName>X</DisplayName>
+            <Description>The X direction.</Description>
+            <DataType>
+                <Constrained>
+                    <DataType>
+                        <Basic>Real</Basic>
+                    </DataType>
+                    <Constraints>
+                        <Unit>
+                            <Label>cm</Label>
+                            <Factor>0.01</Factor>
+                            <Offset>0</Offset>
+                            <UnitComponent>
+                                <SIUnit>Meter</SIUnit>
+                                <Exponent>1</Exponent>
+                            </UnitComponent>
+                        </Unit>
+                    </Constraints>
+                </Constrained>
+            </DataType>
+        </Parameter>
+        <Parameter>
+            <Identifier>Y</Identifier>
+            <DisplayName>Y</DisplayName>
+            <Description>The Y direction.</Description>
+            <DataType>
+                <Constrained>
+                    <DataType>
+                        <Basic>Real</Basic>
+                    </DataType>
+                    <Constraints>
+                        <Unit>
+                            <Label>cm</Label>
+                            <Factor>0.01</Factor>
+                            <Offset>0</Offset>
+                            <UnitComponent>
+                                <SIUnit>Meter</SIUnit>
+                                <Exponent>1</Exponent>
+                            </UnitComponent>
+                        </Unit>
+                    </Constraints>
+                </Constrained>
+            </DataType>
+        </Parameter>
+        <Parameter>
+            <Identifier>Z</Identifier>
+            <DisplayName>Z</DisplayName>
+            <Description>The Z direction.</Description>
+            <DataType>
+                <Constrained>
+                    <DataType>
+                        <Basic>Real</Basic>
+                    </DataType>
+                    <Constraints>
+                        <Unit>
+                            <Label>cm</Label>
+                            <Factor>0.01</Factor>
+                            <Offset>0</Offset>
+                            <UnitComponent>
+                                <SIUnit>Meter</SIUnit>
+                                <Exponent>1</Exponent>
+                            </UnitComponent>
+                        </Unit>
+                    </Constraints>
+                </Constrained>
+            </DataType>
+        </Parameter>
+        <DefinedExecutionErrors>
+            <Identifier>InvalidPose</Identifier>
+        </DefinedExecutionErrors>
+    </Command>
+
+    <Command>
         <Identifier>TransportPlate</Identifier>
         <DisplayName>Transport Plate</DisplayName>
         <Description>Transports a plate between the two given sites.</Description>
