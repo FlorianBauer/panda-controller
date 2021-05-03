@@ -1,7 +1,8 @@
 # Panda Controller
 
 A SiLA 2 complaint robot arm controller for an [Panda](https://www.franka.de/technology) from 
-[Franka Emika](https://www.franka.de/). 
+[Franka Emika](https://www.franka.de/). For a short function overview and a description on how to 
+use this software, take a look into the [User Guide](./doc/UserGuide.md).
 
 
 ## Requirements
@@ -33,9 +34,7 @@ The Real-Time kernel is necessary for dealing with actual hardware. If only a si
 [MoveIt](https://ros-planning.github.io/moveit_tutorials/) and RViz is sufficient, this step can be 
 omitted.
 
-TODO: add install instructions
-
-_Additional links:_  
+_Install Instructions:_  
 [Franka Emika Set-Up Guide](https://frankaemika.github.io/docs/installation_linux.html#setting-up-the-real-time-kernel)  
 [RT Kernel Set-Up Guide](https://medium.com/@patdhlk/realtime-linux-e97628b51d5d)
 
