@@ -99,7 +99,7 @@ a site.
 Commands in the `Robot Controller` feature are generally in charge of the actual movements. These 
 can be distinguished in high and low level operations. High level operations such as `Pick Plate`, 
 `Move To Site`, `Place Plate`, `Transport Plate` only require site-IDs and/or plate-IDs. In contrast 
-to this, the low level operations allow direct and fine grained usage of the robot and the gripper. 
+to this, the low level operations allow direct and fine-grained usage of the robot and the gripper. 
 The according parameters must therefore be set to full extent with all their tedious details.
 
 
@@ -108,8 +108,8 @@ The according parameters must therefore be set to full extent with all their ted
 The path planning of a movement is based on inverse kinematics (IK). The integrated IK-Solver 
 relies on the accurate definition of collision objects within a 3D scene to avoid crashes with 
 other objects in the range of the robot arm. These objects are not manageable within the SiLA 
-features. However a collision object (like a wall or a barrier) can be defined externally within 
-JSON files. Therefore a JSON file must be placed in the `.sila/panda_controller/collision_objects` 
+features. However, a collision object (like a wall or a barrier) can be defined externally within 
+JSON files. Therefore, a JSON file must be placed in the `.sila/panda_controller/collision_objects` 
 directory. After defining such a file, the server must be restarted to recognize the change.
 
 The file itself consist of the following fields:

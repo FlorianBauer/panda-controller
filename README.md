@@ -1,6 +1,6 @@
 # Panda Controller
 
-A SiLA 2 complaint robot arm controller for an [Panda](https://www.franka.de/technology) from 
+A SiLA 2 compliant robot arm controller for an [Panda](https://www.franka.de/technology) from 
 [Franka Emika](https://www.franka.de/). For a short function overview and a description on how to 
 use this software, take a look into the [User Guide](./doc/UserGuide.md).
 
